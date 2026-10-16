@@ -1,16 +1,17 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><title>Dashboard</title>
-<style>body{font-family:system-ui;padding:40px;background:#f5f7fb} .card{background:#fff;padding:24px;border-radius:12px;max-width:500px;margin:auto}</style>
-</head><body>
-<div class="card">
-<h1>✅ LOGIN BERHASIL!</h1>
-<p id="user"></p>
-<button onclick="logout()" style="padding:10px 20px;background:#111827;color:#fff;border:0;border-radius:8px;cursor:pointer">LOGOUT</button>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Rekam Medis</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>*{box-sizing:border-box;font-family:system-ui}body{margin:0;background:#f5f7fb}header{background:#111827;color:#fff;padding:16px 24px;display:flex;justify-content:space-between;align-items:center}.container{max-width:1000px;margin:24px auto;padding:0 16px}.card{background:#fff;padding:20px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.05);margin-bottom:16px}input,textarea,select{width:100%;padding:10px;margin:6px 0;border:1px solid #ddd;border-radius:8px}button{padding:10px 16px;background:#111827;color:#fff;border:0;border-radius:8px;cursor:pointer;font-weight:600}button.green{background:#16a34a}table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #eee;text-align:left;font-size:14px}th{background:#f9fafb}</style></head><body>
+<header><b>🏥 Praktek Mandiri - Rekam Medis V6</b><div><span id="userInfo"></span> <button onclick="logout()" style="background:#374151;margin-left:10px">Logout</button></div></header>
+<div class="container">
+<div class="card"><h3>Tambah Pasien Baru</h3><input id="nama" placeholder="Nama Pasien"><input id="umur" type="number" placeholder="Umur"><textarea id="keluhan" placeholder="Keluhan"></textarea><textarea id="diagnosa" placeholder="Diagnosa"></textarea><input id="obat" placeholder="Obat"><button class="green" onclick="tambahPasien()">+ Simpan Pasien</button></div>
+<div class="card"><h3>Data Pasien</h3><table><thead><tr><th>Nama</th><th>Umur</th><th>Keluhan</th><th>Diagnosa</th><th>Obat</th><th>Tanggal</th></tr></thead><tbody id="list"></tbody></table></div>
 </div>
 <script>
-const u=localStorage.getItem("pm_user");
-if(!u) location.href="index.html";
-document.getElementById("user").innerText="Login sebagai: "+u;
+const u=localStorage.getItem("pm_user"); if(!u) location.href="index.html"; document.getElementById("userInfo").innerText=JSON.parse(u).email;
+let pasien = JSON.parse(localStorage.getItem("pasien") || "[]");
+function render(){ const tbody=document.getElementById("list"); tbody.innerHTML=pasien.map(p=>`<tr><td>${p.nama}</td><td>${p.umur}</td><td>${p.keluhan}</td><td>${p.diagnosa}</td><td>${p.obat}</td><td>${new Date(p.tanggal).toLocaleString('id-ID')}</td></tr>`).join(''); }
+function tambahPasien(){ const data={nama:document.getElementById('nama').value,umur:document.getElementById('umur').value,keluhan:document.getElementById('keluhan').value,diagnosa:document.getElementById('diagnosa').value,obat:document.getElementById('obat').value,tanggal:new Date().toISOString()}; if(!data.nama) return alert("Nama wajib!"); pasien.unshift(data); localStorage.setItem("pasien",JSON.stringify(pasien)); render(); document.querySelectorAll('input,textarea').forEach(i=>i.value=''); alert("Pasien disimpan!"); }
 function logout(){ localStorage.removeItem("pm_user"); location.href="index.html"; }
-</script>
-</body></html>
+render();
+</script></body></html>
