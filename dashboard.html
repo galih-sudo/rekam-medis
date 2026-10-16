@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Dashboard</title>
+<style>body{font-family:system-ui;padding:40px;background:#f5f7fb} .card{background:#fff;padding:24px;border-radius:12px;max-width:500px;margin:auto}</style>
+</head><body>
+<div class="card">
+<h1>✅ LOGIN BERHASIL!</h1>
+<p id="user"></p>
+<button onclick="logout()" style="padding:10px 20px;background:#111827;color:#fff;border:0;border-radius:8px;cursor:pointer">LOGOUT</button>
+</div>
+<script>
+const u=localStorage.getItem("pm_user");
+if(!u) location.href="index.html";
+document.getElementById("user").innerText="Login sebagai: "+u;
+function logout(){ localStorage.removeItem("pm_user"); location.href="index.html"; }
+</script>
+</body></html>
