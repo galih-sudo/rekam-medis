@@ -1,19 +1,100 @@
 <!DOCTYPE html>
-<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Rekam Medis V6.1</title>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>RME V13.3 FINAL GAS</title>
+<script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>*{box-sizing:border-box;font-family:system-ui}body{margin:0;background:#f5f7fb}header{background:#111827;color:#fff;padding:16px 24px;display:flex;justify-content:space-between;align-items:center}.container{max-width:1000px;margin:24px auto;padding:0 16px}.card{background:#fff;padding:20px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.05);margin-bottom:16px}input,textarea{width:100%;padding:10px;margin:6px 0;border:1px solid #ddd;border-radius:8px}button{padding:10px 16px;background:#111827;color:#fff;border:0;border-radius:8px;cursor:pointer;font-weight:600}button.green{background:#16a34a}table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #eee;text-align:left;font-size:14px}th{background:#f9fafb}.loading{opacity:.5}</style></head><body>
-<header><b>🏥 Rekam Medis V6.1 - SUPABASE</b><div><span id="userInfo"></span> <button onclick="logout()" style="background:#374151;margin-left:10px">Logout</button></div></header>
-<div class="container">
-<div class="card"><h3>Tambah Pasien Baru</h3><input id="nama" placeholder="Nama Pasien"><input id="umur" type="number" placeholder="Umur"><textarea id="keluhan" placeholder="Keluhan"></textarea><textarea id="diagnosa" placeholder="Diagnosa"></textarea><input id="obat" placeholder="Obat"><button class="green" id="btnSimpan" onclick="tambahPasien()">+ Simpan ke Supabase</button><p id="status" style="font-size:12px;color:#666"></p></div>
-<div class="card"><h3>Data Pasien (Live dari Supabase)</h3><button onclick="loadPasien()">🔄 Refresh</button><table><thead><tr><th>Nama</th><th>Umur</th><th>Keluhan</th><th>Diagnosa</th><th>Obat</th><th>Waktu</th></tr></thead><tbody id="list"></tbody></table></div>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css" rel="stylesheet">
+<style>@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700&display=swap');body{font-family:'Plus Jakarta Sans',sans-serif}.tab-active{background:#7c3aed!important;color:white!important;border-color:#7c3aed!important}</style>
+</head>
+<body class="bg-[#f6f5fb]">
+<div class="bg-white border-b px-4 py-2.5 flex justify-between items-center sticky top-0 z-20">
+<div class="flex items-center gap-2"><div class="w-6 h-6 bg-violet-600 rounded-md flex items-center justify-center text-white"><i class="ri-heart-pulse-fill text-xs"></i></div><h1 class="font-bold text-xs">Praktek dr.Galih V13.3</h1><p class="text-[10px] text-gray-400 ml-2" id="jam">--:--</p></div>
+<div class="flex gap-2"><span id="notifObat" class="hidden bg-red-500 text-white px-2.5 py-1 rounded-full text-[10px] animate-pulse"></span><span class="bg-gray-100 px-2.5 py-1 rounded-full text-[10px]">dr_galih</span></div>
 </div>
+<div class="px-4 py-2 flex gap-1.5 flex-wrap">
+<button onclick="openTab('dashboard')" id="btn-dashboard" class="tab-active px-3 py-1 rounded-full text-[10px] bg-white border font-bold">Dashboard</button>
+<button onclick="openTab('pasien')" id="btn-pasien" class="px-3 py-1 rounded-full text-[10px] bg-white border">Pasien</button>
+<button onclick="openTab('obat')" id="btn-obat" class="px-3 py-1 rounded-full text-[10px] bg-white border">💊 Obat</button>
+<button onclick="openTab('icd')" id="btn-icd" class="px-3 py-1 rounded-full text-[10px] bg-white border">📖 ICD-10</button>
+<button onclick="window.open('ICD10search','_blank')" class="px-3 py-1 rounded-full text-[10px] bg-violet-600 text-white border font-bold animate-pulse">📚 Full 14K</button>
+<button onclick="openTab('laporan')" id="btn-laporan" class="px-3 py-1 rounded-full text-[10px] bg-white border">Laporan</button>
+</div>
+
+<div id="tab-dashboard" class="px-4">
+<div class="flex gap-2"><div class="bg-white px-3 py-2 rounded-xl border-l-2 border-l-blue-500 border h-[44px] min-w-[135px] flex items-center"><div><h3 class="text-[15px] font-bold" id="stat-aktif">0</h3><p class="text-[9px] text-gray-400">Pasien Aktif</p></div></div><div class="bg-white px-3 py-2 rounded-xl border-l-2 border-l-violet-500 border h-[44px] min-w-[100px] flex items-center"><div><h3 class="text-[15px] font-bold" id="stat-total">0</h3><p class="text-[9px] text-gray-400">Total</p></div></div><div class="bg-white px-3 py-2 rounded-xl border-l-2 border-l-orange-400 border h-[44px] min-w-[100px] flex items-center"><div><h3 class="text-[15px] font-bold" id="stat-obat">0</h3><p class="text-[9px] text-gray-400">Jenis Obat</p></div></div></div>
+<div class="mt-3 flex gap-3 items-start">
+<div class="w-[300px] bg-white rounded-xl border p-3"><p class="font-bold text-[11px] mb-2">Input Pasien</p><input id="nama" placeholder="Nama *" class="w-full bg-[#f8f7ff] text-[11px] p-2.5 rounded-lg mb-2 outline-none"><input id="keluhan" placeholder="Keluhan" class="w-full bg-[#f8f7ff] text-[11px] p-2.5 rounded-lg mb-2 outline-none"><div class="flex gap-1 mb-2"><input id="diagnosa" placeholder="Diagnosa - pilih dari ICD" class="flex-1 bg-[#f8f7ff] text-[11px] p-2.5 rounded-lg outline-none"><button onclick="openTab('icd')" class="bg-violet-600 text-white px-2 rounded-lg text-[10px]">ICD</button></div><div class="bg-[#f8f7ff] p-2 rounded-lg mb-2"><p class="text-[10px] font-bold mb-1">Obat (auto kurang stok):</p><select id="pilihObat" class="w-full bg-white text-[11px] p-2 rounded-md border mb-1"><option value="">-- Pilih Obat --</option></select><div class="flex gap-1"><input id="jmlObat" type="number" value="1" class="w-[50px] bg-white text-[11px] p-2 rounded-md border"><button onclick="tambahObatKeResep()" class="flex-1 bg-violet-600 text-white text-[10px] p-2 rounded-md">+ Resep</button></div><div id="listResep" class="mt-2 space-y-1"></div></div><button onclick="simpan()" class="w-full bg-black text-white text-[11px] p-2.5 rounded-lg font-bold">Simpan</button><p id="msg" class="text-[10px] text-center mt-2 font-bold"></p></div>
+<div class="flex-1 bg-white rounded-xl border p-3 max-w-[750px]"><div class="flex justify-between mb-2"><p class="font-bold text-[11px]">Pasien Terbaru</p><input id="cari" oninput="load()" placeholder="Cari..." class="border text-[10px] px-3 py-1 rounded-full w-[130px] bg-[#f8f7ff]"></div><div class="overflow-y-auto max-h-[420px]"><table class="w-full text-[11px]"><thead class="sticky top-0 bg-white"><tr class="text-[9px] text-gray-400 border-b"><th class="text-left py-2">NO RM</th><th>NAMA</th><th>DIAGNOSA</th></tr></thead><tbody id="list"></tbody></table></div></div>
+</div>
+</div>
+
+<div id="tab-icd" class="hidden px-4">
+<div class="flex gap-3 items-start">
+<div class="w-[300px] bg-white rounded-xl border p-3"><p class="font-bold text-[11px] mb-2">Tambah / Edit ICD-10</p><input id="icdKode" placeholder="Kode - mis: I10" class="w-full bg-[#f8f7ff] text-[11px] p-2.5 rounded-lg mb-2 outline-none"><input id="icdNama" placeholder="Nama Diagnosa" class="w-full bg-[#f8f7ff] text-[11px] p-2.5 rounded-lg mb-2 outline-none"><button onclick="simpanICD()" class="w-full bg-violet-600 text-white text-[11px] p-2.5 rounded-lg font-bold">💾 Simpan ICD</button><button onclick="batalICD()" class="w-full bg-gray-100 text-[11px] p-2 rounded-lg mt-1">Batal</button><p id="msgICD" class="text-[10px] text-center mt-2 font-bold"></p><button onclick="window.open('ICD10search','_blank')" class="w-full mt-3 bg-black text-white text-[11px] p-2.5 rounded-lg font-bold">📚 Buka ICD-10 Full 14.000</button></div>
+<div class="flex-1 bg-white rounded-xl border p-3"><div class="flex justify-between mb-3"><h2 class="font-bold text-xs">Master ICD-10 Praktek (<span id="jmlICD">0</span>)</h2><input id="cariICD" oninput="loadICD()" placeholder="Cari kode / nama..." class="border text-[11px] px-3 py-1.5 rounded-full w-[220px] bg-[#f8f7ff]"></div><div class="overflow-auto max-h-[500px]"><table class="w-full text-[11px]"><thead class="sticky top-0 bg-white"><tr class="text-[9px] text-gray-400 border-b"><th class="text-left py-2">KODE</th><th class="text-left">DIAGNOSA</th><th class="text-right">AKSI</th></tr></thead><tbody id="listICD"></tbody></table></div></div>
+</div>
+</div>
+
+<div id="tab-obat" class="hidden px-4"><div class="flex gap-3 items-start"><div class="w-[280px] bg-white rounded-xl border p-3"><p class="font-bold text-[11px] mb-2">Masuk Obat Baru</p><input id="namaObat" placeholder="Nama Obat *" class="w-full bg-[#f8f7ff] text-[11px] p-2.5 rounded-lg mb-2"><div class="grid grid-cols-2 gap-2 mb-2"><input id="stokObat" type="number" placeholder="Stok" class="bg-[#f8f7ff] text-[11px] p-2.5 rounded-lg"><input id="stokMin" type="number" placeholder="Min Stok" class="bg-[#f8f7ff] text-[11px] p-2.5 rounded-lg"></div><input id="expObat" type="date" class="w-full bg-[#f8f7ff] text-[11px] p-2.5 rounded-lg mb-2"><button onclick="simpanObat()" class="w-full bg-violet-600 text-white text-[11px] p-2.5 rounded-lg font-bold">Simpan Obat</button><p id="msgObat" class="text-[10px] text-center mt-2 font-bold"></p></div><div class="flex-1 bg-white rounded-xl border p-3"><div class="flex justify-between mb-3"><h2 class="font-bold text-xs">Stok Obat</h2><input id="cariObat" oninput="loadObat()" placeholder="Cari obat..." class="border text-[11px] px-3 py-1.5 rounded-full w-[180px] bg-[#f8f7ff]"></div><div class="overflow-auto max-h-[500px]"><table class="w-full text-[11px]"><thead><tr class="text-[9px] text-gray-400 border-b"><th>NAMA</th><th>STOK</th><th>MIN</th><th>EXP</th><th>STATUS</th><th class="text-right">AKSI</th></tr></thead><tbody id="listObat"></tbody></table></div></div></div></div>
+<div id="tab-pasien" class="hidden px-4"><div class="bg-white rounded-xl border p-3"><div class="flex justify-between mb-3"><h2 class="font-bold text-xs">Semua Pasien</h2><input id="cariPasien" oninput="loadPasien()" placeholder="Cari..." class="border text-[11px] px-3 py-1.5 rounded-full w-[200px] bg-[#f8f7ff]"></div><div class="overflow-auto"><table class="w-full text-[11px]"><thead><tr class="text-[9px] text-gray-400 border-b"><th>NO RM</th><th>NAMA</th><th>TERAPI</th><th>TGL</th></tr></thead><tbody id="listPasien"></tbody></table></div></div></div>
+<div id="tab-laporan" class="hidden px-4"><div class="bg-white rounded-xl border p-4 max-w-[700px]"><h2 class="font-bold text-xs mb-3">Laporan</h2><div class="grid grid-cols-3 gap-3"><div class="bg-[#f8f7ff] p-3 rounded-xl text-center"><h3 class="text-xl font-bold" id="lap-total">0</h3><p class="text-[10px]">Total Pasien</p></div><div class="bg-[#fef2f2] p-3 rounded-xl text-center"><h3 class="text-xl font-bold text-red-600" id="lap-obat-tipis">0</h3><p class="text-[10px]">Obat Menipis</p></div><div class="bg-[#f0fdf4] p-3 rounded-xl text-center"><h3 class="text-xl font-bold" id="jmlICD2">0</h3><p class="text-[10px]">Master ICD</p></div></div></div></div>
+
 <script>
-const SUPABASE_URL = "https://gfkacaaairtwpbddingt.supabase.co";
-const SUPABASE_KEY = "sb_publishable_jAbUqEKBWbs7CoupX3SHfQ_JsLpyNbS";
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const u=localStorage.getItem("pm_user"); if(!u) location.href="index.html"; document.getElementById("userInfo").innerText=JSON.parse(u).email;
-async function loadPasien(){ document.getElementById("list").innerHTML="<tr><td colspan=6>Loading...</td></tr>"; const {data,error}=await sb.from("pasien").select("*").order("created_at",{ascending:false}); if(error){ document.getElementById("list").innerHTML=`<tr><td colspan=6 style=color:red>Error: ${error.message}. Pastikan udah bikin table pasien di SQL Editor!</td></tr>`; return;} document.getElementById("list").innerHTML=data.map(p=>`<tr><td>${p.nama}</td><td>${p.umur}</td><td>${p.keluhan}</td><td>${p.diagnosa}</td><td>${p.obat}</td><td>${new Date(p.created_at).toLocaleString('id-ID')}</td></tr>`).join('') || "<tr><td colspan=6>Belum ada data</td></tr>"; }
-async function tambahPasien(){ const btn=document.getElementById("btnSimpan"); btn.disabled=true; btn.innerText="Menyimpan..."; const payload={nama:document.getElementById('nama').value,umur:parseInt(document.getElementById('umur').value)||null,keluhan:document.getElementById('keluhan').value,diagnosa:document.getElementById('diagnosa').value,obat:document.getElementById('obat').value}; if(!payload.nama){ alert("Nama wajib!"); btn.disabled=false; btn.innerText="+ Simpan ke Supabase"; return;} const {error}=await sb.from("pasien").insert([payload]); if(error){ alert("Gagal: "+error.message); } else { document.querySelectorAll('input,textarea').forEach(i=>i.value=''); document.getElementById("status").innerText="✅ Berhasil disimpan ke Supabase!"; loadPasien(); } btn.disabled=false; btn.innerText="+ Simpan ke Supabase"; }
-function logout(){ localStorage.removeItem("pm_user"); location.href="index.html"; }
-loadPasien();
-</script></body></html>
+const SUPA_URL="https://nswjbvjcwbwezejbfsvh.supabase.co";
+const SUPA_KEY="sb_publishable_z5cplyeMi0iJv_a5341pZQ_6IEEoq2a";
+const client=supabase.createClient(SUPA_URL,SUPA_KEY);
+let resepSementara=[]; let editICDMode=false;
+function openTab(name){['dashboard','pasien','obat','icd','laporan'].forEach(t=>{document.getElementById('tab-'+t).classList.add('hidden');document.getElementById('btn-'+t).classList.remove('tab-active');});document.getElementById('tab-'+name).classList.remove('hidden');document.getElementById('btn-'+name).classList.add('tab-active');if(name=='pasien')loadPasien();if(name=='obat')loadObat();if(name=='icd')loadICD();if(name=='laporan')loadLaporan();}
+async function load(){const {data}=await client.from('pasien').select('*').order('created_at',{ascending:false});const f=data||[];document.getElementById('stat-total').innerText=f.length;document.getElementById('stat-aktif').innerText=f.length;const tbody=document.getElementById('list');tbody.innerHTML='';f.slice(0,8).forEach(r=>{tbody.innerHTML+=`<tr class="border-b"><td class="py-2 font-bold">${r.no_rm}</td><td>${r.nama}</td><td>${r.diagnosa||'-'}</td></tr>`});}
+async function loadICD(){
+ const q=(document.getElementById('cariICD').value||'').toLowerCase();
+ const {data}=await client.from('icd10').select('*').order('kode',{ascending:true});
+ let f=data||[]; if(q) f=f.filter(i=>i.kode.toLowerCase().includes(q)||i.nama.toLowerCase().includes(q));
+ document.getElementById('jmlICD').innerText=f.length; document.getElementById('jmlICD2')&&(document.getElementById('jmlICD2').innerText=f.length);
+ const tbody=document.getElementById('listICD'); tbody.innerHTML='';
+ f.forEach(i=>{tbody.innerHTML+=`<tr class="border-b hover:bg-[#faf8ff]"><td class="py-2 font-bold text-violet-600">${i.kode}</td><td>${i.nama}</td><td class="text-right"><button onclick="pakaiICD('${i.kode}','${i.nama}')" class="bg-violet-600 text-white px-3 py-1 rounded-full text-[9px] mr-1">PAKAI</button><button onclick="editICD('${i.kode}','${i.nama}')" class="bg-gray-100 px-2 py-1 rounded-full text-[9px] mr-1">Edit</button><button onclick="hapusICD('${i.kode}')" class="text-red-400 text-[9px]">Hapus</button></td></tr>`});
+}
+async function simpanICD(){
+ const kode=document.getElementById('icdKode').value.trim().toUpperCase(); const nama=document.getElementById('icdNama').value.trim();
+ if(!kode||!nama){document.getElementById('msgICD').innerText='Kode & Nama wajib!'; return;}
+ if(editICDMode){
+  const {error}=await client.from('icd10').update({nama}).eq('kode',kode);
+  if(error) msgICD.innerText=error.message; else{msgICD.innerText='✅ Update!'; batalICD(); loadICD();}
+ } else {
+  const {error}=await client.from('icd10').insert([{kode,nama}]);
+  if(error) msgICD.innerText='❌ '+error.message; else{msgICD.innerText='✅ Tambah!'; batalICD(); loadICD();}
+ }
+}
+function editICD(kode,nama){document.getElementById('icdKode').value=kode; document.getElementById('icdNama').value=nama; document.getElementById('icdKode').disabled=true; editICDMode=true; msgICD.innerText='Edit mode: '+kode;}
+function batalICD(){document.getElementById('icdKode').value=''; document.getElementById('icdNama').value=''; document.getElementById('icdKode').disabled=false; editICDMode=false; msgICD.innerText='';}
+async function hapusICD(kode){if(!confirm('Hapus '+kode+'?')) return; await client.from('icd10').delete().eq('kode',kode); loadICD();}
+function pakaiICD(kode,nama){document.getElementById('diagnosa').value=`${kode} - ${nama}`; openTab('dashboard');}
+async function loadObat(){
+ const {data}=await client.from('obat').select('*').order('nama_obat',{ascending:true});
+ const q=(cariObat.value||'').toLowerCase(); let f=data||[]; if(q) f=f.filter(o=>o.nama_obat.toLowerCase().includes(q));
+ document.getElementById('stat-obat').innerText=f.length;
+ const sel=document.getElementById('pilihObat'); sel.innerHTML='<option value="">-- Pilih Obat --</option>'; f.forEach(o=>{sel.innerHTML+=`<option value="${o.id}|${o.nama_obat}|${o.stok}">${o.nama_obat} (stok:${o.stok})</option>`});
+ const tbody=document.getElementById('listObat'); tbody.innerHTML=''; let tipis=0;
+ f.forEach(o=>{
+  const isTipis=o.stok<=o.stok_minimal; if(isTipis) tipis++; const status=isTipis?'<span class="bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full text-[9px]">MENIPIS</span>':'<span class="bg-green-50 text-green-600 px-2 py-0.5 rounded-full text-[9px]">Aman</span>';
+  tbody.innerHTML+=`<tr class="border-b ${isTipis?'bg-orange-50':''}"><td class="py-2 font-medium">${o.nama_obat}</td><td class="text-center font-bold">${o.stok}</td><td class="text-center">${o.stok_minimal}</td><td class="text-[10px]">${o.tgl_expired||'-'}</td><td>${status}</td><td class="text-right"><button onclick="hapusObat('${o.id}')" class="text-red-400 text-[9px]">Hapus</button></td></tr>`;
+ });
+ const notif=document.getElementById('notifObat'); if(tipis>0){notif.classList.remove('hidden'); notif.innerText=`⚠️ ${tipis} obat menipis`;} else notif.classList.add('hidden');
+}
+async function simpanObat(){if(!namaObat.value.trim()){msgObat.innerText='Nama wajib!'; return;} const payload={nama_obat:namaObat.value, stok:parseInt(stokObat.value)||0, stok_minimal:parseInt(stokMin.value)||10, tgl_expired:expObat.value||null}; const {error}=await client.from('obat').insert([payload]); if(error) msgObat.innerText=error.message; else{msgObat.innerText='✅ Obat masuk!'; namaObat.value='';stokObat.value='';stokMin.value='';expObat.value=''; loadObat();}}
+async function hapusObat(id){if(!confirm('Hapus?')) return; await client.from('obat').delete().eq('id',id); loadObat();}
+function tambahObatKeResep(){const val=pilihObat.value; if(!val){alert('Pilih obat!'); return;} const [id,nama,stok]=val.split('|'); const jml=parseInt(jmlObat.value)||1; if(jml>parseInt(stok)){alert('Stok kurang!'); return;} resepSementara.push({id,nama,jml}); renderResep();}
+function renderResep(){const div=document.getElementById('listResep'); div.innerHTML=''; resepSementara.forEach((r,i)=>{div.innerHTML+=`<div class="flex justify-between bg-white p-1.5 rounded border text-[10px]"><span>${r.nama} x${r.jml}</span><button onclick="resepSementara.splice(${i},1);renderResep()" class="text-red-500">x</button></div>`});}
+async function simpan(){
+ if(!nama.value.trim()){msg.innerText='Nama wajib!'; return;} msg.innerText='Membuat RM...';
+ const th=new Date().getFullYear().toString().slice(-2); const {data}=await client.from('pasien').select('no_rm').like('no_rm',th+'-%').order('no_rm',{ascending:false}).limit(1);
+ let next=1; if(data&&data.length>0){const p=data[0].no_rm.split('-'); if(p.length==2) next=parseInt(p[1])+1;} const noRM=`${th}-${String(next).padStart(4,'0')}`;
+ let terapiText=resepSementara.map(r=>`${r.nama} x${r.jml}`).join(', ');
+ for(const r of resepSementara){const {data:ob}=await client.from('obat').select('stok').eq('id',r.id).single(); if(ob) await client.from('obat').update({stok:ob.stok-r.jml}).eq('id',r.id);}
+ const payload={no_rm:noRM,nama:nama.value,keluhan:keluhan.value,diagnosa:diagnosa.value,terapi:terapiText,status:'Aktif'};
+ const {error}=await client.from('pasien').insert([payload]); if(error) msg.innerText=error.message; else{msg.innerText='✅ '+noRM+' OK!'; nama.value='';keluhan.value='';diagnosa.value='';resepSementara=[];renderResep(); load(); loadObat();}
+}
+async function loadPasien(){const {data}=await client.from('pasien').select('*').order('created_at',{ascending:false});const tbody=document.getElementById('listPasien');tbody.innerHTML='';data?.forEach(r=>{tbody.innerHTML+=`<tr class="border-b"><td class="py-2 font-bold">${r.no_rm}</td><td>${r.nama}</td><td>${r.terapi||'-'}</td><td>${new Date(r.created_at).toLocaleDateString('id-ID')}</td></tr>`});}
+async function loadLaporan(){const {data}=await client.from('pasien').select('*');document.getElementById('lap-total')&&(document.getElementById('lap-total').innerText=data?.length||0);}
+document.getElementById('jam').innerText=new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}); load(); loadObat(); loadICD();
+</script>
+</body></html>

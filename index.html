@@ -1,52 +1,28 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Praktek Mandiri - V5.1 Fix Login</title>
-<style>
-*{box-sizing:border-box;font-family:system-ui}
-body{margin:0;background:#f5f7fb;display:flex;align-items:center;justify-content:center;min-height:100vh}
-.card{background:#fff;padding:32px;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.1);width:360px}
-h2{text-align:center;margin:0 0 20px}
-input{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:8px}
-button{width:100%;padding:12px;background:#111827;color:#fff;border:0;border-radius:8px;cursor:pointer;margin-top:12px;font-weight:600}
-button:hover{background:#000}
-.error{color:#dc2626;font-size:13px;margin-top:8px;display:none;text-align:center}
-.info{background:#eef2ff;padding:10px;border-radius:8px;font-size:12px;margin-top:12px;text-align:center}
-</style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - V8 Premium</title>
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<div class="card">
-<h2>Praktek Mandiri<br><small style="font-size:12px;color:#666">V5.1 - Fix Login</small></h2>
-<input id="email" placeholder="Email / Username" value="admin">
-<input id="pass" type="password" placeholder="Password" value="admin123">
-<button onclick="login()">LOGIN</button>
-<div id="err" class="error">Invalid login credentials</div>
-<div class="info">Email: <b>admin</b><br>Pass: <b>admin123</b></div>
-<div style="margin-top:16px;text-align:center">
-<button onclick="loginGH()" style="background:#24292f">Login GitHub (dr. Galih)</button>
+<body class="min-h-screen bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center p-4">
+<div class="bg-white w-full max-w-[400px] rounded-[24px] p-8 shadow-2xl text-center">
+<div class="text-5xl mb-2">🏥</div>
+<h2 class="text-2xl font-bold text-violet-700">Dr. Galih Clinic</h2>
+<p class="text-gray-500 text-sm mb-6">Praktik Medis Modern - V8 Premium</p>
+<input id="user" class="w-full p-3 border rounded-xl mb-3" placeholder="Username">
+<input id="pass" type="password" class="w-full p-3 border rounded-xl mb-3" placeholder="Password">
+<button onclick="login()" class="w-full bg-violet-600 text-white p-3 rounded-xl font-bold hover:bg-violet-700">LOGIN</button>
+<div class="mt-4 bg-gray-50 p-3 rounded-xl text-left text-[13px] leading-6">
+<b class="text-violet-600">Akun:</b><br>
+👨‍⚕️ dokter / dokter123<br>
+👩‍⚕️ perawat / perawat123<br>
+👑 admin / admin
 </div>
 </div>
 <script>
-function login(){
-  const e=document.getElementById('email').value.trim().toLowerCase();
-  const p=document.getElementById('pass').value.trim();
-  console.log("TRY",e,p);
-  if((e==="admin" || e==="admin@local" || e==="admin@admin.com") && p==="admin123"){
-    localStorage.setItem("pm_user", JSON.stringify({email:"admin", role:"admin"}));
-    location.href="dashboard.html";
-  } else {
-    document.getElementById('err').style.display="block";
-    document.getElementById('err').innerText="Invalid login: "+e+" / "+p;
-  }
-}
-function loginGH(){
-  localStorage.setItem("pm_user", JSON.stringify({email:"galih@github", role:"admin"}));
-  location.href="dashboard.html";
-}
-// Enter key
-document.getElementById('pass').addEventListener('keyup', e=>{ if(e.key==="Enter") login(); });
+const USERS=[{u:'admin',p:'admin',role:'Admin',nama:'Admin'},{u:'dokter',p:'dokter123',role:'Dokter',nama:'dr. Galih'},{u:'perawat',p:'perawat123',role:'Perawat',nama:'Perawat Jaga'}];
+function login(){const u=user.value.trim(),p=pass.value.trim(),f=USERS.find(x=>x.u===u&&x.p===p);if(f){localStorage.setItem('login','ok');localStorage.setItem('role',f.role);localStorage.setItem('nama_user',f.nama);location.href='dashboard.html';}else alert('Salah!');}
 </script>
 </body>
 </html>

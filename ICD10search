@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ICD-10 Full V2 Auto Save</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css" rel="stylesheet">
+<style>@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700&display=swap');body{font-family:'Plus Jakarta Sans',sans-serif}</style>
+</head>
+<body class="bg-[#f6f5fb] min-h-screen">
+<div class="bg-white border-b px-5 py-4 sticky top-0 z-10"><div class="flex justify-between items-center max-w-6xl mx-auto"><div class="flex items-center gap-3"><div class="w-9 h-9 bg-violet-600 rounded-xl flex items-center justify-center text-white"><i class="ri-book-2-fill"></i></div><div><h1 class="font-bold text-[14px]">ICD-10 Full V2 - Auto Save</h1><p class="text-[11px] text-gray-400">Drop sekali, kepake selamanya!</p></div></div><div class="flex gap-2"><span id="count" class="text-[10px] bg-violet-50 text-violet-600 px-3 py-1.5 rounded-full">0 kode</span><button onclick="hapusCache()" class="text-[10px] bg-red-50 text-red-500 px-3 py-1.5 rounded-full">Hapus Cache</button></div></div></div>
+
+<div class="max-w-6xl mx-auto px-5 py-6">
+<div id="statusBox" class="bg-white border rounded-2xl p-4 mb-4 hidden"><p id="statusText" class="text-[12px]"></p></div>
+
+<div id="dropZone" class="bg-white border-2 border-dashed border-violet-200 rounded-2xl p-6 text-center cursor-pointer hover:border-violet-400">
+<i class="ri-upload-cloud-2-line text-3xl text-violet-300"></i>
+<p class="font-bold text-[12px] mt-2">Drop file master_icd_x.sql disini (CUKUP SEKALI)</p><p class="text-[10px] text-gray-400">Setelah itu auto kesimpen di browser lu</p>
+<input type="file" id="fileInput" accept=".sql,.txt" class="hidden">
+</div>
+
+<div class="mt-4 bg-white rounded-2xl border p-4">
+<div class="flex gap-2"><div class="flex-1 relative"><i class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i><input id="search" placeholder="Ketik diagnosa... contoh: hipertensi, diabetes, I10, J06" class="w-full bg-[#f8f7ff] border text-[13px] pl-10 pr-4 py-3 rounded-xl outline-none"></div><button onclick="clearSearch()" class="bg-black text-white px-5 rounded-xl text-[12px]">Clear</button></div>
+</div>
+
+<div class="mt-4 bg-white rounded-2xl border overflow-hidden"><div class="px-4 py-3 border-b flex justify-between"><h2 class="font-bold text-[12px]">Hasil</h2><span id="resultInfo" class="text-[10px] text-gray-400"></span></div><div class="overflow-auto max-h-[65vh]"><table class="w-full text-[12px]"><thead class="sticky top-0 bg-white border-b text-[10px] text-gray-400"><tr><th class="text-left py-2 px-4 w-[90px]">KODE</th><th class="text-left">DIAGNOSA</th><th class="text-right px-4 w-[120px]">AKSI</th></tr></thead><tbody id="results"></tbody></table></div></div>
+</div>
+
+<script>
+let icdData = [];
+const CACHE_KEY = 'icd10_full_cache_v2';
+
+// 1. COBA LOAD DARI CACHE DULU PAS BUKA
+window.onload = () => {
+ const cached = localStorage.getItem(CACHE_KEY);
+ if(cached){
+   try{
+     icdData = JSON.parse(cached);
+     document.getElementById('count').innerText = icdData.length.toLocaleString('id-ID') + ' kode (dari cache)';
+     document.getElementById('statusBox').classList.remove('hidden');
+     document.getElementById('statusText').innerHTML = `✅ <b>${icdData.length.toLocaleString()}</b> kode auto-loaded dari cache! Gak perlu drop lagi bro!`;
+     document.getElementById('dropZone').classList.add('hidden');
+     renderResults(icdData.slice(0,100));
+     document.getElementById('resultInfo').innerText = `Menampilkan 100 dari ${icdData.length} (auto load)`;
+   }catch(e){ localStorage.removeItem(CACHE_KEY); }
+ } else {
+   // Demo kecil biar gak kosong
+   icdData = [{kode:'I10',nama:'Essential hypertension'},{kode:'E11.9',nama:'Type 2 diabetes'},{kode:'J06.9',nama:'ISPA'},{kode:'K29.7',nama:'Gastritis'}];
+   renderResults(icdData);
+ }
+};
+
+function handleFile(file){
+ if(!file) return;
+ const reader = new FileReader();
+ reader.onload = (e) => {
+   const text = e.target.result;
+   const regex = /\(['"]([A-Z0-9\.]+)['"]\s*,\s*['"]([^'"]+)['"]/gi;
+   let m, parsed=[];
+   while((m=regex.exec(text))!==null){ parsed.push({kode:m[1].trim(),nama:m[2].trim()}); }
+   if(parsed.length > 100){
+     icdData = parsed;
+     // SIMPAN KE CACHE! INI KUNCINYA!
+     try{
+       localStorage.setItem(CACHE_KEY, JSON.stringify(icdData));
+       document.getElementById('statusBox').classList.remove('hidden');
+       document.getElementById('statusText').innerHTML = `✅ <b>${icdData.length.toLocaleString()}</b> kode berhasil disimpan! Besok buka lagi langsung ada, gak usah drop lagi!`;
+       document.getElementById('dropZone').classList.add('hidden');
+     }catch(err){ alert('Gagal simpan cache, file kegedean buat localStorage. Coba versi IndexedDB.'); }
+     document.getElementById('count').innerText = icdData.length.toLocaleString('id-ID') + ' kode';
+     renderResults(icdData.slice(0,100));
+   } else alert('Format tidak dikenali bro!');
+ };
+ reader.readAsText(file);
+}
+
+const dropZone=document.getElementById('dropZone'); const fileInput=document.getElementById('fileInput');
+dropZone.onclick=()=>fileInput.click();
+dropZone.ondragover=(e)=>{e.preventDefault();dropZone.classList.add('border-violet-500')};
+dropZone.ondragleave=()=>dropZone.classList.remove('border-violet-500');
+dropZone.ondrop=(e)=>{e.preventDefault();dropZone.classList.remove('border-violet-500');handleFile(e.dataTransfer.files[0]);};
+fileInput.onchange=(e)=>handleFile(e.target.files[0]);
+
+function renderResults(data){
+ const tbody=document.getElementById('results'); tbody.innerHTML='';
+ data.forEach(item=>{
+   tbody.innerHTML+=`<tr class="border-b hover:bg-[#faf8ff]"><td class="py-2.5 px-4 font-bold text-violet-600">${item.kode}</td><td class="py-2.5">${item.nama}</td><td class="py-2.5 px-4 text-right"><button onclick="copyKode('${item.kode} - ${item.nama.replace(/'/g,"")}')" class="bg-violet-600 text-white px-3 py-1 rounded-full text-[10px]">COPY</button></td></tr>`;
+ });
+}
+document.getElementById('search').addEventListener('input',(e)=>{
+ const q=e.target.value.toLowerCase().trim();
+ if(q.length<2){renderResults(icdData.slice(0,100));return;}
+ const f=icdData.filter(i=>i.kode.toLowerCase().includes(q)||i.nama.toLowerCase().includes(q)).slice(0,200);
+ renderResults(f); document.getElementById('resultInfo').innerText=`${f.length} hasil untuk "${q}"`;
+});
+function copyKode(t){navigator.clipboard.writeText(t); document.getElementById('resultInfo').innerText=`✅ Copied: ${t}`;}
+function clearSearch(){document.getElementById('search').value='';renderResults(icdData.slice(0,100));}
+function hapusCache(){if(confirm('Hapus cache ICD? Nanti harus drop lagi!')){localStorage.removeItem(CACHE_KEY);location.reload();}}
+</script>
+</body></html>
