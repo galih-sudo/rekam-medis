@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - Praktek dr Galih</title>
+<style>
+*{box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#dbeafe 0%,#e0f2fe 30%,#f0fdfa 60%,#fef9c3 100%);padding:16px}
+.card-login{background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-radius:24px;padding:30px;box-shadow:0 20px 60px rgba(59,130,246,.15);border:1px solid rgba(255,255,255,.9);width:100%;max-width:380px}
+.logo{text-align:center;margin-bottom:24px}
+.logo b{font-size:22px;background:linear-gradient(90deg,#2563eb,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.logo div{font-size:11px;color:#64748b;margin-top:4px}
+.input{width:100%;padding:14px 16px;border:1px solid #e2e8f0;border-radius:14px;background:#f8fafc;font-size:13px;margin-bottom:12px;transition:.2s}
+.input:focus{outline:none;border-color:#3b82f6;background:#fff;box-shadow:0 0 0 4px #dbeafe}
+.btn-login{width:100%;padding:14px;border:0;border-radius:14px;background:linear-gradient(90deg,#2563eb,#06b6d4);color:#fff;font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(37,99,235,.3);margin-top:6px;transition:.2s}
+.btn-login:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(37,99,235,.4)}
+.footer{text-align:center;margin-top:16px;font-size:9px;color:#94a3b8}
+</style>
+</head>
+<body>
+<div class="card-login">
+<div class="logo"><b>Praktek dr Galih</b><div>Jl Raya Sengkol Mantang • Lombok Tengah NTB</div></div>
+<input id="username" class="input" placeholder="Username" autocomplete="off" autocorrect="off" spellcheck="false">
+<input id="password" class="input" type="password" placeholder="Password">
+<button class="btn-login" onclick="login()">Masuk ➜</button>
+<div class="footer">Melayani Dengan Hati ❤️ • Sistem Real • <span id="jamLogin">--:--:--</span></div>
+</div>
+<script>
+function getUsers(){
+var u=localStorage.getItem('usersV8');
+if(!u){
+var def=[
+{username:'admin',password:'admin123',nama:'Admin',role:'admin'},
+{username:'galih',password:'galih123',nama:'dr Galih',role:'dokter'},
+{username:'perawat',password:'perawat123',nama:'Perawat',role:'perawat'}
+];
+localStorage.setItem('usersV8',JSON.stringify(def));
+return def;
+}
+return JSON.parse(u);
+}
+function login(){
+var u=document.getElementById('username').value.trim().toLowerCase();
+var p=document.getElementById('password').value;
+var users=getUsers();
+var found=users.find(function(x){return x.username.toLowerCase()===u && x.password===p});
+if(found){
+localStorage.setItem('loginUser',found.nama);
+localStorage.setItem('username',found.username);
+localStorage.setItem('role',found.role);
+localStorage.setItem('isLogin','1');
+location.href='./dashboard.html';
+} else {
+alert('Username atau Password salah!');
+}
+}
+document.addEventListener('keydown',function(e){if(e.key==='Enter')login();});
+function updateJam(){
+var now=new Date();
+document.getElementById('jamLogin').textContent=now.toLocaleTimeString('id-ID');
+}
+updateJam();setInterval(updateJam,1000);
+</script>
+</body></html>

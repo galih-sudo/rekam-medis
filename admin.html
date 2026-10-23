@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Kelola User - Admin</title>
+<style>
+*{box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
+body{margin:0;min-height:100vh;background:linear-gradient(135deg,#dbeafe 0%,#f0fdfa 50%,#fef9c3 100%)}
+.header{background:rgba(255,255,255,.9);backdrop-filter:blur(12px);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 20px rgba(59,130,246,.1);border-bottom:1px solid rgba(59,130,246,.1);position:sticky;top:0;z-index:10}
+.header b{font-size:15px;background:linear-gradient(90deg,#2563eb,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.btn{border:0;padding:8px 14px;border-radius:999px;font-weight:700;cursor:pointer;font-size:11px}
+.btn-back{background:#fff;border:1px solid #e2e8f0;color:#334155}
+.btn-save{background:linear-gradient(90deg,#2563eb,#06b6d4);color:#fff}
+.container{max-width:900px;margin:0 auto;padding:18px}
+.card{background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border-radius:20px;padding:20px;box-shadow:0 8px 30px rgba(0,0,0,.06);border:1px solid rgba(255,255,255,.9);margin-bottom:16px}
+.input, .select{width:100%;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc;font-size:13px;margin-bottom:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+table{width:100%;border-collapse:collapse;margin-top:12px}th{font-size:9px;color:#94a3b8;text-align:left;padding:10px 8px;border-bottom:1px solid #f1f5f9;text-transform:uppercase}td{padding:10px 8px;border-bottom:1px solid #f8fafc;font-size:12px}
+.badge{padding:3px 8px;border-radius:999px;font-size:9px;font-weight:800;border:1px solid}
+.b-admin{background:#ede9fe;color:#5b21b6;border-color:#ddd6fe}
+.b-dokter{background:#dbeafe;color:#1e40af;border-color:#bfdbfe}
+.b-perawat{background:#fef3c7;color:#92400e;border-color:#fde68a}
+</style>
+</head>
+<body>
+<div class="header"><b>👑 Kelola User - Admin</b><div style="display:flex;gap:8px"><button onclick="location.href='./dashboard.html'" class="btn btn-back">← Dashboard</button><button onclick="logout()" class="btn" style="background:linear-gradient(90deg,#ef4444,#dc2626);color:#fff">Logout</button></div></div>
+<div class="container">
+<div id="aksesDitolak" style="display:none" class="card"><h3 style="color:#dc2626">🔒 Hanya Admin</h3><p style="font-size:13px;color:#64748b">Halaman ini hanya untuk <b>Admin</b>. Silakan login sebagai Admin.</p></div>
+<div id="kontenAdmin">
+<div class="card"><b style="font-size:14px">➕ Tambah User Baru</b><div style="margin-top:12px" class="grid"><input id="newUsername" class="input" placeholder="Username (contoh: suster2)"><input id="newNama" class="input" placeholder="Nama Lengkap (contoh: Suster Ani)"></div><div class="grid"><input id="newPassword" class="input" placeholder="Password"><select id="newRole" class="select"><option value="perawat">Perawat - Entri Pasien Only</option><option value="dokter">Dokter - Full + Stok Obat</option><option value="admin">Admin - Kelola User</option></select></div><button onclick="tambahUser()" class="btn btn-save" style="width:100%;padding:12px">💾 Tambah User</button></div>
+<div class="card"><b style="font-size:14px">👥 Daftar User</b><table><thead><tr><th>Username</th><th>Nama</th><th>Role</th><th>Aksi</th></tr></thead><tbody id="listUser"></tbody></table><div style="margin-top:12px;font-size:10px;color:#94a3b8">* Admin bisa hapus user kecuali dirinya sendiri. Default: admin/admin123, galih/galih123, perawat/perawat123 bisa diganti disini.</div></div>
+</div>
+</div>
+<script>
+if(!localStorage.getItem('isLogin')){location.href='./login.html';}
+var role=localStorage.getItem('role')||'';
+if(role!=='admin'){
+document.getElementById('aksesDitolak').style.display='block';
+document.getElementById('kontenAdmin').style.display='none';
+} else {
+document.getElementById('aksesDitolak').style.display='none';
+document.getElementById('kontenAdmin').style.display='block';
+}
+function getUsers(){return JSON.parse(localStorage.getItem('usersV8')||'[]')}
+function renderUser(){
+var tbody=document.getElementById('listUser');
+var users=getUsers();
+var cur=localStorage.getItem('username');
+var html='';
+for(var i=0;i<users.length;i++){
+var u=users[i];
+var badgeClass=u.role=='admin'?'b-admin':(u.role=='dokter'?'b-dokter':'b-perawat');
+var delBtn=u.username===cur?'<span style="font-size:10px;color:#94a3b8">Anda</span>':'<button onclick="hapusUser(\''+u.username+'\')" style="border:0;background:#fee2e2;color:#dc2626;padding:5px 10px;border-radius:999px;font-size:10px;font-weight:700;cursor:pointer">Hapus</button>';
+html+='<tr><td><b>'+u.username+'</b></td><td>'+u.nama+'</td><td><span class="badge '+badgeClass+'">'+u.role.toUpperCase()+'</span></td><td>'+delBtn+'</td></tr>';
+}
+tbody.innerHTML=html||'<tr><td colspan="4" style="text-align:center;padding:20px;color:#94a3b8">Belum ada user</td></tr>';
+}
+function tambahUser(){
+var username=document.getElementById('newUsername').value.trim().toLowerCase();
+var nama=document.getElementById('newNama').value.trim();
+var pass=document.getElementById('newPassword').value;
+var role=document.getElementById('newRole').value;
+if(!username||!nama||!pass){alert('Semua field harus diisi!');return;}
+var users=getUsers();
+if(users.find(function(x){return x.username.toLowerCase()===username})){alert('Username sudah ada!');return;}
+users.push({username:username,password:pass,nama:nama,role:role});
+localStorage.setItem('usersV8',JSON.stringify(users));
+document.getElementById('newUsername').value='';document.getElementById('newNama').value='';document.getElementById('newPassword').value='';
+renderUser();
+alert('User '+nama+' ('+role+') berhasil ditambahkan!');
+}
+function hapusUser(username){
+if(!confirm('Hapus user '+username+'?'))return;
+var users=getUsers().filter(function(x){return x.username!==username});
+localStorage.setItem('usersV8',JSON.stringify(users));
+renderUser();
+}
+function logout(){localStorage.removeItem('isLogin');location.href='./login.html';}
+renderUser();
+</script>
+</body></html>

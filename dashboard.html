@@ -1,187 +1,110 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Praktek dr Galih - V17.0 FINAL GABUNGAN</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./ICD10search/icd10.js"></script>
-<script src="./supabase.js"></script>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Dashboard - dr Galih</title>
 <style>
- body{background:#f8f7fb; font-family:Inter,sans-serif}
- .card{background:white; border-radius:16px; box-shadow:0 2px 12px rgba(0,0,0,.04); border:1px solid #f0eef6}
- .input-pro{background:#f6f5ff; border:1.5px solid transparent; border-radius:12px; padding:10px 14px; font-size:12px; width:100%}
- .input-pro:focus{background:white; border-color:#6d28d9; outline:none; box-shadow:0 0 0 3px #ede9fe}
- .pill-menu{background:white; padding:6px; border-radius:999px; box-shadow:0 2px 10px rgba(0,0,0,.06); border:1px solid #eee; display:inline-flex; gap:4px; flex-wrap:wrap; justify-content:center}
- .pill-btn{padding:7px 14px; border-radius:999px; font-size:11px; font-weight:700; cursor:pointer}
- .pill-btn.active{background:#6d28d9; color:white}
- .soap-label{font-size:10px; font-weight:800; padding:3px 8px; border-radius:999px; display:inline-block; margin-bottom:5px}
- .marquee{white-space:nowrap; overflow:hidden; background:linear-gradient(to right,#6d28d9,#4338ca); color:white; font-size:11px; padding:6px 0}
- .marquee span{display:inline-block; padding-left:100%; animation:marquee 25s linear infinite}
- @keyframes marquee{0%{transform:translate(0,0)}100%{transform:translate(-100%,0)}}
- .suggest-box{position:absolute; top:100%; left:0; right:0; background:white; border:1px solid #e5e7eb; border-radius:12px; max-height:260px; overflow-y:auto; z-index:50; box-shadow:0 10px 20px rgba(0,0,0,.1)}
- .suggest-item{padding:8px 12px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-size:11px}
- .suggest-item:hover{background:#f5f3ff}
+*{box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
+body{margin:0;min-height:100vh;background:linear-gradient(135deg,#dbeafe 0%,#e0f2fe 25%,#f0fdfa 50%,#fef9c3 100%);background-attachment:fixed}
+.header{background:rgba(255,255,255,.95);backdrop-filter:blur(12px);padding:14px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;box-shadow:0 4px 20px rgba(59,130,246,.1);border-bottom:1px solid rgba(59,130,246,.1);position:sticky;top:0;z-index:10;width:100%}
+.header-left b{font-size:16px;cursor:pointer;user-select:none;background:linear-gradient(90deg,#2563eb,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.header-left .realtime{font-size:11px;font-weight:700;margin-top:5px;display:flex;gap:6px;flex-wrap:wrap}
+.header-left .realtime span{background:#fff;border:1px solid #e0f2fe;padding:4px 10px;border-radius:999px}
+.header-left .realtime span:first-child{background:linear-gradient(90deg,#22c55e,#16a34a);color:#fff;border:0}
+#hariReal{background:#fef3c7;color:#92400e;border-color:#fde68a!important}
+#tglReal{background:#dbeafe;color:#1e40af;border-color:#bfdbfe!important}
+.header-right{display:flex;gap:8px;align-items:center}
+.btn{border:0;padding:8px 14px;border-radius:999px;font-weight:700;cursor:pointer;font-size:11px}
+.btn-logout{background:linear-gradient(90deg,#ef4444,#dc2626);color:#fff}
+.btn-admin{background:linear-gradient(90deg,#8b5cf6,#7c3aed);color:#fff}
+.user-badge{background:linear-gradient(90deg,#f0f9ff,#e0f2fe);border:1px solid #bfdbfe;padding:7px 14px;border-radius:999px;font-size:11px;display:flex;gap:6px;align-items:center;color:#1e40af;font-weight:700}
+.badge-role{padding:2px 8px;border-radius:999px;font-size:8px;font-weight:900;margin-left:4px;border:1px solid}
+.role-admin{background:#ede9fe;color:#5b21b6;border-color:#ddd6fe}
+.role-dokter{background:#dbeafe;color:#1e40af;border-color:#bfdbfe}
+.role-perawat{background:#fef3c7;color:#92400e;border-color:#fde68a}
+.running{background:linear-gradient(90deg,#2563eb,#06b6d4,#10b981);color:#fff;overflow:hidden;white-space:nowrap;padding:10px 0;font-size:12px;font-weight:800;width:100%}
+.running span{display:inline-block;animation:m 50s linear infinite;padding-left:100%}@keyframes m{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+/* INI KUNCI JUSTIFY BRO - FULL WIDTH */
+.container{width:96%;max-width:100%;margin:0 auto;padding:18px 0;display:block}
+.stats{display:flex;justify-content:space-between;gap:16px;margin-bottom:18px;width:100%}
+.stat-card{flex:1;background:rgba(255,255,255,.9);backdrop-filter:blur(8px);border-radius:18px;padding:18px 20px;box-shadow:0 4px 16px rgba(0,0,0,.06);border:1px solid rgba(255,255,255,.9);display:flex;justify-content:space-between;align-items:center;min-width:0}
+.stat-card:nth-child(1){border-left:5px solid #3b82f6}
+.stat-card:nth-child(2){border-left:5px solid #10b981}
+.stat-card:nth-child(3){border-left:5px solid #f59e0b}
+.stat-card .num{font-size:26px;font-weight:900;color:#0f172a}.stat-card .lab{font-size:10px;color:#64748b;font-weight:700;margin-top:3px;text-transform:uppercase}
+.card{background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-radius:20px;padding:22px 24px;box-shadow:0 8px 30px rgba(0,0,0,.06);border:1px solid rgba(255,255,255,.9);width:100%;display:block}
+.input-search{width:100%;padding:14px 16px;border:1px solid #e0f2fe;border-radius:14px;background:#f8fafc;font-size:13px}
+table{width:100%;border-collapse:collapse;margin-top:16px}th{font-size:9px;color:#94a3b8;text-align:left;padding:12px 8px;border-bottom:1px solid #f1f5f9;text-transform:uppercase}td{padding:14px 8px;border-bottom:1px solid #f8fafc;font-size:12px}
+.badge-rm{background:linear-gradient(90deg,#eff6ff,#dbeafe);color:#1d4ed8;padding:5px 10px;border-radius:999px;font-size:10px;font-weight:800;border:1px solid #bfdbfe}
+.notif{padding:12px 14px;border-radius:14px;margin-top:10px;font-size:12px;font-weight:600;border:1px solid;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.btn-green{background:linear-gradient(90deg,#10b981,#059669);color:#fff;border:0;padding:7px 12px;border-radius:999px;font-weight:700;cursor:pointer;font-size:11px}
+.btn-blue{background:linear-gradient(90deg,#3b82f6,#2563eb);color:#fff;border:0;padding:7px 12px;border-radius:999px;font-weight:700;cursor:pointer;font-size:11px}
+@media(max-width:768px){.container{width:94%}.stats{flex-direction:column}.stat-card{width:100%}}
 </style>
 </head>
 <body>
-<div class="bg-white border-b sticky top-0 z-50">
- <div class="max-w-[1600px] mx-auto px-8 py-3 flex justify-between items-center">
-  <div class="flex items-center gap-3"><div class="w-9 h-9 bg-gradient-to-br from-violet-600 to-indigo-600 rounded-xl flex items-center justify-center text-white">🏥</div><b class="text-[14px]">Praktek Mandiri dr. Galih <span class="ml-2 text-[10px] bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">V17.0 GABUNGAN 10K + SMART</span></b><span id="supaStatus" class="ml-3 text-[10px] bg-gray-100 px-2 py-1 rounded-full">Loading...</span></div>
-  <button onclick="location.href='index.html'" class="px-4 py-1.5 bg-gray-900 text-white rounded-full text-[11px] font-bold">Logout</button>
- </div>
- <div class="marquee"><span>📍 Aik Darek Batukliang | V17.0 FINAL - 10.469 ICD + SMART SUGGEST (ketik keluhan auto ICD) + SUPABASE LIVE! | NO AUTO BALEK |</span></div>
+<div class="header">
+<div class="header-left">
+<b id="judulUser">Rekam Medis dr Galih</b>
+<div class="realtime"><span id="jamReal">--:--:--</span><span id="hariReal">--</span><span id="tglReal">--</span></div>
+<!-- <div id="hintStok" style="font-size:8px;color:#94a3b8;margin-top:5px">💡 Klik 3x cepat di judul untuk buka Stok Obat (Hanya Dokter/Admin)</div> -->
 </div>
-
-<div class="max-w-[1600px] mx-auto px-8 pb-12">
-<div class="flex justify-center my-6"><div class="pill-menu">
- <button onclick="show('pasien')" id="m-pasien" class="pill-btn active">Pasien Baru + SOAP</button>
- <button onclick="show('search')" id="m-search" class="pill-btn">🔍 Search + Ulang</button>
- <button onclick="show('riwayat')" id="m-riwayat" class="pill-btn">📜 Riwayat</button>
- <button onclick="show('obat')" id="m-obat" class="pill-btn">💊 Obat + Exp</button>
- <button onclick="show('icd')" id="m-icd" class="pill-btn">📖 ICD-10 10K</button>
-</div></div>
-
-<div id="v-pasien" class="block">
- <div class="grid grid-cols-12 gap-6 items-start">
-  <div class="col-span-12 lg:col-span-5 card p-5 sticky top-[105px]">
-   <div class="flex justify-between"><b class="text-[13px]" id="judulForm">Pasien Baru - Auto RM + SOAP SMART</b><button onclick="resetForm()" class="text-[10px] bg-gray-100 px-3 py-1 rounded-full font-bold">Reset</button></div>
-   <div class="mt-3 p-3 rounded-xl border text-center bg-violet-50 border-violet-100"><div class="text-[10px] text-gray-400">NoRM OTOMATIS</div><div id="previewRM" class="text-2xl font-bold text-violet-700">26-0001</div><div id="ketRM" class="text-[11px] mt-1">Auto</div><input id="p_norm" type="hidden"></div>
-   <div id="notifPasien" class="hidden mt-2 p-2.5 rounded-xl text-[11px] font-bold"></div>
-   <input id="p_nama" oninput="autoCheckPasien()" class="input-pro mt-3" placeholder="Nama Pasien *">
-   <div class="grid grid-cols-2 gap-2 mt-2"><input id="p_usia" type="number" class="input-pro" placeholder="Usia"><select id="p_jk" class="input-pro"><option>Laki-laki</option><option>Perempuan</option></select></div>
-   <div class="mt-4 p-3 bg-gray-50 rounded-xl border">
-    <b class="text-[11px]">📝 SOAP - SMART SUGGEST 10K ICD!</b>
-    <div class="mt-2 relative"><span class="soap-label bg-blue-100 text-blue-700">S - SUBJECTIVE (ketik keluhan → auto suggest ICD)</span><textarea id="soap_s" rows="2" class="input-pro" placeholder="Contoh: pusing leher tegang 2 hari, batuk pilek, nyeri ulu hati..." oninput="autoSuggestFromS()"></textarea><div id="smartSuggestBox" class="suggest-box hidden"></div></div>
-    <div class="mt-2"><span class="soap-label bg-emerald-100 text-emerald-700">O - OBJECTIVE</span><textarea id="soap_o" rows="2" class="input-pro" placeholder="TD 130/80..."></textarea></div>
-    <div class="mt-2 relative"><span class="soap-label bg-amber-100 text-amber-700">A - ASSESSMENT (Predict ICD 10K)</span><input id="soap_a" oninput="showIcdSuggest()" onfocus="showIcdSuggest()" autocomplete="off" class="input-pro" placeholder="Ketik I10, E11... atau klik suggest di atas"><div id="suggestIcd" class="suggest-box hidden"></div><div id="icdInfo" class="mt-1 text-[10px]"></div></div>
-    <div class="mt-2"><span class="soap-label bg-violet-100 text-violet-700">P - PLAN</span><textarea id="soap_p" rows="2" class="input-pro" placeholder="Terapi..."></textarea></div>
-   </div>
-   <div class="mt-3 p-3 bg-amber-50 rounded-xl border"><div class="flex justify-between"><b class="text-[11px] text-amber-800">💊 Resep</b><button onclick="tambahResep()" class="text-[10px] bg-white px-2 py-1 rounded-full border font-bold">+ Obat</button></div><div id="listResep" class="mt-2 space-y-2"></div></div>
-   <button id="btnSimpanPasien" onclick="simpanPasienSOAP()" class="w-full mt-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl py-3 text-xs font-bold">Simpan RM SOAP</button>
-  </div>
-  <div class="col-span-12 lg:col-span-7 card p-5"><b class="text-[13px]">Kunjungan Hari Ini</b><div class="mt-4 border rounded-xl overflow-hidden"><table class="w-full text-xs"><thead class="bg-gray-50 text-[10px] text-gray-400"><tr><th class="text-left py-3 px-4">NoRM</th><th>NAMA</th><th>DIAGNOSA</th><th>TGL</th></tr></thead><tbody id="listPasien"></tbody></table></div></div>
- </div>
+<div class="header-right">
+<div class="user-badge"><span id="iconRole">👨‍⚕️</span> <span id="namaLogin">dr Galih</span> <span id="badgeRole" class="badge-role role-dokter">DOKTER</span></div>
+<button id="btnAdmin" onclick="location.href='./admin.html'" class="btn btn-admin" style="display:none">👑 Kelola User</button>
+<button onclick="logout()" class="btn btn-logout">Logout</button>
 </div>
-
-<div id="v-search" class="hidden"><div class="card p-6"><b>🔍 Search + Kunjungan Ulang</b><input id="inputSearchPasien" onkeyup="renderSearch()" placeholder="Ketik Nama/NoRM..." class="mt-3 w-full bg-gray-50 border rounded-full px-5 py-3 text-[13px]"><div class="mt-4 border rounded-xl overflow-hidden"><table class="w-full text-xs"><thead class="bg-gray-50 text-[10px] text-gray-400"><tr><th class="text-left py-3 px-4">NoRM</th><th>NAMA</th><th>AKSI</th></tr></thead><tbody id="listSearch"></tbody></table></div></div></div>
-<div id="v-riwayat" class="hidden"><div class="card p-6"><div class="flex justify-between"><b class="text-[14px]">📜 Riwayat SOAP - Bisa Kopi Paste!</b><button onclick="copyRiwayat()" class="text-[11px] bg-violet-600 text-white px-3 py-1.5 rounded-full font-bold">📋 Copy</button></div><div id="riwayatList" class="mt-4 space-y-3 select-text"></div></div></div>
-<div id="v-obat" class="hidden"><div class="grid grid-cols-12 gap-6"><div class="col-span-12 md:col-span-4 card p-5"><b id="formObatTitle" class="text-[13px]">Masuk Obat + Exp</b><input id="o_nama" class="input-pro mt-3" placeholder="Nama Obat *"><div class="grid grid-cols-2 gap-2 mt-2"><input id="o_stok" type="number" class="input-pro" placeholder="Stok"><input id="o_min" type="number" class="input-pro" placeholder="Min"></div><div class="mt-2"><label class="text-[10px] font-bold">📅 Exp Date</label><input id="o_exp" type="date" class="input-pro mt-1"></div><input id="o_id" type="hidden"><button onclick="simpanObat()" class="w-full mt-3 bg-violet-600 text-white rounded-xl py-2.5 text-xs font-bold">Simpan</button><button onclick="resetObat()" id="btnBatalObat" class="hidden w-full mt-2 bg-gray-100 rounded-xl py-2 text-xs">Batal</button></div><div class="col-span-12 md:col-span-8 card p-5"><div class="flex justify-between mb-4"><b class="text-[13px]">Stok Obat + Exp</b><input id="cariObat" onkeyup="renderObat()" placeholder="Cari..." class="bg-gray-50 rounded-full px-4 py-1.5 text-xs w-40 border"></div><div class="border rounded-xl overflow-hidden"><table class="w-full text-xs"><thead class="bg-gray-50 text-[10px]"><tr><th class="text-left py-3 px-4">NAMA</th><th>STOK</th><th>EXP</th><th>STATUS</th><th class="text-right pr-4">AKSI</th></tr></thead><tbody id="listObat"></tbody></table></div></div></div></div>
-<div id="v-icd" class="hidden"><div class="grid grid-cols-12 gap-6"><div class="col-span-12 md:col-span-4 card p-5"><b id="formIcdTitle" class="text-[13px]">ICD-10 - 10K LOADED!</b><div class="mt-3 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-[11px]"><b>✅ Auto Load ./ICD10search/icd10.js</b><br><span id="statusCSV"></span></div><input id="i_kode" class="input-pro mt-3" placeholder="Kode I10 *"><input id="i_nama" class="input-pro mt-2" placeholder="Nama *"><input id="i_id" type="hidden"><button onclick="simpanIcd()" class="w-full mt-3 bg-violet-600 text-white rounded-xl py-2.5 text-xs font-bold">Simpan ICD</button><button onclick="resetIcd()" id="btnBatalIcd" class="hidden w-full mt-2 bg-gray-100 rounded-xl py-2 text-xs">Batal</button></div><div class="col-span-12 md:col-span-8 card p-5"><div class="flex justify-between mb-4"><b class="text-[13px]">Master ICD - <span id="countIcd">0</span></b><input id="cariIcd" onkeyup="renderIcd()" placeholder="Cari I10, J06, demam..." class="bg-gray-50 rounded-full px-4 py-1.5 text-xs w-56 border"></div><div class="border rounded-xl overflow-hidden max-h-[600px] overflow-y-auto"><table class="w-full text-xs"><thead class="bg-gray-50 sticky top-0 text-[10px]"><tr><th class="text-left py-3 px-4">KODE</th><th>DIAGNOSA</th><th class="text-right pr-4">AKSI</th></tr></thead><tbody id="listIcd"></tbody></table></div></div></div></div>
 </div>
-
+<div class="running"><span>☀️ PRAKTEK MANDIRI dr. GALIH — Jl Raya Sengkol Mantang Lombok Tengah NTB — Melayani Dengan Hati ❤️ — Buka Setiap Hari Kerja Jam 08.30-12.30 WITA & 16.00-21.00 WITA — Sehat Bersama dr. Galih! ☀️</span></div>
+<div class="container">
+<div class="stats">
+<div class="stat-card"><div><div class="num" id="statTotal">0</div><div class="lab">Pasien Terdaftar</div></div><div style="font-size:28px">👥</div></div>
+<div class="stat-card"><div><div class="num" id="statHari">0</div><div class="lab">Hari Ini</div></div><div style="font-size:28px">🌤️</div></div>
+<div class="stat-card"><div><div class="num" id="statKunj">0</div><div class="lab">Total Kunjungan</div></div><div style="font-size:28px">📋</div></div>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b style="font-size:15px;color:#0f172a">Daftar Pasien ✨</b><div style="font-size:10px;color:#64748b;background:#f0f9ff;padding:4px 10px;border-radius:999px;border:1px solid #dbeafe">Auto RM: <span id="rmNext" style="font-weight:900;color:#2563eb">260001</span> • <span id="jamTabel">--:--:--</span></div></div>
+<input id="pintarSearch" class="input-search" placeholder="🔍 Ketik nama pasien..." oninput="pintarSearch()" autocomplete="off" autocorrect="off" spellcheck="false">
+<div id="hasilPencarianPasien"></div>
+<table><thead><tr><th>No RM</th><th>Nama</th><th>Umur / JK</th><th>ICD</th><th>Tgl</th><th>Aksi</th></tr></thead><tbody id="listPasien"></tbody></table>
+</div>
+</div>
 <script>
-let allPasien=[],encounters=[],obats=[],icds=[],supabaseReady=false;
-if (typeof icdMaster !== 'undefined' && icdMaster.length > 0) {
-  icds = icdMaster.map(x => ({id: x.kode, kode: x.kode, nama: x.nama}));
-} else {
-  icds = [{id:1,kode:'I10',nama:'Hipertensi'},{id:2,kode:'E11.9',nama:'DM Tipe 2'},{id:3,kode:'J06.9',nama:'ISPA'}];
+function updateJam(){
+try{
+var now=new Date();
+var hh=String(now.getHours()).padStart(2,'0');
+var mm=String(now.getMinutes()).padStart(2,'0');
+var ss=String(now.getSeconds()).padStart(2,'0');
+var jamStr=hh+':'+mm+':'+ss;
+var hariStr=now.toLocaleDateString('id-ID',{weekday:'long'});
+var tglStr=now.getDate()+' '+now.toLocaleDateString('id-ID',{month:'long'})+' '+now.getFullYear();
+document.getElementById('jamReal').textContent='🕐 '+jamStr+' WITA';
+document.getElementById('jamTabel').textContent=jamStr;
+document.getElementById('hariReal').textContent=hariStr;
+document.getElementById('tglReal').textContent=tglStr;
+}catch(e){}
 }
-const smartICDMap=[
-  {keywords:["pusing","leher tegang","tengkuk","hipertensi","td tinggi","tensi tinggi"],icd:"I10"},
-  {keywords:["lemas","sering kencing","banyak minum","gula tinggi","dm","diabetes","kencing manis"],icd:"E11"},
-  {keywords:["batuk","pilek","flu","hidung mampet","bersin","ispa"],icd:"J06"},
-  {keywords:["nyeri ulu hati","ulu hati","mual","perih","maag","gastritis","asam lambung"],icd:"K29"},
-  {keywords:["nyeri punggung","pinggang sakit","low back","lumbal"],icd:"M54"},
-  {keywords:["nyeri dada","dada sakit","stemi","jantung"],icd:"I21"},
-  {keywords:["demam","panas","menggigil"],icd:"R50"},
-  {keywords:["diare","mencret","berak cair"],icd:"A09"},
-  {keywords:["sesak","nafas pendek","asma","mengi"],icd:"J45"},
-  {keywords:["sakit kepala","migrain","vertigo"],icd:"G44"},
-];
-function suggestICDFromKeluhan(text){
-  if(!text||text.length<3) return [];
-  text=text.toLowerCase(); let results=[];
-  smartICDMap.forEach(map=>{
-    let matched=[];
-    map.keywords.forEach(kw=>{ if(text.includes(kw)) matched.push(kw); });
-    if(matched.length>0){
-      let icdData=icds.find(x=>x.kode.toLowerCase().includes(map.icd.toLowerCase()));
-      if(icdData) results.push({kode:icdData.kode,nama:icdData.nama,score:matched.length*10,reason:matched.join(', ')});
-    }
-  });
-  let uniq={}; results.forEach(r=>{ if(!uniq[r.kode]||uniq[r.kode].score<r.score) uniq[r.kode]=r; });
-  return Object.values(uniq).sort((a,b)=>b.score-a.score).slice(0,4);
+updateJam();setInterval(updateJam,1000);
+if(!localStorage.getItem('isLogin')){location.href='./login.html';}
+function getData(){return JSON.parse(localStorage.getItem('rekamMedisV8')||'[]')}
+function generateRM(){var th=new Date().getFullYear().toString().slice(-2);var data=getData();var max=0;for(var i=0;i<data.length;i++){var rm=data[i].norm||'';if(rm.startsWith(th)&&rm.length>=6){var num=parseInt(rm.slice(-4))||0;if(num>max)max=num}}if(max==0)return th+'0001';return th+String(max+1).padStart(4,'0');}
+var role=localStorage.getItem('role')||'dokter';
+var userLogin=localStorage.getItem('loginUser')||'dr Galih';
+document.getElementById('namaLogin').textContent=userLogin;
+document.getElementById('badgeRole').textContent=role.toUpperCase();
+document.getElementById('badgeRole').className='badge-role '+(role=='admin'?'role-admin':(role=='dokter'?'role-dokter':'role-perawat'));
+document.getElementById('iconRole').textContent=role=='admin'?'👑':(role=='dokter'?'👨‍⚕️':'👩‍⚕️');
+document.getElementById('judulUser').textContent='Rekam Medis '+userLogin;
+if(role=='admin'){
+document.getElementById('btnAdmin').style.display='inline-block';
+document.getElementById('judulUser').addEventListener('click',function(e){if(e.detail===3){window.location.href='./obat.html';}});
+} else if(role=='dokter'){
+document.getElementById('judulUser').addEventListener('click',function(e){if(e.detail===3){window.location.href='./obat.html';}});
 }
-function autoSuggestFromS(){
-  let text=document.getElementById('soap_s').value;
-  let box=document.getElementById('smartSuggestBox');
-  if(text.length<4){ box.classList.add('hidden'); return; }
-  let suggests=suggestICDFromKeluhan(text);
-  if(suggests.length===0){ box.classList.add('hidden'); return; }
-  box.innerHTML=`<div class="px-3 py-1.5 text-[9px] font-bold text-violet-600 bg-violet-50">🤖 SMART SUGGEST dari keluhan:</div>`;
-  suggests.forEach(s=>{
-    let div=document.createElement('div');
-    div.className='suggest-item border-b last:border-0';
-    div.innerHTML=`<span><b class="text-violet-700">${s.kode}</b> - ${s.nama}<br><span class="text-[9px] text-gray-400">karena: ${s.reason}</span></span><span class="bg-violet-600 text-white px-2 py-1 rounded-full text-[9px]">Pakai</span>`;
-    div.onclick=()=>{ document.getElementById('soap_a').value=`${s.kode} - ${s.nama}`; document.getElementById('icdInfo').innerHTML=`<span class="bg-violet-50 text-violet-700 border px-2 py-1 rounded-full font-bold">🤖 Auto: ${s.kode} - ${s.nama}</span>`; box.classList.add('hidden'); };
-    box.appendChild(div);
-  });
-  box.classList.remove('hidden');
-}
-function getClient(){ if(window._client) return window._client; if(typeof supabaseClient!=='undefined') return supabaseClient; if(window.supabaseClient) return window.supabaseClient; return null; }
-function loadDummy(){
-  allPasien=[{norm:'26-0001', nama:'Siti Aminah', usia:35, riwayat:3, lastDiag:'I10 - Hipertensi Esensial', tgl:'20/10/2026', soap:{s:'Pusing', o:'TD 150/90', a:'I10 - Hipertensi Esensial', p:'Amlodipin'}}];
-  encounters=[...allPasien].map(e=>({...e, diag:e.lastDiag, isUlang:true}));
-  obats=[{id:1,nama:'Paracetamol 500mg',stok:50,min:10,exp:'2026-12-31'},{id:2,nama:'Amoxicillin 500mg',stok:5,min:10,exp:'2026-06-01'}];
-  updatePreview(); renderPasien(); renderSearch(); renderObat(); renderIcd(); renderRiwayat();
-}
-async function initSupabase(){
-  const statusEl=document.getElementById('supaStatus');
-  try{
-    let client=getClient();
-    if(client){
-      supabaseReady=true;
-      statusEl.innerText=`🟢 ${icds.length} ICD + Supabase Connected`;
-      statusEl.className='ml-3 text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full';
-      const [{data:pasien},{data:enc},{data:obatData}] = await Promise.all([
-        client.from('pasien').select('*').order('created_at',{ascending:false}).limit(500),
-        client.from('encounters').select('*').eq('tgl', new Date().toLocaleDateString('id-ID')).order('created_at',{ascending:false}),
-        client.from('obat').select('*').order('nama')
-      ]);
-      if(pasien?.length) allPasien=pasien.map(p=>({norm:p.norm,nama:p.nama,usia:p.usia,jk:p.jk,riwayat:p.riwayat||1,lastDiag:p.last_diag||'',tgl:p.tgl||p.created_at,soap:p.soap||{}}));
-      if(enc?.length) encounters=enc.map(e=>({norm:e.norm,nama:e.nama,diag:e.diagnosa,tgl:e.tgl,soap:e.soap,isUlang:e.is_ulang,riwayat:e.riwayat}));
-      if(obatData?.length) obats=obatData.map(o=>({id:o.id,nama:o.nama,stok:o.stok,min:o.min_stok,exp:o.exp_date}));
-    } else {
-      statusEl.innerText=`🟢 ${icds.length} ICD Loaded (LOCAL)`;
-      statusEl.className='ml-3 text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full';
-    }
-  }catch(e){ console.error(e); statusEl.innerText=`🟢 ${icds.length} ICD (LOCAL - Supabase off)`; }
-  updatePreview(); renderPasien(); renderSearch(); renderObat(); renderIcd(); renderRiwayat();
-}
-function getYY(){return new Date().getFullYear().toString().slice(-2);}
-function getNextRM(){let yy=getYY(); let max=0; allPasien.forEach(r=>{ if(r.norm && r.norm.startsWith(yy+'-')){ let n=parseInt(r.norm.split('-')[1]); if(n>max) max=n; } }); return `${yy}-${String(max+1).padStart(4,'0')}`;}
-function updatePreview(){let n=getNextRM(); document.getElementById('previewRM').innerText=n; document.getElementById('p_norm').value=n; document.getElementById('totalIcdBadge')?document.getElementById('totalIcdBadge').innerText=icds.length:null; document.getElementById('countIcd')?document.getElementById('countIcd').innerText=icds.length:null; document.getElementById('statusCSV')?document.getElementById('statusCSV').innerHTML=`✅ ${icds.length} records - SEARCH INSTANT!`:null;}
-function autoCheckPasien(){let nama=document.getElementById('p_nama').value.trim().toLowerCase(); let notif=document.getElementById('notifPasien'); if(nama.length<2){ notif.classList.add('hidden'); updatePreview(); return;} let f=allPasien.filter(p=>p.nama.toLowerCase().includes(nama) && p.norm.startsWith(getYY()+'-')); if(f.length>0){ notif.classList.remove('hidden'); notif.className='mt-2 p-2.5 rounded-xl text-[11px] font-bold bg-red-50 text-red-600 border'; notif.innerHTML=`⛔ SUDAH TERDAFTAR! ${f[0].norm}`; document.getElementById('previewRM').innerText=f[0].norm; document.getElementById('p_norm').value=f[0].norm;} else{ notif.classList.add('hidden'); updatePreview();}}
-function showIcdSuggest(){let input=document.getElementById('soap_a'); let box=document.getElementById('suggestIcd'); let q=input.value.toLowerCase(); if(q.length<1){ box.classList.add('hidden'); return; } let filtered=icds.filter(i=>i.kode.toLowerCase().includes(q)||i.nama.toLowerCase().includes(q)); if(filtered.length==0){ box.innerHTML=`<div class="suggest-item text-gray-400">Gak ada ICD!</div>`; box.classList.remove('hidden'); return;} box.innerHTML=''; filtered.slice(0,8).forEach(icd=>{ let item=document.createElement('div'); item.className='suggest-item'; item.innerHTML=`<span><b class="text-violet-700">${icd.kode}</b> - ${icd.nama}</span>`; item.onclick=()=>selectIcd(icd); box.appendChild(item); }); box.classList.remove('hidden');}
-function selectIcd(icd){ document.getElementById('soap_a').value=`${icd.kode} - ${icd.nama}`; document.getElementById('suggestIcd').classList.add('hidden'); document.getElementById('icdInfo').innerHTML=`<span class="bg-violet-50 text-violet-700 border px-2 py-1 rounded-full font-bold">✅ ${icd.kode} - ${icd.nama}</span>`; }
-function tambahResep(){let id=Date.now(); let div=document.createElement('div'); div.className='relative flex gap-2 items-start'; div.id='resep-'+id; div.innerHTML=`<div class="flex-1 relative"><input id="obat-${id}" oninput="showSuggest(${id})" onfocus="showSuggest(${id})" autocomplete="off" class="w-full bg-white rounded-lg px-3 py-2.5 text-[11px] border" placeholder="Ketik obat..."><div id="suggest-${id}" class="suggest-box hidden"></div><div id="stokinfo-${id}" class="mt-1 text-[10px]"></div></div><input id="qty-${id}" type="number" value="1" min="1" class="w-16 bg-white rounded-lg px-2 py-2.5 text-[11px] border"><button onclick="document.getElementById('resep-${id}').remove()" class="text-red-400 text-xs px-1 mt-2">✕</button>`; document.getElementById('listResep').appendChild(div);}
-function showSuggest(id){let input=document.getElementById('obat-'+id); let box=document.getElementById('suggest-'+id); let q=input.value.toLowerCase(); if(q.length<1){ box.classList.add('hidden'); return; } let filtered=obats.filter(o=>o.nama.toLowerCase().includes(q)); if(filtered.length==0){ box.innerHTML=`<div class="suggest-item text-gray-400">Gak ada!</div>`; box.classList.remove('hidden'); return;} box.innerHTML=''; filtered.slice(0,6).forEach(o=>{let expStatus = new Date(o.exp) < new Date() ? 'EXPIRED!' : `Exp ${o.exp}`; let status=o.stok==0?'HABIS!':o.stok<=o.min?`Kritis Sisa ${o.stok}`:`Sisa ${o.stok}`; let color=o.stok==0?'bg-red-500 text-white':o.stok<=o.min?'bg-amber-400':'bg-emerald-100 text-emerald-700'; let item=document.createElement('div'); item.className='suggest-item'; item.innerHTML=`<span>${o.nama}<br><span class="text-[9px] bg-gray-100 px-1 rounded">${expStatus}</span></span><span class="${color} px-2 py-0.5 rounded-full text-[9px] font-bold">${status}</span>`; item.onclick=()=>selectObat(id,o); box.appendChild(item);}); box.classList.remove('hidden');}
-function selectObat(id,obat){document.getElementById('obat-'+id).value=obat.nama; document.getElementById('suggest-'+id).classList.add('hidden'); let info=document.getElementById('stokinfo-'+id); let isExpired = new Date(obat.exp) < new Date(); let expText = isExpired ? `⛔ EXPIRED! ${obat.exp}` : `📅 Exp ${obat.exp}`; let stokText = obat.stok==0 ? '⛔ HABIS!' : obat.stok<=obat.min ? `⚠️ Kritis Sisa ${obat.stok}` : `✅ Sisa ${obat.stok} Aman`; info.innerHTML=`<span class="${isExpired?'bg-red-50 text-red-600 border-red-200':'bg-emerald-50 text-emerald-700'} border px-2 py-1 rounded-full font-bold">${stokText} | ${expText}</span>`; document.getElementById('obat-'+id).dataset.obatId=obat.id;}
-async function simpanPasienSOAP(){let nama=document.getElementById('p_nama').value.trim(); if(!nama) return alert('Nama wajib!'); let a=document.getElementById('soap_a').value.trim(); if(!a) return alert('Assessment ICD wajib!'); let norm=document.getElementById('p_norm').value || getNextRM(); let usia=document.getElementById('p_usia').value; let jk=document.getElementById('p_jk').value; let soap={s:document.getElementById('soap_s').value,o:document.getElementById('soap_o').value,a:a,p:document.getElementById('soap_p').value}; let isUlang=allPasien.some(x=>x.norm===norm); let btn=document.getElementById('btnSimpanPasien'); btn.disabled=true; btn.innerText='Menyimpan...'; let dataEnc={norm:norm, nama:nama, diagnosa:a, tgl:new Date().toLocaleDateString('id-ID'), soap:soap, is_ulang:isUlang, riwayat:isUlang ? (allPasien.find(x=>x.norm===norm).riwayat+1) : 1, usia:usia, jk:jk}; try{ const client=getClient(); if(client && supabaseReady){ await client.from('pasien').upsert({norm:norm, nama:nama, usia:usia, jk:jk, last_diag:a, tgl:dataEnc.tgl, soap:soap, riwayat:dataEnc.riwayat},{onConflict:'norm'}); await client.from('encounters').insert(dataEnc); for(let div of document.querySelectorAll('[id^=resep-]')){ let input=div.querySelector('input[id^=obat-]'); let qtyInput=div.querySelector('input[id^=qty-]'); let obatId=input.dataset.obatId; if(obatId){ let obat=obats.find(o=>o.id==obatId); let newStok = obat.stok - (parseInt(qtyInput.value)||1); await client.from('obat').update({stok:newStok}).eq('id', obatId); obat.stok=newStok; } } } }catch(err){ console.warn(err); } if(!isUlang){ allPasien.unshift({norm:norm, nama:nama, riwayat:1, lastDiag:a, tgl:dataEnc.tgl, soap:soap}); } else { let idx=allPasien.findIndex(x=>x.norm===norm); if(idx>=0){ allPasien[idx].riwayat++; allPasien[idx].lastDiag=a; allPasien[idx].soap=soap; } } encounters.unshift({norm:norm, nama:nama, diag:a, tgl:dataEnc.tgl, soap:soap, isUlang:isUlang, riwayat:dataEnc.riwayat}); renderPasien(); renderSearch(); renderRiwayat(); renderObat(); btn.disabled=false; btn.innerText='Simpan RM SOAP'; alert(`${isUlang?'🔁 Ulang':'✅ Baru'} ${norm} - ${icds.length} ICD!`); resetForm();}
-function show(id){document.querySelectorAll('[id^=v-]').forEach(e=>e.classList.add('hidden')); document.getElementById('v-'+id).classList.remove('hidden'); document.querySelectorAll('.pill-btn').forEach(e=>e.classList.remove('active')); document.getElementById('m-'+id).classList.add('active'); if(id=='obat')renderObat(); if(id=='icd')renderIcd(); if(id=='search')renderSearch(); if(id=='riwayat')renderRiwayat();}
-function renderPasien(){let tb=document.getElementById('listPasien'); tb.innerHTML=''; if(encounters.length==0){tb.innerHTML=`<tr><td colspan="4" class="py-12 text-center text-gray-400">Belum ada kunjungan</td></tr>`; return;} encounters.forEach(e=>{tb.innerHTML+=`<tr class="border-b"><td class="py-3 px-4 font-bold ${e.isUlang?'text-blue-600':'text-violet-700'}">${e.norm}</td><td>${e.nama}</td><td class="text-[11px]">${e.diag}</td><td>${e.tgl}</td></tr>`;});}
-function renderSearch(){let q=(document.getElementById('inputSearchPasien')?.value||'').toLowerCase(); let tb=document.getElementById('listSearch'); if(!tb) return; tb.innerHTML=''; let f=allPasien.filter(p=>p.norm.toLowerCase().includes(q)||p.nama.toLowerCase().includes(q)); if(f.length==0){tb.innerHTML=`<tr><td colspan="3" class="py-12 text-center text-gray-400">Gak ketemu</td></tr>`; return;} f.forEach(p=>{tb.innerHTML+=`<tr class="border-b hover:bg-violet-50"><td class="py-3 px-4 font-bold text-violet-700">${p.norm}</td><td>${p.nama} (${p.riwayat}x)</td><td class="text-right pr-4"><button onclick="kunjunganUlang('${p.norm}')" class="bg-blue-600 text-white px-3 py-1 rounded-full text-[11px] font-bold">Kunjungan Ulang →</button></td></tr>`;});}
-function renderRiwayat(){let div=document.getElementById('riwayatList'); div.innerHTML=''; let dataTampil = encounters.length > 0 ? encounters : allPasien; dataTampil.forEach(e=>{ let soap = e.soap || {s:'-', o:'-', a:e.lastDiag||e.diag||'-', p:'-'}; div.innerHTML+=`<div class="border rounded-xl p-4 bg-white select-text"><div class="flex justify-between items-center"><b class="text-[12px]">${e.norm} - ${e.nama}</b><span class="text-[10px] bg-gray-100 px-2 py-1 rounded-full">${e.tgl}</span></div><div class="grid grid-cols-1 md:grid-cols-4 gap-2 mt-3 text-[11px]"><div class="bg-blue-50 p-2.5 rounded-lg border select-text"><b class="text-blue-700 text-[10px] block">S</b>${soap.s||'-'}</div><div class="bg-emerald-50 p-2.5 rounded-lg border select-text"><b class="text-emerald-700 text-[10px] block">O</b>${soap.o||'-'}</div><div class="bg-amber-50 p-2.5 rounded-lg border select-text"><b class="text-amber-700 text-[10px] block">A</b>${soap.a||e.diag||'-'}</div><div class="bg-violet-50 p-2.5 rounded-lg border select-text"><b class="text-violet-700 text-[10px] block">P</b>${soap.p||'-'}</div></div></div>`; });}
-function copyRiwayat(){ let text=document.getElementById('riwayatList').innerText; navigator.clipboard.writeText(text).then(()=>alert('✅ Riwayat berhasil di-copy bro!')).catch(()=>alert('Blok manual aja bro!')); }
-function kunjunganUlang(norm){let p=allPasien.find(x=>x.norm===norm); show('pasien'); document.getElementById('p_norm').value=p.norm; document.getElementById('previewRM').innerText=p.norm; document.getElementById('p_nama').value=p.nama; document.getElementById('judulForm').innerText=`Kunjungan Ulang ${p.norm} - ${p.nama}`; document.getElementById('ketRM').innerText=`KUNJUNGAN ULANG - ${p.riwayat}x`;}
-function resetForm(){updatePreview(); document.getElementById('p_nama').value=''; document.getElementById('soap_s').value=''; document.getElementById('soap_o').value=''; document.getElementById('soap_a').value=''; document.getElementById('soap_p').value=''; document.getElementById('icdInfo').innerHTML=''; document.getElementById('listResep').innerHTML=''; document.getElementById('notifPasien').classList.add('hidden'); document.getElementById('judulForm').innerText='Pasien Baru - Auto RM + SOAP'; document.getElementById('ketRM').innerText='Auto'; document.getElementById('smartSuggestBox').classList.add('hidden'); tambahResep();}
-function renderObat(){let q=(document.getElementById('cariObat')?.value||'').toLowerCase(); let tb=document.getElementById('listObat'); if(!tb) return; tb.innerHTML=''; obats.filter(o=>o.nama.toLowerCase().includes(q)).forEach(o=>{let isExpired = new Date(o.exp) < new Date(); let st=isExpired ? 'Expired' : o.stok==0 ? 'Habis' : o.stok<=o.min ? 'Kritis' : 'Aman'; let col=isExpired ? 'bg-red-600 text-white' : o.stok==0 ? 'bg-red-500 text-white' : o.stok<=o.min ? 'bg-amber-400' : 'bg-emerald-100 text-emerald-700'; tb.innerHTML+=`<tr class="border-b ${isExpired?'bg-red-50/50':''}"><td class="py-3 px-4">${o.nama}</td><td class="text-center font-bold">${o.stok}</td><td class="text-center text-[11px] ${isExpired?'text-red-600 font-bold':''}">${o.exp}</td><td><span class="${col} px-2 py-1 rounded-full text-[10px] font-bold">${st}</span></td><td class="text-right pr-4"><button onclick="editObat(${o.id})" class="text-violet-600 font-bold mr-2">Edit</button><button onclick="hapusObat(${o.id})" class="text-red-500">Hapus</button></td></tr>`;});}
-async function simpanObat(){let id=document.getElementById('o_id').value; let nama=document.getElementById('o_nama').value.trim(); let stok=parseInt(document.getElementById('o_stok').value)||0; let min=parseInt(document.getElementById('o_min').value)||5; let exp=document.getElementById('o_exp').value; if(!nama) return alert('Nama obat wajib!'); if(!exp) return alert('Exp wajib!'); const client=getClient(); try{ if(client && supabaseReady){ if(id){ await client.from('obat').update({nama:nama, stok:stok, min_stok:min, exp_date:exp}).eq('id', id); } else { await client.from('obat').insert({nama:nama, stok:stok, min_stok:min, exp_date:exp}); } await initSupabase(); } else { if(id){ let i=obats.findIndex(o=>o.id==id); obats[i]={...obats[i], nama:nama, stok:stok, min:min, exp:exp}; } else { obats.unshift({id:Date.now(), nama:nama, stok:stok, min:min, exp:exp}); } renderObat(); } }catch(e){ alert('Gagal: '+e.message);} resetObat();}
-function editObat(id){ let o=obats.find(x=>x.id==id); document.getElementById('o_id').value=o.id; document.getElementById('o_nama').value=o.nama; document.getElementById('o_stok').value=o.stok; document.getElementById('o_min').value=o.min; document.getElementById('o_exp').value=o.exp; document.getElementById('formObatTitle').innerText=`Edit Obat: ${o.nama}`; document.getElementById('btnBatalObat').classList.remove('hidden'); show('obat'); }
-function resetObat(){ document.getElementById('o_id').value=''; document.getElementById('o_nama').value=''; document.getElementById('o_stok').value=''; document.getElementById('o_min').value=''; document.getElementById('o_exp').value=''; document.getElementById('formObatTitle').innerText='Masuk Obat + Exp Date'; document.getElementById('btnBatalObat').classList.add('hidden'); }
-async function hapusObat(id){ if(!confirm('Hapus obat?')) return; const client=getClient(); try{ if(client && supabaseReady) await client.from('obat').delete().eq('id', id); }catch(e){} obats=obats.filter(x=>x.id!=id); renderObat(); }
-function renderIcd(){let q=(document.getElementById('cariIcd')?.value||'').toLowerCase(); let tb=document.getElementById('listIcd'); if(!tb) return; tb.innerHTML=''; icds.filter(i=>i.kode.toLowerCase().includes(q)||i.nama.toLowerCase().includes(q)).slice(0,200).forEach(o=>{tb.innerHTML+=`<tr class="border-b"><td class="py-3 px-4 font-bold text-violet-700">${o.kode}</td><td>${o.nama}</td><td class="text-right pr-4"><button onclick="editIcd('${o.id}')" class="text-violet-600 font-bold mr-2">Edit</button><button onclick="hapusIcd('${o.id}')" class="text-red-500">Hapus</button></td></tr>`;});}
-async function simpanIcd(){let id=document.getElementById('i_id').value; let kode=document.getElementById('i_kode').value.trim().toUpperCase(); let nama=document.getElementById('i_nama').value.trim(); if(!kode||!nama) return alert('Wajib!'); const client=getClient(); try{ if(client && supabaseReady){ if(id){ await client.from('icd_master').update({kode:kode, nama:nama}).eq('id', id); } else { await client.from('icd_master').insert({kode:kode, nama:nama}); } await initSupabase(); } else { if(id){let idx=icds.findIndex(x=>String(x.id)==String(id)); icds[idx]={...icds[idx], kode:kode, nama:nama};}else{icds.unshift({id:Date.now(), kode:kode, nama:nama});} renderIcd(); } }catch(e){ alert('Gagal: '+e.message);} resetIcd();}
-function editIcd(id){let o=icds.find(x=>String(x.id)==String(id)); if(!o) return; document.getElementById('i_id').value=o.id; document.getElementById('i_kode').value=o.kode; document.getElementById('i_nama').value=o.nama; document.getElementById('formIcdTitle').innerText=`Edit ICD: ${o.kode}`; document.getElementById('btnBatalIcd').classList.remove('hidden');}
-function resetIcd(){document.getElementById('i_id').value=''; document.getElementById('i_kode').value=''; document.getElementById('i_nama').value=''; document.getElementById('formIcdTitle').innerText='ICD-10 - 10K LOADED!'; document.getElementById('btnBatalIcd').classList.add('hidden');}
-async function hapusIcd(id){ if(!confirm('Hapus ICD?')) return; const client=getClient(); try{ if(client && supabaseReady) await client.from('icd_master').delete().eq('id', id); }catch(e){} icds=icds.filter(x=>String(x.id)!=String(id)); renderIcd(); }
-initSupabase(); tambahResep();
-document.addEventListener('click', function(e){
-  if(!e.target.closest('#suggestIcd') && !e.target.closest('#soap_a')){ let b=document.getElementById('suggestIcd'); if(b) b.classList.add('hidden'); }
-  if(!e.target.closest('#smartSuggestBox') && !e.target.closest('#soap_s')){ let b=document.getElementById('smartSuggestBox'); if(b) b.classList.add('hidden'); }
-  if(!e.target.closest('[id^=resep-]')){ document.querySelectorAll('[id^=suggest-]').forEach(b=>b.classList.add('hidden')); }
-});
+document.getElementById('rmNext').textContent=generateRM();
+function logout(){localStorage.removeItem('isLogin');location.href='./login.html';}
+function pintarSearch(){var q=document.getElementById('pintarSearch').value.trim().toLowerCase();var hasil=document.getElementById('hasilPencarianPasien');var nextRM=generateRM();document.getElementById('rmNext').textContent=nextRM;if(q.length<2){hasil.innerHTML='';renderPasien();return}var all=getData();var found=all.filter(function(p){return p.nama.toLowerCase().indexOf(q)!==-1});if(found.length==0){hasil.innerHTML='<div class="notif" style="background:rgba(248,250,252,.9);color:#334155;border-color:#e2e8f0"><div>Pasien "'+q.toUpperCase()+'" belum terdaftar • RM Baru: <b>'+nextRM+'</b></div><button onclick="bukaBaru(\''+q+'\')" class="btn-blue">➕ Buat Baru</button></div>';renderPasien([]);}else{var html='';for(var i=0;i<found.length&&i<3;i++){var f=found[i];html+='<div class="notif" style="background:rgba(240,253,244,.9);color:#166534;border-color:#bbf7d0"><div><b>'+f.nama.toUpperCase()+'</b> • RM '+f.norm+'</div><button onclick="bukaUlang(\''+f.id+'\')" class="btn-green">Kunjungan Ulang</button></div>';}hasil.innerHTML=html;renderPasien(found);}}
+function bukaBaru(n){localStorage.setItem('pasienBaruNama',n);localStorage.setItem('nextRM',generateRM());location.href='./rekam-medis.html?nama='+encodeURIComponent(n)+'&rm='+generateRM()+'&baru=1'}
+function bukaUlang(id){location.href='./rekam-medis.html?id='+id+'&ulang=1'}
+function renderPasien(list){var all=list||getData();document.getElementById('statTotal').textContent=getData().length;document.getElementById('statKunj').textContent=getData().length;document.getElementById('statHari').textContent=getData().filter(function(x){return x.tanggal==new Date().toISOString().slice(0,10)}).length;var tbody=document.getElementById('listPasien');var html='';for(var i=0;i<all.length;i++){var p=all[i];html+='<tr><td><span class="badge-rm">'+(p.norm||'')+'</span></td><td><b style="color:#0f172a">'+p.nama+'</b></td><td>'+(p.umur||'-')+' / '+(p.jk||'L')+'</td><td><span style="background:#f0f9ff;padding:4px 8px;border-radius:999px;font-size:10px;border:1px solid #dbeafe;color:#2563eb;font-weight:700">'+(p.kode_icd||'-')+'</span></td><td style="color:#64748b">'+(p.tanggal||'').slice(5)+'</td><td><button onclick="bukaUlang(\''+p.id+'\')" class="btn-green">Ulang</button></td></tr>';}if(!html)html='<tr><td colspan="6" style="text-align:center;padding:24px;color:#94a3b8;font-size:12px">Belum ada data pasien — cerah ceria hari ini ☀️</td></tr>';tbody.innerHTML=html;}
+renderPasien();
 </script>
-</body>
-</html>
+</body></html>

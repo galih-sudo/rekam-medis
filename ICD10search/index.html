@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICD-10 Search - Dr Galih V8 Premium</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#f5f7fb] min-h-screen p-4">
+<div class="max-w-3xl mx-auto">
+  <div class="bg-[#0f172a] text-white p-5 rounded-2xl flex justify-between items-center shadow-xl sticky top-2 z-20">
+    <div><h1 class="font-bold text-lg">🔍 ICD-10 V8 Premium</h1><p id="info" class="text-sm text-gray-400">Loading 10469 codes...</p></div>
+    <div class="flex gap-2">
+      <button onclick="location.href='../dashboard.html'" class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl text-sm">Dashboard</button>
+      <button onclick="location.href='../rekam-medis.html'" class="bg-violet-600 hover:bg-violet-500 px-4 py-2 rounded-xl text-sm">Rekam Medis</button>
+    </div>
+  </div>
+  <div class="mt-4 bg-white p-4 rounded-2xl shadow-sm border sticky top-[86px] z-10">
+    <div class="relative">
+      <input id="q" oninput="search()" autofocus placeholder="Cari: demam, tifoid, A01, kolera, diare..." class="w-full p-4 pl-12 border-2 border-violet-200 rounded-xl focus:border-violet-500 outline-none text-[15px] font-medium">
+      <span class="absolute left-4 top-4 text-gray-400">🔍</span>
+      <button onclick="document.getElementById('q').value='';search();document.getElementById('q').focus()" class="absolute right-3 top-3 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg text-xs">Clear</button>
+    </div>
+    <div class="mt-3 flex justify-between text-[11px] text-gray-500"><span id="count">10469 codes - V8 Premium</span><span>Enter=copy, Klik Pakai=ke Rekam Medis</span></div>
+  </div>
+  <div id="hasil" class="mt-4 space-y-2.5 pb-20"></div>
+</div>
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#0f172a] text-white px-5 py-3 rounded-full text-sm shadow-2xl z-50 hidden"></div>
+<script>
+let data=[];
+let lastQuery='';
+async function load(){
+  try{
+    const r=await fetch('./icd10.json');
+    const j=await r.json();
+    data=j.map(function(x){return {code:x.kode||x.code||'', desc:x.nama||x.desc||'', raw:x}});
+    document.getElementById('info').textContent=data.length.toLocaleString()+' codes ready - V8 Premium Active';
+    document.getElementById('count').textContent=data.length.toLocaleString()+' codes - V8 Premium';
+    document.getElementById('hasil').innerHTML='<div class="bg-white p-8 rounded-2xl text-center border shadow-sm"><div class="text-4xl mb-3">✅</div><div class="font-bold text-lg">'+data.length.toLocaleString()+' ICD-10 SIAP!</div><div class="text-sm text-gray-500 mt-2">Tips: ketik <b>demam</b>, <b>tifoid</b>, <b>A01</b>, <b>kolera</b>, <b>diare</b></div><div class="mt-4 grid grid-cols-2 gap-2 text-xs"><button onclick="setQ(\'demam\')" class="bg-violet-50 text-violet-700 py-2 rounded-xl">demam</button><button onclick="setQ(\'A01\')" class="bg-violet-50 text-violet-700 py-2 rounded-xl">A01</button><button onclick="setQ(\'diare\')" class="bg-violet-50 text-violet-700 py-2 rounded-xl">diare</button><button onclick="setQ(\'hipertensi\')" class="bg-violet-50 text-violet-700 py-2 rounded-xl">hipertensi</button></div></div>';
+  }catch(e){document.getElementById('hasil').innerHTML='<div class="bg-red-50 p-4 rounded-xl text-red-700">Error: '+e.message+'</div>';}
+}
+function setQ(v){document.getElementById('q').value=v;search();}
+function showToast(t){
+  const el=document.getElementById('toast');
+  el.textContent=t; el.classList.remove('hidden');
+  setTimeout(function(){el.classList.add('hidden');},1800);
+}
+function pakai(code,desc){
+  localStorage.setItem('selectedICD', JSON.stringify({code:code, desc:desc, time:Date.now()}));
+  showToast('✅ Dipakai: '+code);
+  setTimeout(function(){location.href='../rekam-medis.html';},500);
+}
+function copyCode(code){
+  navigator.clipboard.writeText(code);
+  showToast('📋 Copied: '+code);
+}
+function search(){
+  const q=document.getElementById('q').value.toLowerCase().trim();
+  lastQuery=q;
+  const box=document.getElementById('hasil');
+  if(q.length<2){box.innerHTML='<div class="text-center text-gray-400 p-8">Ketik minimal 2 huruf bro...</div>';return;}
+  const filtered=data.filter(function(d){return d.code.toLowerCase().includes(q)||d.desc.toLowerCase().includes(q)}).slice(0,100);
+  if(filtered.length==0){box.innerHTML='<div class="bg-white p-8 rounded-xl text-center text-gray-500 border">Gak ketemu "'+q+'" bro</div>';return;}
+  let html='';
+  for(let i=0;i<filtered.length;i++){
+    let d=filtered[i];
+    let safeDesc=d.desc.replace(/'/g,"&#39;").replace(/"/g,"&quot;");
+    html+='<div class="bg-white p-4 rounded-2xl shadow-sm hover:shadow-md border hover:border-violet-300 transition group"><div class="flex justify-between items-start gap-3"><div class="flex-1"><span class="font-bold text-violet-700 bg-violet-50 group-hover:bg-violet-600 group-hover:text-white px-3 py-1 rounded-lg text-[13px] transition cursor-pointer" onclick="copyCode(\''+d.code+'\')">'+d.code+'</span><div class="mt-3 text-[14px] text-gray-800 leading-6">'+d.desc+'</div></div><div class="flex flex-col gap-1.5"><button onclick="copyCode(\''+d.code+'\')" class="bg-gray-50 hover:bg-gray-100 text-gray-600 px-3 py-1.5 rounded-xl text-[11px]">Copy</button><button onclick="pakai(\''+d.code+'\',\''+safeDesc+'\')" class="bg-violet-600 hover:bg-violet-700 text-white px-4 py-1.5 rounded-xl text-[11px] font-bold">Pakai →</button></div></div></div>';
+  }
+  box.innerHTML=html;
+}
+document.addEventListener('keydown',function(e){if(e.key==='Enter'){let first=data.filter(function(d){return d.code.toLowerCase().includes(lastQuery)||d.desc.toLowerCase().includes(lastQuery)})[0]; if(first){copyCode(first.code);}}});
+load();
+</script>
+</body>
+</html>
