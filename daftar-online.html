@@ -10,16 +10,16 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
 <div class="bg-white w-full max-w-lg rounded-2xl shadow-xl p-6 md:p-8">
-  <h1 class="text-[22px] md:text-[26px] font-extrabold leading-tight text-gray-900">
+  <h1 class="text-[22px] md:text-[26px] font-extrabold leading-tight text-gray-900 text-center">
     📋 Daftar Online Praktek Mandiri dr. Galih<br>
     <span class="text-blue-600">Sengkol-Aikdarek</span>
   </h1>
-  <p class="text-sm text-gray-500 mt-2 mb-6">Praktek Mandiri - Sengkol, Pujut, Lombok Tengah</p>
+  <p class="text-sm text-gray-500 mt-2 mb-6 text-center">Praktek Mandiri - Sengkol-Aikdarek, Lombok Tengah</p>
   <div class="space-y-4">
     <div>
       <label class="text-sm font-semibold text-gray-700">Nama Lengkap</label>
       <input id="nama" type="text" placeholder="Contoh: Afwan Hafizi" class="mt-1 w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none">
-      <p id="previewNama" class="text-sm mt-2 hidden text-green-600"></p>
+      <p id="previewNama" class="text-sm mt-2 hidden text-green-600 text-center"></p>
     </div>
     <div>
       <label class="text-sm font-semibold text-gray-700">No. HP / WhatsApp</label>
@@ -59,10 +59,10 @@
 </div>
 <script>
 const namaInput=document.getElementById('nama');const preview=document.getElementById('previewNama');
-namaInput.addEventListener('input',()=>{const v=namaInput.value.trim();if(!v){preview.classList.add('hidden');return;}preview.classList.remove('hidden');const fixed=v.replace(/\\b\\w/g,l=>l.toUpperCase());preview.innerHTML=`Preview: <b>${fixed}</b>`;});
-function showConfirm(){const nama=document.getElementById('nama').value.trim();const hp=document.getElementById('hp').value.trim();const alamat=document.getElementById('alamat').value.trim();if(!nama||!hp){alert('Lengkapi Nama & No HP dulu!');return;}document.getElementById('cNama').innerText=nama.replace(/\\b\\w/g,l=>l.toUpperCase());document.getElementById('cHp').innerText=hp;document.getElementById('cAlamat').innerText=alamat||'-';document.getElementById('modal').classList.remove('hidden');document.getElementById('modal').classList.add('flex');}
+namaInput.addEventListener('input',()=>{const v=namaInput.value.trim();if(!v){preview.classList.add('hidden');return;}preview.classList.remove('hidden');const fixed=v.replace(/\b\w/g,l=>l.toUpperCase());preview.innerHTML=`Preview: <b>${fixed}</b>`;});
+function showConfirm(){const nama=document.getElementById('nama').value.trim();const hp=document.getElementById('hp').value.trim();const alamat=document.getElementById('alamat').value.trim();if(!nama||!hp){alert('Lengkapi Nama & No HP dulu!');return;}document.getElementById('cNama').innerText=nama.replace(/\b\w/g,l=>l.toUpperCase());document.getElementById('cHp').innerText=hp;document.getElementById('cAlamat').innerText=alamat||'-';document.getElementById('modal').classList.remove('hidden');document.getElementById('modal').classList.add('flex');}
 function closeModal(){document.getElementById('modal').classList.add('hidden');document.getElementById('modal').classList.remove('flex');}
-async function submitData(){closeModal();const nama=document.getElementById('nama').value;const hp=document.getElementById('hp').value;const alamat=document.getElementById('alamat').value;try{const res=await fetch('/api/daftar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nama,hp,alamat})});const data=await res.json();if(res.ok){alert('✅ Berhasil! No RM: '+(data.no_rm||'terdaftar')+'\\nNama: '+nama);location.reload();}else{alert('Gagal: '+(data.message||'coba lagi'));}}catch(e){alert('✅ Data tercatat: '+nama);}}
+async function submitData(){closeModal();const nama=document.getElementById('nama').value;const hp=document.getElementById('hp').value;const alamat=document.getElementById('alamat').value;try{const res=await fetch('/api/daftar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nama,hp,alamat})});const data=await res.json();if(res.ok){alert('✅ Berhasil! No RM: '+(data.no_rm||'terdaftar')+'\nNama: '+nama);location.reload();}else{alert('Gagal: '+(data.message||'coba lagi'));}}catch(e){alert('✅ Data tercatat: '+nama);}}
 </script>
 </body>
 </html>
