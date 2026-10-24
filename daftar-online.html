@@ -1,25 +1,96 @@
 <!DOCTYPE html>
 <html lang="id">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><title>Daftar Online - dr Galih</title>
-<style>*{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif}body{background:linear-gradient(135deg,#e0f2fe,#fef9c3);min-height:100vh;padding:20px}.card{max-width:520px;margin:20px auto;background:white;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.08);overflow:hidden}.header{background:linear-gradient(90deg,#0ea5e9,#22c55e);color:white;padding:18px;text-align:center}.form{padding:22px;display:flex;flex-direction:column;gap:14px}label{font-size:13px;font-weight:600}input,select,textarea{width:100%;padding:12px;border:1.5px solid #e2e8f0;border-radius:12px}.btn{background:linear-gradient(90deg,#0ea5e9,#22c55e);color:white;border:none;padding:14px;border-radius:12px;font-weight:700;cursor:pointer}.note{background:#f0fdf4;border:1px dashed #22c55e;border-radius:12px;padding:12px;font-size:12px;text-align:center}.sukses{display:none;background:#dcfce7;border:1px solid #22c55e;padding:16px;border-radius:12px;text-align:center}</style>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daftar Online - Praktek dr Galih - ANTI TYPO</title>
+<style>
+body{font-family:system-ui;padding:20px;max-width:480px;margin:auto}
+input{width:100%;padding:12px;margin:8px 0;border:2px solid #ddd;border-radius:8px;font-size:16px}
+input:focus{border-color:#0ea5e9;outline:none}
+.btn{width:100%;padding:14px;background:#0ea5e9;color:#fff;border:none;border-radius:8px;font-size:18px;font-weight:bold}
+.preview{background:#f0f9ff;padding:12px;border-radius:8px;margin:10px 0;display:none}
+.ok{color:green} .typo{color:red;font-weight:bold}
+</style>
 </head>
 <body>
-<div class="card">
-<div class="header"><h1>Daftar Online - dr Galih</h1><p>Jl Raya Sengkol Mantang - 08.30-12.30 & 16.00-21.00 WITA</p></div>
-<div class="form" id="formWrap">
-<label>Nama Lengkap *</label><input id="nama" placeholder="Widia">
-<label>NIK / HP *</label><input id="nik" placeholder="08xxxxxxxxxx">
-<div style="display:flex;gap:8px"><input id="umur" placeholder="Umur" style="flex:1"><select id="jk" style="flex:1"><option value="P">Perempuan</option><option value="L">Laki-laki</option></select></div>
-<label>Keluhan</label><textarea id="keluhan" rows="2"></textarea>
-<label>Tanggal *</label><input id="tgl" type="date">
-<button class="btn" onclick="daftar()">Daftar Sekarang</button>
-<div class="note">No RM otomatis: <b id="autoRM">Auto</b></div>
-<div class="sukses" id="sukses"><h3>✅ Berhasil!</h3><p id="msgSukses"></p><button class="btn" onclick="location.reload()">Daftar Lagi</button></div>
-</div></div>
+<h2>📋 Daftar Online - Mantang</h2>
+<p>50 pasien/hari - cek dulu biar gak jadi Maling Ramadan 😂</p>
+
+<input id="nama" placeholder="Nama lengkap" autocomplete="name">
+<div id="preview" class="preview"></div>
+
+<input id="hp" placeholder="No HP (contoh 0812xxxx)" inputmode="numeric">
+<input id="alamat" placeholder="Alamat (pilih Desa Mantang)" list="desaMantan">
+<datalist id="desaMantan">
+  <option value="Mantan Daye">
+  <option value="Mantan Lauk">
+  <option value="Mantan Tengah">
+  <option value="Batukliang">
+  <option value="Praya">
+</datalist>
+
+<button class="btn" onclick="daftar()">CEK & DAFTAR</button>
+<div id="status"></div>
+
 <script>
-function getAutoRM(){let l=JSON.parse(localStorage.getItem('pasienList')||'[]'),m=260001;l.forEach(p=>{let n=parseInt(p.rm||0);if(n>m)m=n});return m+1}
-document.getElementById('autoRM').innerText=getAutoRM();document.getElementById('tgl').valueAsDate=new Date();
-function daftar(){let a=document.getElementById('nama').value.trim(),b=document.getElementById('nik').value.trim(),c=document.getElementById('umur').value.trim(),d=document.getElementById('jk').value,e=document.getElementById('keluhan').value.trim(),f=document.getElementById('tgl').value;if(!a||!b||!f){alert('Isi nama, HP, tgl!');return}let g=getAutoRM(),h={rm:g.toString(),nama:a,nik:b,umur:c||'-',jk:d,keluhan:e,tgl:f.slice(5).replace('-','-'),tglFull:f,icd:'-',daftarOnline:true};let i=JSON.parse(localStorage.getItem('pasienList')||'[]');i.push(h);localStorage.setItem('pasienList',JSON.stringify(i));localStorage.setItem('patients',JSON.stringify(i));document.querySelectorAll('#formWrap input,#formWrap select,#formWrap textarea,#formWrap button').forEach(x=>{if(x.closest('#sukses'))return;x.style.display='none'});document.querySelectorAll('#formWrap label').forEach(x=>x.style.display='none');document.querySelector('.note').style.display='none';document.getElementById('sukses').style.display='block';document.getElementById('msgSukses').innerHTML='Nama: <b>'+a+'</b><br>No RM: <b>'+g+'</b><br>Tgl: <b>'+f+'</b>'}
+const $ = id => document.getElementById(id);
+
+// 1. AUTO BENERIN - ANTI MALIG
+$('nama').addEventListener('input', () => {
+  let raw = $('nama').value;
+  // Trim double spasi, Capitalize tiap kata
+  let fixed = raw.replace(/\s+/g,' ').replace(/\b\w/g, c => c.toUpperCase());
+
+  // Preview live
+  if(fixed.length > 2){
+    $('preview').style.display='block';
+    // Cek kata aneh "Maling" - kasih warning
+    if(fixed.toLowerCase().includes('maling')){
+      $('preview').innerHTML = `⚠️ Yakin namanya <span class="typo">${fixed}</span>? Bukan <span class="ok">Malang</span>?`;
+    } else {
+      $('preview').innerHTML = `Preview: <span class="ok">${fixed}</span> - Sudah benar?`;
+    }
+  }
+  // Auto isi yang bener
+  if(raw !== fixed && raw.length > 3){
+    // Jangan auto replace pas ngetik, cuma preview
+  }
+});
+
+async function daftar(){
+  let namaRaw = $('nama').value.trim();
+  let nama = namaRaw.replace(/\s+/g,' ').replace(/\b\w/g, c => c.toUpperCase());
+  let hp = $('hp').value.trim();
+  let alamat = $('alamat').value.trim();
+
+  if(nama.length < 3) return alert('Nama kependekan bro!');
+
+  // 2. KONFIRMASI SIANG BOLONG - BIAR MELEK
+  let ok = confirm(`CEK LAGI BRO:\n\nNama: ${nama}\nHP: ${hp}\nAlamat: ${alamat}\n\nYakin sudah BENAR? (jangan jadi Maling Ramadan lagi)`);
+  if(!ok) return;
+
+  $('status').innerHTML = '⏳ Nyimpen ke Prisma 2GB...';
+
+  // 3. KIRIM KE VERCEL PRISMA
+  try{
+    let res = await fetch('/api/daftar', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({nama, hp, alamat})
+    });
+    let data = await res.json();
+    if(data.no_rm){
+      $('status').innerHTML = `✅ SUKSES! No RM: <b>${data.no_rm}</b><br>Nama: ${data.nama}<br>Silakan ke praktek!`;
+      $('nama').value=''; $('hp').value=''; $('alamat').value='';
+      $('preview').style.display='none';
+    } else {
+      $('status').innerHTML = `❌ ${data.error || 'Gagal'}`;
+    }
+  }catch(e){
+    $('status').innerHTML = '❌ Koneksi error - cek Vercel!';
+  }
+}
 </script>
 </body>
 </html>

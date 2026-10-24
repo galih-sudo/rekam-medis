@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="id">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><title>Daftar Online - dr Galih</title>
+<style>*{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif}body{background:linear-gradient(135deg,#e0f2fe,#fef9c3);min-height:100vh;padding:20px}.card{max-width:520px;margin:20px auto;background:white;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.08);overflow:hidden}.header{background:linear-gradient(90deg,#0ea5e9,#22c55e);color:white;padding:18px;text-align:center}.form{padding:22px;display:flex;flex-direction:column;gap:14px}label{font-size:13px;font-weight:600}input,select,textarea{width:100%;padding:12px;border:1.5px solid #e2e8f0;border-radius:12px}.btn{background:linear-gradient(90deg,#0ea5e9,#22c55e);color:white;border:none;padding:14px;border-radius:12px;font-weight:700;cursor:pointer}.note{background:#f0fdf4;border:1px dashed #22c55e;border-radius:12px;padding:12px;font-size:12px;text-align:center}.sukses{display:none;background:#dcfce7;border:1px solid #22c55e;padding:16px;border-radius:12px;text-align:center}</style>
+</head>
+<body>
+<div class="card">
+<div class="header"><h1>Daftar Online - dr Galih</h1><p>Jl Raya Sengkol Mantang - 08.30-12.30 & 16.00-21.00 WITA</p></div>
+<div class="form" id="formWrap">
+<label>Nama Lengkap *</label><input id="nama" placeholder="Widia">
+<label>NIK / HP *</label><input id="nik" placeholder="08xxxxxxxxxx">
+<div style="display:flex;gap:8px"><input id="umur" placeholder="Umur" style="flex:1"><select id="jk" style="flex:1"><option value="P">Perempuan</option><option value="L">Laki-laki</option></select></div>
+<label>Keluhan</label><textarea id="keluhan" rows="2"></textarea>
+<label>Tanggal *</label><input id="tgl" type="date">
+<button class="btn" onclick="daftar()">Daftar Sekarang</button>
+<div class="note">No RM otomatis: <b id="autoRM">Auto</b></div>
+<div class="sukses" id="sukses"><h3>✅ Berhasil!</h3><p id="msgSukses"></p><button class="btn" onclick="location.reload()">Daftar Lagi</button></div>
+</div></div>
+<script>
+function getAutoRM(){let l=JSON.parse(localStorage.getItem('pasienList')||'[]'),m=260001;l.forEach(p=>{let n=parseInt(p.rm||0);if(n>m)m=n});return m+1}
+document.getElementById('autoRM').innerText=getAutoRM();document.getElementById('tgl').valueAsDate=new Date();
+function daftar(){let a=document.getElementById('nama').value.trim(),b=document.getElementById('nik').value.trim(),c=document.getElementById('umur').value.trim(),d=document.getElementById('jk').value,e=document.getElementById('keluhan').value.trim(),f=document.getElementById('tgl').value;if(!a||!b||!f){alert('Isi nama, HP, tgl!');return}let g=getAutoRM(),h={rm:g.toString(),nama:a,nik:b,umur:c||'-',jk:d,keluhan:e,tgl:f.slice(5).replace('-','-'),tglFull:f,icd:'-',daftarOnline:true};let i=JSON.parse(localStorage.getItem('pasienList')||'[]');i.push(h);localStorage.setItem('pasienList',JSON.stringify(i));localStorage.setItem('patients',JSON.stringify(i));document.querySelectorAll('#formWrap input,#formWrap select,#formWrap textarea,#formWrap button').forEach(x=>{if(x.closest('#sukses'))return;x.style.display='none'});document.querySelectorAll('#formWrap label').forEach(x=>x.style.display='none');document.querySelector('.note').style.display='none';document.getElementById('sukses').style.display='block';document.getElementById('msgSukses').innerHTML='Nama: <b>'+a+'</b><br>No RM: <b>'+g+'</b><br>Tgl: <b>'+f+'</b>'}
+</script>
+</body>
+</html>
