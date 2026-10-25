@@ -1,3 +1,18 @@
-datasource db { provider="postgresql" url=env("DATABASE_POSTGRES_URL") }
-generator client { provider="prisma-client-js" }
-model pasien { id Int @id @default(autoincrement()) no_rm String @unique nama String no_hp String alamat String? created_at DateTime @default(now()) }
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model pasien {
+  id Int @id @default(autoincrement())
+  no_rm String @unique
+  nama String
+  no_hp String
+  alamat String?
+  created_at DateTime @default(now())
+}
