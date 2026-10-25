@@ -1,0 +1,10 @@
+{
+  "outputDirectory": ".",
+  "buildCommand": "prisma generate",
+  "framework": null,
+  "functions": {
+    "api/*.js": {
+      "includeFiles": "prisma/**"
+    }
+  }
+}
