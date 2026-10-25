@@ -15,12 +15,17 @@ export default async function handler(req, res) {
     if (req.method === 'POST') {
       const { nama, no_hp, alamat } = req.body
       
-      // FIX: hitung hanya yang format 26-xxxxx, ignore RM-xxxx lama
-      const pasien26 = await prisma.pasien.findMany({
-        where: { no_rm: { startsWith: '26-' } }
+      // FIX: cari MAX number dari 26-xxxxxx, bukan length
+      const all = await prisma.pasien.findMany({
+        where: { no_rm: { startsWith: '26-' } },
+        orderBy: { no_rm: 'desc' }
       })
-      const lastNumber = pasien26.length
-      const newNoRM = `26-${String(lastNumber + 1).padStart(5, '0')}`
+      let maxNum = 0
+      all.forEach(p => {
+        const n = parseInt(p.no_rm.split('-')[1])
+        if (!isNaN(n) && n > maxNum) maxNum = n
+      })
+      const newNoRM = `26-${String(maxNum + 1).padStart(5, '0')}`
 
       const newPasien = await prisma.pasien.create({
         data: { no_rm: newNoRM, nama, no_hp, alamat }
