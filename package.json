@@ -1,13 +1,12 @@
 {
+  "name": "rekam-medis",
+  "type": "module",
   "dependencies": {
-    "@prisma/client": "^5.22.0"
-  },
-  "devDependencies": {
+    "@prisma/client": "^5.22.0",
     "prisma": "^5.22.0"
   },
-  "allowScripts": {
-    "prisma@5.22.0": true,
-    "@prisma/engines@5.22.0": true,
-    "@prisma/client@5.22.0": true
+  "scripts": {
+    "postinstall": "prisma generate",
+    "build": "prisma generate"
   }
 }
