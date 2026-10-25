@@ -75,4 +75,22 @@ renderUser();
 function logout(){localStorage.removeItem('isLogin');location.href='./login.html';}
 renderUser();
 </script>
+
+<script>
+async function editPasien(id, nama, hp, alamat) {
+  const n = prompt('Edit Nama:', nama); if(n===null) return
+  const h = prompt('Edit No HP:', hp); if(h===null) return
+  const a = prompt('Edit Alamat:', alamat); if(a===null) return
+  const res = await fetch('/api/pasien/'+id, {
+    method:'PUT', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({nama:n, no_hp:h, alamat:a})
+  })
+  if(res.ok){ alert('✅ Updated!'); location.reload() } else { alert('Gagal update') }
+}
+async function hapusPasien(id, nama) {
+  if(!confirm('Hapus '+nama+' ?')) return
+  const res = await fetch('/api/pasien/'+id, { method:'DELETE' })
+  if(res.ok){ alert('🗑️ Dihapus'); location.reload() } else { alert('Gagal hapus') }
+}
+</script>
 </body></html>
