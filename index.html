@@ -1,9 +1,18 @@
 <!DOCTYPE html>
 <html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login - Praktek dr Galih</title>
+<title>Login - Praktek dr Galih AVICENA</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0ea5e9">
 <style>
 *{box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
 body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#dbeafe 0%,#e0f2fe 30%,#f0fdfa 60%,#fef9c3 100%);padding:16px}
+.wrapper{width:100%;max-width:1100px;display:flex;align-items:center;gap:40px;justify-content:center;flex-wrap:wrap}
+.hero-side{flex:1 1 520px;max-width:620px}
+.hero-side picture img{width:100%;height:auto;border-radius:24px;box-shadow:0 20px 60px rgba(37,99,235,.15);display:block}
+.hero-text{margin-top:16px}
+.hero-text h1{font-size:32px;line-height:1.1;margin:0;color:#0f172a}
+.hero-text h1 span{background:linear-gradient(90deg,#2563eb,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-text p{color:#64748b;font-size:13.5px;line-height:1.6;margin-top:8px}
 .card-login{background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-radius:24px;padding:30px;box-shadow:0 20px 60px rgba(59,130,246,.15);border:1px solid rgba(255,255,255,.9);width:100%;max-width:380px}
 .logo{text-align:center;margin-bottom:24px}
 .logo b{font-size:22px;background:linear-gradient(90deg,#2563eb,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -13,11 +22,27 @@ body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:c
 .btn-login{width:100%;padding:14px;border:0;border-radius:14px;background:linear-gradient(90deg,#2563eb,#06b6d4);color:#fff;font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(37,99,235,.3);margin-top:6px;transition:.2s}
 .btn-login:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(37,99,235,.4)}
 .footer{text-align:center;margin-top:16px;font-size:9px;color:#94a3b8}
+@media(max-width:900px){
+.wrapper{flex-direction:column}
+.hero-side{order:2;max-width:380px}
+.card-login{order:1}
+.hero-text h1{font-size:24px}
+}
 </style>
 </head>
-  <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0ea5e9">
 <body>
+<div class="wrapper">
+<div class="hero-side">
+<picture>
+  <source media="(max-width: 900px)" srcset="hero-mobile.png">
+  <img src="hero-desktop.png" alt="Praktek Mandiri dr Galih AVICENA Sengkol">
+</picture>
+<div class="hero-text">
+<h1>Kesehatan Anda, <span>Prioritas Kami</span></h1>
+<p>Daftar antrian dari rumah via HP. Datang sesuai jam, tanpa antre lama. Sistem AVICENA dengan Prisma Postgres 2GB anti-pause real-time.</p>
+</div>
+</div>
+
 <div class="card-login">
 <div class="logo"><b>Praktek dr Galih</b><div>Jl Raya Sengkol Mantang • Lombok Tengah NTB</div></div>
 <input id="username" class="input" placeholder="Username" autocomplete="off" autocorrect="off" spellcheck="false">
@@ -25,6 +50,8 @@ body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:c
 <button class="btn-login" onclick="login()">Masuk ➜</button>
 <div class="footer">Melayani Dengan Hati ❤️ • Sistem Real • <span id="jamLogin">--:--:--</span></div>
 </div>
+</div>
+
 <script>
 function getUsers(){
 var u=localStorage.getItem('usersV8');
