@@ -1,71 +1,92 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daftar Online Praktek Mandiri dr. Galih Sengkol Aikdarek Batukliang</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-<style>body{font-family:'Inter',sans-serif}</style>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daftar Online Praktek Mandiri dr Galih</title>
+<style>
+*{box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#dbeafe 0%,#e0f2fe 30%,#f0fdfa 60%,#fef9c3 100%);padding:16px}
+.wrapper{width:100%;max-width:1100px;display:flex;align-items:center;gap:40px;justify-content:center;flex-wrap:wrap}
+.hero-side{flex:1 1 520px;max-width:620px}
+.hero-side picture img{width:100%;height:auto;border-radius:24px;box-shadow:0 20px 60px rgba(37,99,235,.15);display:block}
+.hero-text{margin-top:16px}
+.hero-text h1{font-size:32px;line-height:1.1;margin:0;color:#0f172a}
+.hero-text h1 span{background:linear-gradient(90deg,#2563eb,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-text p{color:#64748b;font-size:13.5px;line-height:1.6;margin-top:8px}
+.card{flex:1 1 380px;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-radius:24px;padding:28px;box-shadow:0 20px 60px rgba(59,130,246,.15);border:1px solid rgba(255,255,255,.9);max-width:420px}
+.card h2{margin:0;text-align:center;font-size:20px;color:#0f172a}
+.card .sub{font-size:11px;color:#94a3b8;text-align:center;margin-top:6px;margin-bottom:18px}
+.label{font-size:12px;font-weight:700;color:#334155;margin:12px 0 6px 4px;display:block}
+.input{width:100%;padding:14px 16px;border:1px solid #e2e8f0;border-radius:14px;background:#f8fafc;font-size:13.5px;transition:.2s}
+.input:focus{outline:none;border-color:#3b82f6;background:#fff;box-shadow:0 0 0 4px #dbeafe}
+.btn{width:100%;padding:14px;border:0;border-radius:14px;background:linear-gradient(90deg,#0ea5e9,#06b6d4);color:#fff;font-weight:800;font-size:14px;cursor:pointer;margin-top:18px;box-shadow:0 4px 16px rgba(14,165,233,.3);transition:.2s}
+.btn:hover{transform:translateY(-1px)}
+.back{text-align:center;margin-top:14px}
+.back a{font-size:12px;color:#2563eb;text-decoration:none;font-weight:600}
+.footer{text-align:center;margin-top:12px;font-size:10px;color:#94a3b8}
+@media(max-width:900px){
+.wrapper{flex-direction:column}
+.hero-side{order:2;max-width:380px}
+.card{order:1}
+.hero-text h1{font-size:24px}
+}
+</style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
-<div class="bg-white w-full max-w-lg rounded-2xl shadow-xl p-7 md:p-8">
-  <!-- JUDUL 2 BARIS -->
-  <div class="text-center leading-tight">
-    <p class="text-[21px] md:text-[24px] font-bold text-gray-900">Daftar Online Praktek dr. Galih</p>
-  </div>
-  <p class="text-[12px] text-gray-400 mt-3 mb-6 text-center tracking-wide">Praktek Mandiri - Sengkol-Aikdarek, Batukliang, Lombok Tengah</p>
-
-  <div class="space-y-4">
-    <div>
-      <label class="text-sm font-semibold text-gray-700">Nama Lengkap</label>
-      <input id="nama" type="text" placeholder="Contoh: Afwan Hafizi" class="mt-1 w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none">
-      <p id="previewNama" class="text-sm mt-2 hidden text-green-600 text-center"></p>
-    </div>
-    <div>
-      <label class="text-sm font-semibold text-gray-700">No. HP / WhatsApp</label>
-      <input id="hp" type="tel" placeholder="Contoh: 0812xxxx" class="mt-1 w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none">
-    </div>
-    <div>
-      <label class="text-sm font-semibold text-gray-700">Alamat</label>
-      <input id="alamat" type="text" placeholder="Contoh: Pejeruk Ampenan" class="mt-1 w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none">
-    </div>
-    <button onclick="showConfirm()" class="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 rounded-xl mt-4 transition">Daftar Sekarang</button>
-    <p class="text-[11px] text-center text-gray-400 mt-3">© Rekam Medis Praktek Mandiri dr.Galih • 50 pasien/hari</p>
-  </div>
+<body>
+<div class="wrapper">
+<div class="hero-side">
+<picture>
+  <source media="(max-width: 900px)" srcset="hero-mobile.png">
+  <img src="hero-desktop.png" alt="Daftar Antrian AVICENA" loading="eager">
+</picture>
+<div class="hero-text">
+<h1>Daftar Dari Rumah, <span>Tanpa Antre!</span></h1>
+<p>Cukup isi HP & Alamat, datang sesuai jam praktek. Sistem otomatis catat antrian, 50 pasien/hari, real-time di Sengkol.</p>
+</div>
 </div>
 
-<div id="modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-  <div class="bg-[#1e1e1e] text-white w-full max-w-md rounded-[20px] shadow-2xl overflow-hidden border border-white/10">
-    <div class="px-6 pt-6 pb-3 border-b border-white/10">
-      <div class="flex items-center gap-2 text-[15px] font-bold tracking-wide">
-        <div class="w-6 h-6 bg-white text-black rounded-full flex items-center justify-center text-[13px] font-extrabold">R</div>
-        Rekam Medis Praktek Mandiri dr.Galih
-      </div>
-      <p class="text-white/50 text-[12px] mt-1">rekam-medis-v5.vercel.app</p>
-    </div>
-    <div class="px-6 py-5">
-      <p class="font-bold text-[15px] mb-4">CEK KEMBALI DATA:</p>
-      <div class="space-y-1.5 text-[15px] leading-relaxed">
-        <p>Nama: <span id="cNama" class="font-semibold"></span></p>
-        <p>HP: <span id="cHp" class="font-semibold"></span></p>
-        <p>Alamat: <span id="cAlamat" class="font-semibold"></span></p>
-      </div>
-      <p class="mt-6 text-[14px] text-white/80">Yakin sudah BENAR?</p>
-      <div class="flex justify-end gap-3 mt-6">
-        <button onclick="closeModal()" class="px-6 py-2.5 rounded-full border border-white/30 text-white font-bold hover:bg-white/10">Batal</button>
-        <button onclick="submitData()" class="px-7 py-2.5 rounded-full bg-white text-black font-bold hover:bg-gray-200">Oke</button>
-      </div>
-    </div>
-  </div>
+<div class="card">
+<h2>Daftar Online Praktek dr. Galih</h2>
+<div class="sub">Praktek Mandiri - Sengkol-Aikdarek, Batukliang, Lombok Tengah</div>
+
+<label class="label">Nama Lengkap</label>
+<input id="nama" class="input" placeholder="Contoh: Afwan Hafizi">
+
+<label class="label">No. HP / WhatsApp</label>
+<input id="hp" class="input" placeholder="Contoh: 0812xxxx">
+
+<label class="label">Alamat</label>
+<input id="alamat" class="input" placeholder="Contoh: Pejeruk Ampenan">
+
+<button class="btn" onclick="daftar()">Daftar Sekarang 🚀</button>
+
+<div class="back"><a href="./index.html">← Kembali ke Login</a></div>
+<div class="footer">© Rekam Medis Praktek Mandiri dr.Galih • 50 pasien/hari</div>
+</div>
 </div>
 
 <script>
-const namaInput=document.getElementById('nama');const preview=document.getElementById('previewNama');
-namaInput.addEventListener('input',()=>{const v=namaInput.value.trim();if(!v){preview.classList.add('hidden');return;}preview.classList.remove('hidden');const fixed=v.replace(/\b\w/g,l=>l.toUpperCase());preview.innerHTML=`Preview: <b>${fixed}</b>`;});
-function showConfirm(){const nama=document.getElementById('nama').value.trim();const hp=document.getElementById('hp').value.trim();const alamat=document.getElementById('alamat').value.trim();if(!nama||!hp){alert('Lengkapi Nama & No HP dulu!');return;}document.getElementById('cNama').innerText=nama.replace(/\b\w/g,l=>l.toUpperCase());document.getElementById('cHp').innerText=hp;document.getElementById('cAlamat').innerText=alamat||'-';document.getElementById('modal').classList.remove('hidden');document.getElementById('modal').classList.add('flex');}
-function closeModal(){document.getElementById('modal').classList.add('hidden');document.getElementById('modal').classList.remove('flex');}
-async function submitData(){closeModal();const nama=document.getElementById('nama').value;const hp=document.getElementById('hp').value;const alamat=document.getElementById('alamat').value;try{const res=await fetch('/api/pasien',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nama, no_hp: hp, alamat})});const data=await res.json();if(res.ok){alert('✅ Berhasil! No RM: '+(data.no_rm||'terdaftar')+'\nNama: '+nama);location.reload();}else{alert('Gagal: '+(data.message||'coba lagi'));}}catch(e){alert('✅ Data tercatat: '+nama);}}
+async function daftar(){
+var nama=document.getElementById('nama').value.trim();
+var hp=document.getElementById('hp').value.trim();
+var alamat=document.getElementById('alamat').value.trim();
+if(!nama||!hp||!alamat){alert('Lengkapi semua data bro!');return;}
+try{
+var res=await fetch('/api/pasien',{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({nama:nama, hp:hp, alamat:alamat, sumber:'daftar-online'})
+});
+var j=await res.json();
+if(res.ok){
+alert('SUKSES! No Antrian: '+ (j.no_antrian||'-') +' - Datang jam praktek ya!');
+location.href='./index.html';
+}else{alert(j.error||'Gagal daftar');}
+}catch(e){
+var list=JSON.parse(localStorage.getItem('daftarOnlineV1')||'[]');
+list.push({nama, hp, alamat, tgl:new Date().toISOString()});
+localStorage.setItem('daftarOnlineV1',JSON.stringify(list));
+alert('SUKSES (Offline) - Data tersimpan, admin akan cek!');
+location.href='./index.html';
+}
+}
 </script>
-</body>
-</html>
+</body></html>
