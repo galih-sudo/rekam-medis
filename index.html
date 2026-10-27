@@ -1,97 +1,96 @@
 <!DOCTYPE html>
-<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login - Praktek dr Galih AVICENA</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0ea5e9">
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AVICENA - Praktek Mandiri dr. Galih</title>
 <style>
-*{box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
-body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#dbeafe 0%,#e0f2fe 30%,#f0fdfa 60%,#fef9c3 100%);padding:16px}
-.wrapper{width:100%;max-width:1100px;display:flex;align-items:center;gap:40px;justify-content:center;flex-wrap:wrap}
-.hero-side{flex:1 1 520px;max-width:620px}
-.hero-side picture img{width:100%;height:auto;border-radius:24px;box-shadow:0 20px 60px rgba(37,99,235,.15);display:block}
-.hero-text{margin-top:16px}
-.hero-text h1{font-size:32px;line-height:1.1;margin:0;color:#0f172a}
-.hero-text h1 span{background:linear-gradient(90deg,#2563eb,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero-text p{color:#64748b;font-size:13.5px;line-height:1.6;margin-top:8px}
-.card-login{background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-radius:24px;padding:30px;box-shadow:0 20px 60px rgba(59,130,246,.15);border:1px solid rgba(255,255,255,.9);width:100%;max-width:380px}
-.logo{text-align:center;margin-bottom:24px}
-.logo b{font-size:22px;background:linear-gradient(90deg,#2563eb,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.logo div{font-size:11px;color:#64748b;margin-top:4px}
-.input{width:100%;padding:14px 16px;border:1px solid #e2e8f0;border-radius:14px;background:#f8fafc;font-size:13px;margin-bottom:12px;transition:.2s}
-.input:focus{outline:none;border-color:#3b82f6;background:#fff;box-shadow:0 0 0 4px #dbeafe}
-.btn-login{width:100%;padding:14px;border:0;border-radius:14px;background:linear-gradient(90deg,#2563eb,#06b6d4);color:#fff;font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 4px 16px rgba(37,99,235,.3);margin-top:6px;transition:.2s}
-.btn-login:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(37,99,235,.4)}
-.link-daftar{text-align:center;margin-top:16px}
-.link-daftar a{font-size:12.5px;font-weight:600;color:#2563eb;text-decoration:none;background:#eff6ff;padding:10px 16px;border-radius:99px;display:inline-block;border:1px solid #dbeafe;transition:.2s}
-.link-daftar a:hover{background:#dbeafe;transform:translateY(-1px)}
-.footer{text-align:center;margin-top:14px;font-size:9px;color:#94a3b8}
-@media(max-width:900px){
-.wrapper{flex-direction:column}
-.hero-side{order:2;max-width:380px}
-.card-login{order:1}
-.hero-text h1{font-size:24px}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif;scroll-behavior:smooth}
+body{background:#f7fffe}
+header{position:fixed;top:0;left:0;right:0;z-index:30;background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid #e0f2f1}
+.logo{display:flex;gap:10px;align-items:center}
+.logo-icon{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#0f766e,#2dd4bf);display:grid;place-items:center;color:#fff;font-weight:900}
+.logo b{font-size:16px;color:#134e4a;line-height:1}
+.logo span{font-size:8px;color:#0f766e;font-weight:800;letter-spacing:.5px}
+nav{display:flex;gap:10px;align-items:center}
+nav a{font-size:12px;color:#334155;text-decoration:none;font-weight:600;padding:6px 10px;border-radius:999px}
+nav a.active{background:#e0f2f1;color:#0f766e}
+.btn-nav{background:#0f766e!important;color:#fff!important;padding:8px 14px!important}
+
+.hero{min-height:100svh;display:flex;align-items:center;padding:72px 18px 30px;background:linear-gradient(180deg,#fff 0%,#edfffd 100%)}
+.hero-inner{max-width:1200px;margin:0 auto;width:100%;display:flex;align-items:center;gap:20px}
+.hero-left{flex:1}
+.hero-left h1{font-size:32px;line-height:.95;color:#102a2a;font-weight:900;letter-spacing:-.8px}
+.hero-left .sub{margin-top:14px;font-size:14px;line-height:1.6;color:#475569}
+.btn-cta{margin-top:22px;display:inline-flex;gap:8px;background:#14988a;color:#fff;padding:14px 24px;border-radius:999px;font-weight:800;font-size:14px;text-decoration:none;box-shadow:0 10px 24px rgba(20,152,138,.28)}
+.checks{margin-top:12px;display:flex;gap:14px;font-size:12px;font-weight:700;color:#115e59}
+.hero-right{flex:1.1;display:flex;justify-content:center}
+.hero-right img{width:100%;max-width:720px;height:auto;object-fit:contain;filter:drop-shadow(0 12px 28px rgba(0,0,0,.08))}
+
+#tentang{padding:40px 18px;background:#fff}
+#tentang h2{font-size:22px;color:#0f2e2e;font-weight:900}
+
+/* ===== DESKTOP LANDSCAPE TETAP CAKEP ===== */
+@media(min-width:900px){
+  header{padding:16px 56px}
+  nav a{font-size:14px;padding:8px 14px}
+  .hero{padding:110px 56px 60px}
+  .hero-left h1{font-size:54px}
+  .hero-left .sub{font-size:17px}
+  .btn-cta{font-size:16px;padding:16px 30px}
+  #tentang{padding:80px 56px}
+}
+
+/* ===== HP PORTRAIT FIX ===== */
+@media(max-width:899px){
+  .hero-inner{flex-direction:column-reverse}
+  .hero-right img{
+    max-width:100%;
+    max-height:42vh;
+    object-fit:cover;
+    object-position:top center;
+    border-radius:22px;
+  }
+  .hero-left h1{font-size:30px;text-align:center}
+  .hero-left .sub{text-align:center}
+  .hero-left{display:flex;flex-direction:column;align-items:center}
 }
 </style>
 </head>
 <body>
-<div class="wrapper">
-<div class="hero-side">
-<picture>
-  <source media="(max-width: 900px)" srcset="hero-mobile.png">
-  <img src="hero-desktop.png" alt="Praktek Mandiri dr Galih AVICENA Sengkol" loading="eager">
-</picture>
-<div class="hero-text">
-<h1>Kesehatan Anda, <span>Prioritas Kami</span></h1>
-<p>Daftar antrian dari rumah via HP. Datang sesuai jam, tanpa antre lama. Sistem AVICENA dengan Prisma Postgres 2GB anti-pause real-time.</p>
-</div>
-</div>
+<header>
+  <div class="logo">
+    <div class="logo-icon">A</div>
+    <div><b>AVICENA</b><span>PRAKTEK MANDIRI dr. GALIH</span></div>
+  </div>
+  <nav>
+    <a href="#beranda" class="active">Beranda</a>
+    <a href="#tentang">Tentang</a>
+    <a href="dashboard.html">Rekam</a>
+    <a href="daftar-online.html" class="btn-nav">Daftar</a>
+  </nav>
+</header>
 
-<div class="card-login">
-<div class="logo"><b>Praktek dr Galih</b><div>Jl Raya Sengkol Mantang • Lombok Tengah NTB</div></div>
-<input id="username" class="input" placeholder="Username" autocomplete="off" autocorrect="off" spellcheck="false">
-<input id="password" class="input" type="password" placeholder="Password">
-<button class="btn-login" onclick="login()">Masuk ➜</button>
-<div class="link-daftar">
-<a href="./daftar-online.html">📱 Belum punya akun? Daftar Antrian Online →</a>
-</div>
-<div class="footer">Melayani Dengan Hati ❤️ • Sistem Real • <span id="jamLogin">--:--:--</span></div>
-</div>
-</div>
+<section class="hero" id="beranda">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <h1>Praktek Mandiri dr. Galih</h1>
+      <p class="sub">Cepat, praktis, dan tanpa antre lama. Jadwalkan konsultasi kesehatan Anda dan keluarga dengan mudah dari mana saja.</p>
+      <a href="daftar-online.html" class="btn-cta">📅 Daftar Online Sekarang</a>
+      <div class="checks">
+        <span>✓ Tanpa Antre</span>
+        <span>✓ 100% Praktis</span>
+      </div>
+    </div>
+    <div class="hero-right">
+      <img src="hero-landing.png" alt="Praktek dr Galih">
+    </div>
+  </div>
+</section>
 
-<script>
-function getUsers(){
-var u=localStorage.getItem('usersV8');
-if(!u){
-var def=[
-{username:'admin',password:'admin123',nama:'Admin',role:'admin'},
-{username:'galih',password:'galih123',nama:'dr Galih',role:'dokter'},
-{username:'perawat',password:'perawat123',nama:'Perawat',role:'perawat'}
-];
-localStorage.setItem('usersV8',JSON.stringify(def));
-return def;
-}
-return JSON.parse(u);
-}
-function login(){
-var u=document.getElementById('username').value.trim().toLowerCase();
-var p=document.getElementById('password').value;
-var users=getUsers();
-var found=users.find(function(x){return x.username.toLowerCase()===u && x.password===p});
-if(found){
-localStorage.setItem('loginUser',found.nama);
-localStorage.setItem('username',found.username);
-localStorage.setItem('role',found.role);
-localStorage.setItem('isLogin','1');
-location.href='./dashboard.html';
-} else {
-alert('Username atau Password salah!');
-}
-}
-document.addEventListener('keydown',function(e){if(e.key==='Enter')login();});
-function updateJam(){
-var now=new Date();
-document.getElementById('jamLogin').textContent=now.toLocaleTimeString('id-ID');
-}
-updateJam();setInterval(updateJam,1000);
-</script>
-</body></html>
+<section id="tentang">
+  <h2>Tentang Kami</h2>
+  <p style="margin-top:10px;color:#475569;line-height:1.6">Praktek di Sengkol Aikdarek Batukliang, Lombok Tengah. Buka setiap hari.</p>
+</section>
+</body>
+</html>
