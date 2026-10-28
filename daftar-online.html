@@ -95,4 +95,28 @@ location.href='./index.html';
 }
 }
 </script>
+
+<script>
+function simpanKeAntrian(nama, hp, keluhan){
+  let antri = JSON.parse(localStorage.getItem('antrian_drg')||'[]');
+  antri.push({id:Date.now(), nama:nama, hp:hp, keluhan:keluhan||'-', waktu:new Date().toLocaleString('id-ID'), status:'Menunggu', sumber:'Online'});
+  localStorage.setItem('antrian_drg', JSON.stringify(antri));
+  // LOG
+  let logs=JSON.parse(localStorage.getItem('log_aktivitas')||'[]');
+  logs.unshift({waktu:new Date().toLocaleString('id-ID'), user:'Pasien '+nama, aksi:'Daftar Online'});
+  localStorage.setItem('log_aktivitas', JSON.stringify(logs.slice(0,100)));
+}
+// Override fungsi daftar yang lama kalau ada
+document.addEventListener('DOMContentLoaded', ()=>{
+  const form = document.querySelector('form');
+  if(form){
+    form.addEventListener('submit', (e)=>{
+      const nama = document.querySelector('[name=nama], #nama')?.value || 'Pasien';
+      const hp = document.querySelector('[name=hp], #hp, [name=wa]')?.value || '';
+      const keluhan = document.querySelector('[name=keluhan], #keluhan')?.value || '';
+      simpanKeAntrian(nama, hp, keluhan);
+    });
+  }
+});
+</script>
 </body></html>

@@ -1,1 +1,19 @@
-<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Login dr. Galih</title><style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0f172a;font-family:system-ui}.c{background:white;padding:32px;border-radius:20px;width:90%;max-width:360px;text-align:center}input{width:100%;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #ccc;box-sizing:border-box}.b{width:100%;padding:12px;background:#0ea5e9;color:white;border:0;border-radius:10px;font-weight:bold;cursor:pointer}</style></head><body><div class="c"><h2>🔒 dr. Galih</h2><input id="u" placeholder="user: drgalih"><input id="p" type="password" placeholder="pass: galih123"><button class="b" onclick="login()">MASUK</button><p id="msg" style="color:red"></p></div><script>function login(){if(u.value==='drgalih'&&p.value==='galih123'){document.cookie='login_drg=ok; path=/; max-age=86400';localStorage.setItem('login_drg','ok');location.href='/dashboard.html'}else{msg.innerText='Salah! user:drgalih pass:galih123'}}</script></body></html>
+<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Login - dr. Galih</title><style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0f172a;font-family:system-ui}.c{background:white;padding:32px;border-radius:20px;width:90%;max-width:380px;text-align:center}input{width:100%;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #ccc;box-sizing:border-box}.b{width:100%;padding:12px;background:#0ea5e9;color:white;border:0;border-radius:10px;font-weight:bold;cursor:pointer;margin-top:8px}.role{font-size:11px;color:#64748b;margin-top:12px;text-align:left;background:#f8fafc;padding:10px;border-radius:8px}</style></head><body><div class="c"><h2>🔒 Praktek dr. Galih</h2><p style="font-size:13px;color:#666">Pilih Role Login</p><input id="u" placeholder="Username"><input id="p" type="password" placeholder="Password"><button class="b" onclick="login()">MASUK</button><p id="msg" style="color:red;font-size:12px"></p><div class="role"><b>Akun Demo:</b><br>👨‍⚕️ Dokter: drgalih / galih123 (Full Access)<br>👩‍⚕️ Perawat: perawat / perawat123 (No Hapus)</div></div><script>
+const USERS={drgalih:{pass:'galih123',role:'dokter',name:'dr. Galih'},perawat:{pass:'perawat123',role:'perawat',name:'Perawat'}};
+function login(){
+  const u=document.getElementById('u').value.trim().toLowerCase();
+  const p=document.getElementById('p').value;
+  if(USERS[u] && USERS[u].pass===p){
+    document.cookie='login_drg=ok; path=/; max-age=86400';
+    localStorage.setItem('login_drg','ok');
+    localStorage.setItem('role_drg',USERS[u].role);
+    localStorage.setItem('nama_drg',USERS[u].name);
+    localStorage.setItem('user_drg',u);
+    // LOG
+    let logs=JSON.parse(localStorage.getItem('log_aktivitas')||'[]');
+    logs.unshift({waktu:new Date().toLocaleString('id-ID'),user:USERS[u].name,aksi:'Login'});
+    localStorage.setItem('log_aktivitas',JSON.stringify(logs.slice(0,100)));
+    location.href='/dashboard.html';
+  }else{msg.innerText='Salah! Cek akun demo di bawah';}
+}
+</script></body></html>
