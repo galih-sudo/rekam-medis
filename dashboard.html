@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="id"><head>
-<script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
+
 <script>
 // ROLE CHECK
 const role = localStorage.getItem('role_drg')||'dokter';
@@ -38,7 +38,8 @@ body{font-family:system-ui; background:#f0f9ff; padding:15px; max-width:1100px; 
 .stat{ text-align:center } .stat h2{font-size:36px; margin:5px; color:#0369a1}
 .badge{padding:4px 10px; border-radius:20px; color:white; font-size:12px}
 .red{background:#ef4444} .yellow{background:#f59e0b} .green{background:#10b981}
-</style></head><body>
+</style></head><script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
+<body>
 <h1>📊 DASHBOARD BOS KLINIK dr. Galih</h1>
 <a href="/">Daftar</a> | <a href="/antrian.html">Antrian</a> | <a href="/riwayat.html">Riwayat</a> | <button onclick="load()">🔄 Refresh</button>
 

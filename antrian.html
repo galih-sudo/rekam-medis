@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="id"><head>
-<script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
+
 <script>
 // ROLE CHECK
 const role = localStorage.getItem('role_drg')||'dokter';
@@ -36,7 +36,8 @@ body{font-family:system-ui; background:#f0f9ff; padding:20px; text-align:center}
 .btn{padding:14px 24px; border:none; border-radius:12px; font-weight:bold; cursor:pointer; margin:5px}
 .panggil{background:#0ea5e9; color:white; font-size:18px}
 .rm{background:#10b981; color:white}
-</style></head><body>
+</style></head><script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
+<body>
 <h1>🩺 Antrian - dr. Galih</h1>
 <a href="/">Daftar</a> | <a href="/riwayat.html">Riwayat</a> | <button onclick="load()">🔄 Refresh</button>
 <div id="list">Loading...</div>

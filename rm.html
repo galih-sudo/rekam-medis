@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="id"><head>
-<script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
+
 <script>
 // ROLE CHECK
 const role = localStorage.getItem('role_drg')||'dokter';
@@ -37,7 +37,8 @@ input, textarea, select{width:100%; padding:10px; margin:6px 0; border-radius:8p
 .suggest{background:white; border:1px solid #ddd; border-radius:8px; max-height:150px; overflow:auto; position:absolute; z-index:10; width:90%}
 .suggest div{padding:8px; cursor:pointer} .suggest div:hover{background:#e0f2fe}
 .row{display:flex; gap:10px} .row>*{flex:1}
-</style></head><body>
+</style></head><script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
+<body>
 <a href="/riwayat.html">← Kembali ke Riwayat</a>
 <div id="pasien" class="card">Loading...</div>
 <h3>Tambah Kunjungan Baru - Lengkap ICD10 + Stok Obat</h3>

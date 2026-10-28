@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="id"><head>
-<script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
+
 </body></html>
 </script><head></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>SOAP + Stok + ED - dr Galih</title><style>
 *{font-family:sans-serif;box-sizing:border-box}body{margin:0;background:#f0f7ff}.header{background:#3b82f6;color:#fff;padding:14px 20px;display:flex;justify-content:space-between}
@@ -13,7 +13,8 @@
 .icd-item{padding:10px 12px;border-bottom:1px solid #f1f5f9;cursor:pointer;font-size:12px}.icd-item:hover{background:#eff6ff}
 table.obat{width:100%;border-collapse:collapse;margin-top:10px}table.obat th{font-size:9px;color:#94a3b8;padding:8px;text-align:left;border-bottom:1px solid #e2e8f0}table.obat td{padding:10px 8px;border-bottom:1px solid #f1f5f9;font-size:12px}
 textarea.input{min-height:80px;resize:vertical}.stok-warn{font-size:11px;font-weight:800;padding:6px 10px;border-radius:8px;margin-top:6px;display:inline-block}
-</style></head><body>
+</style></head><script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
+<body>
 <div class="header"><div style="display:flex;gap:10px;align-items:center"><a href="./dashboard.html" style="text-decoration:none"><button class="btn" style="background:#fff;color:#3b82f6">← Dashboard</button></a><b>SOAP - Stok+ED</b></div><div><span id="rmDisplay" class="badge-rm">260001</span></div></div>
 <div class="container">
 <div class="card"><div class="label">DATA PASIEN</div><div class="grid2"><div><div class="label">NAMA AUTO</div><input id="nama" class="input"></div><div><div class="label">NO RM - AUTO</div><input id="norm" class="input" readonly style="background:#eff6ff;font-weight:800;color:#3b82f6"></div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px"><div><div class="label">TGL LAHIR</div><input id="tglLahir" type="date" class="input" onchange="hitungUmur()"></div><div><div class="label">UMUR</div><input id="umur" class="input" oninput="hitungTglLahir()"></div><div><div class="label">JK</div><select id="jk" class="input"><option>L</option><option>P</option></select></div></div><div class="grid2" style="margin-top:12px"><div><div class="label">TGL KUNJUNGAN</div><input id="tanggal" type="date" class="input"></div><div><div class="label">PEKERJAAN</div><input id="pekerjaan" class="input"></div></div></div>
