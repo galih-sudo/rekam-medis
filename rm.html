@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RM Pasien</title>
+<style>
+body{font-family:system-ui; background:#f0f9ff; padding:20px; max-width:800px; margin:auto}
+.card{background:white; padding:16px; margin:12px 0; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.1)}
+input, textarea{width:100%; padding:10px; margin:6px 0; border-radius:8px; border:1px solid #ccc; box-sizing:border-box}
+.btn{padding:12px 20px; background:#0ea5e9; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold}
+.badge{background:#0ea5e9; color:white; padding:4px 10px; border-radius:20px}
+</style>
+</head>
+<body>
+<a href="/riwayat.html">← Kembali ke Riwayat</a>
+<div id="pasien" class="card">Loading...</div>
+
+<h3>Tambah Kunjungan Baru</h3>
+<div class="card">
+<textarea id="keluhan" placeholder="Keluhan..."></textarea>
+<input id="diagnosa" placeholder="Diagnosa...">
+<textarea id="terapi" placeholder="Terapi / Tindakan..."></textarea>
+<input id="obat" placeholder="Obat...">
+<button class="btn" onclick="simpan()">💾 Simpan RM</button>
+</div>
+
+<h3>Riwayat Kunjungan</h3>
+<div id="riwayat"></div>
+
+<script>
+const params = new URLSearchParams(location.search)
+const no_rm = params.get('no_rm')
+async function load(){
+  const res = await fetch('/api/kunjungan?no_rm='+no_rm)
+  const p = await res.json()
+  document.getElementById('pasien').innerHTML = `<b>${p.nama}</b> <span class="badge">${p.no_rm}</span><br>📱 ${p.no_hp} | 📍 ${p.alamat}<br>Total Kunjungan: ${p.kunjungan.length}`
+  document.getElementById('riwayat').innerHTML = p.kunjungan.map(k=>`
+    <div class="card">
+      <b>${new Date(k.tanggal).toLocaleString('id-ID')}</b><br>
+      Keluhan: ${k.keluhan}<br>
+      Diagnosa: <b>${k.diagnosa}</b><br>
+      Terapi: ${k.terapi}<br>
+      Obat: ${k.obat}
+    </div>
+  `).join('') || '<p>Belum ada kunjungan</p>'
+}
+async function simpan(){
+  const body = { no_rm, keluhan: keluhan.value, diagnosa: diagnosa.value, terapi: terapi.value, obat: obat.value }
+  if(!body.keluhan || !body.diagnosa) return alert('Keluhan & Diagnosa wajib!')
+  const res = await fetch('/api/kunjungan',{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)})
+  const j = await res.json()
+  if(j.success){ alert('Tersimpan!'); keluhan.value=''; diagnosa.value=''; terapi.value=''; obat.value=''; load() } else alert(j.error)
+}
+load()
+</script>
+</body>
+</html>

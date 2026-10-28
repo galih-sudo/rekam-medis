@@ -1,6 +1,5 @@
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "rhel-openssl-3.0.x", "debian-openssl-3.0.x"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -8,11 +7,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model pasien {
-  id         Int      @id @default(autoincrement())
-  no_rm      String   @unique
+model Pasien {
+  id         Int         @id @default(autoincrement())
+  no_rm      String      @unique
   nama       String
-  no_hp      String?
-  alamat     String?
+  no_hp      String
+  alamat     String
+  created_at DateTime    @default(now())
+  kunjungan  Kunjungan[]
+}
+
+model Kunjungan {
+  id         Int      @id @default(autoincrement())
+  pasienId   Int
+  pasien     Pasien   @relation(fields: [pasienId], references: [id])
+  tanggal    DateTime @default(now())
+  keluhan    String
+  diagnosa   String
+  terapi     String
+  obat       String
   created_at DateTime @default(now())
 }
