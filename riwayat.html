@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riwayat Pasien - dr. Galih</title>
+<style>
+body{font-family:system-ui; background:#f0f9ff; padding:20px}
+input{width:100%; padding:14px; border-radius:10px; border:2px solid #0ea5e9; font-size:16px; box-sizing:border-box}
+.card{background:white; padding:14px; margin:10px 0; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.badge{background:#0ea5e9; color:white; padding:4px 10px; border-radius:20px; font-size:12px}
+.btn{padding:8px 14px; border:none; border-radius:8px; background:#0369a1; color:white; cursor:pointer; margin-top:6px}
+a{color:#0369a1; text-decoration:none}
+</style>
+</head>
+<body>
+<h1>🔍 Riwayat Pasien</h1>
+<a href="/antrian.html">← Antrian Hari Ini</a> | <a href="/">← Form Daftar</a>
+<br><br>
+<input id="q" placeholder="Ketik Nama / No RM (26-00001) / HP / Alamat..." oninput="cari()" autofocus>
+<h3 id="total"></h3>
+<div id="list"></div>
+<script>
+async function cari(){
+  const q = document.getElementById('q').value
+  if(q.length < 2){ document.getElementById('list').innerHTML='<p>Ketik minimal 2 huruf...</p>'; return }
+  const res = await fetch('/api/cari?q='+encodeURIComponent(q))
+  const j = await res.json()
+  document.getElementById('total').innerText = j.total + ' ditemukan'
+  document.getElementById('list').innerHTML = j.data.map(p=>`
+    <div class="card">
+      <b>${p.nama}</b> <span class="badge">${p.no_rm}</span><br>
+      📱 ${p.no_hp} | 📍 ${p.alamat}<br>
+      <small>🕒 Daftar: ${new Date(p.created_at).toLocaleString('id-ID')}</small><br>
+      <button class="btn" onclick="alert('Fitur RM lengkap segera!\\nPasien: ${p.nama}\\nNo RM: ${p.no_rm}')">Lihat RM</button>
+    </div>
+  `).join('') || '<p>Tidak ada hasil</p>'
+}
+</script>
+</body>
+</html>
