@@ -11,37 +11,60 @@ model Pasien {
   id         Int         @id @default(autoincrement())
   no_rm      String      @unique
   nama       String
-  no_hp      String
-  alamat     String
+  no_hp      String?
+  alamat     String?
+  nik        String?
+  tgl_lahir  DateTime?
   created_at DateTime    @default(now())
   kunjungan  Kunjungan[]
 }
 
 model Kunjungan {
-  id         Int      @id @default(autoincrement())
-  pasienId   Int
-  pasien     Pasien   @relation(fields: [pasienId], references: [id])
-  tanggal    DateTime @default(now())
-  keluhan    String
-  diagnosa   String
-  icd10_code String?
-  icd10_nama String?
-  terapi     String
-  obat       String
-  obatId     Int?
-  qty_obat   Int?     @default(1)
-  created_at DateTime @default(now())
-}
+  id                Int       @id @default(autoincrement())
+  pasienId          Int
+  pasien            Pasien    @relation(fields: [pasienId], references: [id])
+  tanggal           DateTime  @default(now())
 
-model Obat {
-  id         Int      @id @default(autoincrement())
-  nama       String   @unique
-  stok       Int      @default(0)
-  satuan     String   @default("tablet")
-  created_at DateTime @default(now())
+  // S - SUBJECTIVE
+  keluhan           String
+  lama_sakit        String?
+  riwayat_alergi    String?
+  riwayat_penyakit  String?
+
+  // O - OBJECTIVE
+  tensi             String?
+  suhu              Float?
+  nadi              Int?
+  rr                Int?
+  bb                Float?
+  spo2              Int?
+  pemeriksaan_fisik String?   @db.Text
+
+  // A - ASSESSMENT
+  diagnosa          String
+  icd10_code        String?
+  icd10_nama        String?
+
+  // P - PLAN
+  terapi            String    @db.Text
+  obat              String?
+  obatId            Int?
+  qty_obat          Int?      @default(1)
+  edukasi           String?   @db.Text
+  kontrol           DateTime?
+
+  @@index([pasienId])
 }
 
 model ICD10 {
-  code String @id
+  id   Int    @id @default(autoincrement())
+  code String @unique
   nama String
+}
+
+model Obat {
+  id     Int    @id @default(autoincrement())
+  nama   String @unique
+  stok   Int    @default(0)
+  satuan String @default("tablet")
 }

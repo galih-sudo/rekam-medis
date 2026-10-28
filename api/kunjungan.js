@@ -13,14 +13,36 @@ export default async function handler(req,res){
       return res.json(pasien)
     }
     if(req.method==='POST'){
-      const { no_rm, keluhan, diagnosa, icd10_code, icd10_nama, terapi, obat, obatId, qty_obat } = req.body
-      const pasien = await prisma.pasien.findUnique({ where:{ no_rm } })
+      const b = req.body
+      const pasien = await prisma.pasien.findUnique({ where:{ no_rm: b.no_rm } })
       if(!pasien) return res.status(404).json({error:'Pasien tidak ditemukan'})
       const kun = await prisma.kunjungan.create({
-        data:{ pasienId: pasien.id, keluhan, diagnosa, icd10_code, icd10_nama, terapi, obat, obatId: obatId?parseInt(obatId):null, qty_obat: qty_obat?parseInt(qty_obat):1 }
+        data:{
+          pasienId: pasien.id,
+          keluhan: b.keluhan,
+          lama_sakit: b.lama_sakit,
+          riwayat_alergi: b.riwayat_alergi,
+          riwayat_penyakit: b.riwayat_penyakit,
+          tensi: b.tensi,
+          suhu: b.suhu?parseFloat(b.suhu):null,
+          nadi: b.nadi?parseInt(b.nadi):null,
+          rr: b.rr?parseInt(b.rr):null,
+          bb: b.bb?parseFloat(b.bb):null,
+          spo2: b.spo2?parseInt(b.spo2):null,
+          pemeriksaan_fisik: b.pemeriksaan_fisik,
+          diagnosa: b.diagnosa,
+          icd10_code: b.icd10_code,
+          icd10_nama: b.icd10_nama,
+          terapi: b.terapi,
+          obat: b.obat,
+          obatId: b.obatId?parseInt(b.obatId):null,
+          qty_obat: b.qty_obat?parseInt(b.qty_obat):1,
+          edukasi: b.edukasi,
+          kontrol: b.kontrol?new Date(b.kontrol):null
+        }
       })
-      if(obatId && qty_obat){
-        await prisma.obat.update({ where:{id:parseInt(obatId)}, data:{ stok:{ decrement: parseInt(qty_obat) } } })
+      if(b.obatId && b.qty_obat){
+        await prisma.obat.update({ where:{id:parseInt(b.obatId)}, data:{ stok:{ decrement: parseInt(b.qty_obat) } } })
       }
       return res.json({ success:true, data: kun })
     }
