@@ -1,34 +1,6 @@
 <!DOCTYPE html>
-<html lang="id"><head>
-
-<script>
-// ROLE CHECK
-const role = localStorage.getItem('role_drg')||'dokter';
-const nama = localStorage.getItem('nama_drg')||'User';
-if(role==='perawat'){
-  // sembunyiin tombol hapus
-  document.querySelectorAll('[onclick*=hapus], [onclick*=delete], .btn-hapus, .btn-danger').forEach(b=>b.style.display='none');
-  let badge = document.createElement('div');
-  badge.innerHTML = '👩‍⚕️ Mode Perawat (Read Only)';
-  badge.style='position:fixed;top:10px;right:10px;background:#f59e0b;color:white;padding:6px 12px;border-radius:20px;font-size:11px;z-index:999';
-  document.body.appendChild(badge);
-}
-function logAksi(aksi, detail=''){
-  let logs=JSON.parse(localStorage.getItem('log_aktivitas')||'[]');
-  logs.unshift({waktu:new Date().toLocaleString('id-ID'), user:nama+' ('+role+')', aksi:aksi+' '+detail});
-  localStorage.setItem('log_aktivitas', JSON.stringify(logs.slice(0,100)));
-}
-function logout(){
-  logAksi('Logout');
-  document.cookie='login_drg=; path=/; max-age=0';
-  localStorage.removeItem('login_drg');
-  location.href='/login.html';
-}
-</script>
-<button onclick="logout()" style="position:fixed;bottom:20px;right:20px;background:#ef4444;color:white;border:0;padding:10px 16px;border-radius:10px;font-weight:bold;cursor:pointer;z-index:999">Logout</button>
-</body></html>
-</script><head></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Bos - dr. Galih</title>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - dr. Galih</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 body{font-family:system-ui; background:#f0f9ff; padding:15px; max-width:1100px; margin:auto}
@@ -38,10 +10,13 @@ body{font-family:system-ui; background:#f0f9ff; padding:15px; max-width:1100px; 
 .stat{ text-align:center } .stat h2{font-size:36px; margin:5px; color:#0369a1}
 .badge{padding:4px 10px; border-radius:20px; color:white; font-size:12px}
 .red{background:#ef4444} .yellow{background:#f59e0b} .green{background:#10b981}
-</style></head><script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
+</style></head>
 <body>
+<script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
+
 <h1>📊 DASHBOARD BOS KLINIK dr. Galih</h1>
-<a href="/">Daftar</a> | <a href="/antrian.html">Antrian</a> | <a href="/riwayat.html">Riwayat</a> | <button onclick="load()">🔄 Refresh</button>
+<a href="/">Daftar</a> | <a href="/antrian.html">Antrian</a> | <a href="/riwayat.html">Riwayat</a> | <a href="/log.html">Log</a> | <button onclick="load()">🔄 Refresh</button>
+<span id="roleBadge" style="float:right;background:#0ea5e9;color:white;padding:4px 10px;border-radius:20px;font-size:12px"></span>
 
 <div class="grid4">
   <div class="card stat"><div>Total Pasien</div><h2 id="totalPasien">-</h2><small>Pasien terdaftar</small></div>
@@ -57,45 +32,34 @@ body{font-family:system-ui; background:#f0f9ff; padding:15px; max-width:1100px; 
 
 <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
   <div class="card"><h3>💊 Obat Paling Laku</h3><div id="obatLaku"></div></div>
-  <div class="card"><h3>⚠️ Stok Menipis - Beli Lagi!</h3><div id="stokMenipis"></div></div>
+  <div class="card"><h3>⚠ Stok Menipis - Beli Lagi!</h3><div id="stokMenipis"></div></div>
 </div>
 
 <script>
 async function load(){
-  const res = await fetch('/api/laporan')
-  const d = await res.json()
-  document.getElementById('totalPasien').innerText = d.totalPasien
-  document.getElementById('hariIni').innerText = d.hariIni
-  document.getElementById('totalKunjungan').innerText = d.totalKunjungan
-  document.getElementById('stokKritis').innerText = d.stokMenipis.length
-
-  // chart 7 hari
-  const ctx = document.getElementById('chart7')
-  new Chart(ctx, {
-    type:'bar',
-    data:{
-      labels: d.kunjungan7hari.map(x=> new Date(x.tgl).toLocaleDateString('id-ID', {day:'2-digit', month:'short'})),
-      datasets:[{ label:'Pasien', data: d.kunjungan7hari.map(x=>x.jumlah), backgroundColor:'#0ea5e9' }]
-    }
-  })
-
-  document.getElementById('topDiagnosa').innerHTML = d.topDiagnosa.map((x,i)=>`${i+1}. <b>${x.icd10_code||''} ${x.diagnosa}</b> - ${x._count.diagnosa}x`).join('<br>') || 'Belum ada'
-  document.getElementById('obatLaku').innerHTML = d.obatLaku.map((x,i)=>`${i+1}. <b>${x.obat||'-'}</b> - ${x._count.obat}x`).join('<br>') || 'Belum ada'
-  document.getElementById('stokMenipis').innerHTML = d.stokMenipis.map(o=>`<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #eee"><span>${o.nama}</span><span class="badge ${o.stok==0?'red':o.stok<=5?'red':'yellow'}">${o.stok} ${o.satuan}</span></div>`).join('') || '<span class="badge green">Semua stok aman!</span>'
+  try{
+    const res = await fetch('/api/laporan')
+    const d = await res.json()
+    document.getElementById('totalPasien').innerText = d.totalPasien
+    document.getElementById('hariIni').innerText = d.hariIni
+    document.getElementById('totalKunjungan').innerText = d.totalKunjungan
+    document.getElementById('stokKritis').innerText = d.stokMenipis.length
+    const ctx = document.getElementById('chart7')
+    new Chart(ctx, {type:'bar', data:{labels: d.kunjungan7hari.map(x=> new Date(x.tgl).toLocaleDateString('id-ID', {day:'2-digit', month:'short'})), datasets:[{ label:'Pasien', data: d.kunjungan7hari.map(x=>x.jumlah), backgroundColor:'#0ea5e9' }]}})
+    document.getElementById('topDiagnosa').innerHTML = d.topDiagnosa.map((x,i)=>`${i+1}. <b>${x.icd10_code||''} ${x.diagnosa}</b> - ${x._count.diagnosa}x`).join('<br>') || 'Belum ada'
+    document.getElementById('obatLaku').innerHTML = d.obatLaku.map((x,i)=>`${i+1}. <b>${x.obat||'-'}</b> - ${x._count.obat}x`).join('<br>') || 'Belum ada'
+    document.getElementById('stokMenipis').innerHTML = d.stokMenipis.map(o=>`<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #eee"><span>${o.nama}</span><span class="badge ${o.stok==0?'red':o.stok<=5?'red':'yellow'}">${o.stok} ${o.satuan}</span></div>`).join('') || '<span class="badge green">Semua stok aman!</span>'
+  }catch(e){ console.log(e) }
 }
 load()
 </script>
+
 <script>
-// ROLE CHECK
 const role = localStorage.getItem('role_drg')||'dokter';
 const nama = localStorage.getItem('nama_drg')||'User';
+document.getElementById('roleBadge').innerText = nama + ' ('+role+')';
 if(role==='perawat'){
-  // sembunyiin tombol hapus
   document.querySelectorAll('[onclick*=hapus], [onclick*=delete], .btn-hapus, .btn-danger').forEach(b=>b.style.display='none');
-  let badge = document.createElement('div');
-  badge.innerHTML = '👩‍⚕️ Mode Perawat (Read Only)';
-  badge.style='position:fixed;top:10px;right:10px;background:#f59e0b;color:white;padding:6px 12px;border-radius:20px;font-size:11px;z-index:999';
-  document.body.appendChild(badge);
 }
 function logAksi(aksi, detail=''){
   let logs=JSON.parse(localStorage.getItem('log_aktivitas')||'[]');
@@ -103,7 +67,9 @@ function logAksi(aksi, detail=''){
   localStorage.setItem('log_aktivitas', JSON.stringify(logs.slice(0,100)));
 }
 function logout(){
-  logAksi('Logout');
+  let logs=JSON.parse(localStorage.getItem('log_aktivitas')||'[]');
+  logs.unshift({waktu:new Date().toLocaleString('id-ID'), user:nama, aksi:'Logout'});
+  localStorage.setItem('log_aktivitas', JSON.stringify(logs.slice(0,100)));
   document.cookie='login_drg=; path=/; max-age=0';
   localStorage.removeItem('login_drg');
   location.href='/login.html';
