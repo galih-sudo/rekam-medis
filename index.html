@@ -5,59 +5,46 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AVICENA - Praktek Mandiri dr. Galih</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Inter,sans-serif}
-body{background:#f8fffe}
-header{position:absolute;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;gap:40px;padding:20px 56px;background:transparent}
-.logo img{height:52px;width:auto}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
+header{position:absolute;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;gap:40px;padding:12px 56px;background:transparent}
+.logo img{height:68px !important;width:auto !important;max-width:220px !important;object-fit:contain !important;display:block}
 nav{display:flex;gap:32px}
 nav a{font-size:14px;color:#334155;text-decoration:none;font-weight:500}
-nav a:hover{color:#0f766e;font-weight:700}
 .hero{min-height:100vh;display:flex;align-items:center;padding:0 56px;background:linear-gradient(90deg,#ffffff 0%,#eefcfb 55%,#e0f7f5 100%)}
-.hero-left{flex:1;max-width:520px;z-index:2}
-.hero-left h1{font-size:48px;line-height:1.1;color:#0f2e2e;font-weight:900;letter-spacing:-.5px}
+.hero-left{flex:1;max-width:580px;z-index:2}
+.hero-left h1{font-size:38px !important;line-height:1.1 !important;white-space:nowrap !important;letter-spacing:-0.8px !important;color:#0f2e2e;font-weight:900}
 .hero-left p{margin-top:16px;font-size:16px;line-height:1.6;color:#334155}
-.btn-cta{margin-top:28px;display:inline-flex;align-items:center;gap:8px;background:#14a798;color:#fff;padding:14px 28px;border-radius:999px;font-weight:800;font-size:15px;text-decoration:none;box-shadow:0 8px 24px rgba(20,167,152,.3)}
-.btn-cta:hover{background:#0d8f8a}
+.btn-cta{margin-top:28px;display:inline-flex;align-items:center;gap:8px;background:#14a798;color:#fff;padding:14px 28px;border-radius:999px;font-weight:800;font-size:15px;text-decoration:none}
 .checks{margin-top:16px;display:flex;gap:16px;font-size:13px;font-weight:600;color:#1e3a3a}
 .hero-right{flex:1.2;position:relative;height:100vh;display:flex;align-items:flex-end;justify-content:center}
 .hero-right img{width:100%;max-width:800px;height:auto;object-fit:contain}
-
 @media(max-width:900px){
-  header{padding:14px 18px;gap:16px;background:rgba(255,255,255,0.9);backdrop-filter:blur(10px)}
-  .logo img{height:40px}
-  nav{gap:14px}
-  nav a{font-size:12px}
-  .hero{flex-direction:column;padding:80px 18px 0;min-height:auto}
-  .hero-left h1{font-size:32px;text-align:center}
-  .hero-left p{text-align:center;font-size:14px}
-  .hero-left{display:flex;flex-direction:column;align-items:center}
-  .hero-right{height:auto;width:100%;margin-top:10px}
-  .hero-right img{max-height:84vh}
+  header{padding:10px 18px !important}
+  .logo img{height:48px !important}
+  .hero{flex-direction:column;padding:80px 18px 0}
+  .hero-left h1{font-size:28px !important;white-space:normal !important;text-align:center}
+  .hero-right{height:auto}
 }
 </style>
 </head>
 <body>
 <header>
-  <div class="logo"><img src="logo-avicena.png" alt="AVICENA"></div>
+  <div class="logo"><img src="logo-avicena.png?v=3" alt="AVICENA"></div>
   <nav>
     <a href="#beranda">Beranda</a>
     <a href="#tentang">Tentang Kami</a>
     <a href="dashboard.html">Rekam medis</a>
   </nav>
 </header>
-
-<section class="hero" id="beranda">
+<section class="hero">
   <div class="hero-left">
     <h1>Praktek Mandiri dr. Galih</h1>
-    <p>Cepat, praktis, dan tanpa antre lama.<br>Jadwalkan konsultasi kesehatan Anda dan keluarga dengan mudah dari mana saja.</p>
+    <p>Cepat, praktis, dan tanpa antre lama. Jadwalkan konsultasi kesehatan Anda dan keluarga dengan mudah dari mana saja.</p>
     <a href="daftar-online.html" class="btn-cta">📅 Daftar Online Sekarang</a>
-    <div class="checks">
-      <span>✓ Tanpa Antre</span>
-      <span>✓ 100% Praktis</span>
-    </div>
+    <div class="checks"><span>✓ Tanpa Antre</span><span>✓ 100% Praktis</span></div>
   </div>
   <div class="hero-right">
-    <img src="banner-avicena.png" alt="Dokter Galih">
+    <img src="banner-avicena-v2.png" alt="Dokter Galih">
   </div>
 </section>
 </body>
