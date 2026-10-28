@@ -9,11 +9,10 @@ body{font-family:system-ui; background:#f0f9ff; padding:20px; text-align:center}
 .panggil{background:#0ea5e9; color:white; font-size:18px}
 .rm{background:#10b981; color:white}
 </style></head><body>
-<h1>🩺 Antrian - dr. Galih PRO Voice</h1>
+<h1>🩺 Antrian - dr. Galih</h1>
 <a href="/">Daftar</a> | <a href="/riwayat.html">Riwayat</a> | <button onclick="load()">🔄 Refresh</button>
-<label style="display:block;margin:10px"><input type="checkbox" id="useGoogle" checked> Pakai Suara Google Indonesia (Bagus)</label>
 <div id="list">Loading...</div>
-<audio id="player" style="display:none"></audio>
+<audio id="player" controls style="margin-top:20px; width:100%; max-width:400px"></audio>
 <script>
 let data=[]
 async function load(){
@@ -23,7 +22,7 @@ async function load(){
     <div class="card">
       <div class="big">#${p.no_antrian}</div>
       <b style="font-size:20px">${p.nama}</b><br><span>${p.no_rm}</span><br><br>
-      <button class="btn panggil" onclick="panggil(${i})">📢 PANGGIL - Suara Indo Halus</button>
+      <button class="btn panggil" onclick="panggil(${i})">📢 PANGGIL - Suara Indo</button>
       <a class="btn rm" href="/rm.html?no_rm=${p.no_rm}" style="text-decoration:none">📝 RM</a>
     </div>
   `).join('') || '<p>Belum ada antrian</p>'
@@ -31,19 +30,9 @@ async function load(){
 async function panggil(i){
   const p = data[i]
   const teks = `Nomor antrian ${p.no_antrian}, ${p.nama}, silakan masuk ke ruang periksa dokter Galih`
-  
-  if(document.getElementById('useGoogle').checked){
-    // PAKAI SUARA GOOGLE INDONESIA - SEBAGUS DI HP!
-    const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=id&client=tw-ob&q=${encodeURIComponent(teks)}`
-    const player = document.getElementById('player')
-    player.src = url
-    player.play()
-  } else {
-    // fallback espeak
-    const u = new SpeechSynthesisUtterance(teks)
-    u.lang = 'id-ID'
-    speechSynthesis.speak(u)
-  }
+  const player = document.getElementById('player')
+  player.src = `/api/tts?text=${encodeURIComponent(teks)}`
+  await player.play()
   document.body.style.background = '#fef3c7'
   setTimeout(()=>document.body.style.background='#f0f9ff', 1000)
 }
