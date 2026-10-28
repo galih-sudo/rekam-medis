@@ -1,5 +1,33 @@
 <!DOCTYPE html>
-<html lang="id"><head><script>if(!localStorage.getItem("login_drg")) location.href="/login.html";</script><head><head>!location.pathname.includes("login.html")){location.href="/login.html"}</script><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="id"><head>
+<script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
+<script>
+// ROLE CHECK
+const role = localStorage.getItem('role_drg')||'dokter';
+const nama = localStorage.getItem('nama_drg')||'User';
+if(role==='perawat'){
+  // sembunyiin tombol hapus
+  document.querySelectorAll('[onclick*=hapus], [onclick*=delete], .btn-hapus, .btn-danger').forEach(b=>b.style.display='none');
+  let badge = document.createElement('div');
+  badge.innerHTML = '👩‍⚕️ Mode Perawat (Read Only)';
+  badge.style='position:fixed;top:10px;right:10px;background:#f59e0b;color:white;padding:6px 12px;border-radius:20px;font-size:11px;z-index:999';
+  document.body.appendChild(badge);
+}
+function logAksi(aksi, detail=''){
+  let logs=JSON.parse(localStorage.getItem('log_aktivitas')||'[]');
+  logs.unshift({waktu:new Date().toLocaleString('id-ID'), user:nama+' ('+role+')', aksi:aksi+' '+detail});
+  localStorage.setItem('log_aktivitas', JSON.stringify(logs.slice(0,100)));
+}
+function logout(){
+  logAksi('Logout');
+  document.cookie='login_drg=; path=/; max-age=0';
+  localStorage.removeItem('login_drg');
+  location.href='/login.html';
+}
+</script>
+<button onclick="logout()" style="position:fixed;bottom:20px;right:20px;background:#ef4444;color:white;border:0;padding:10px 16px;border-radius:10px;font-weight:bold;cursor:pointer;z-index:999">Logout</button>
+</body></html>
+</script><head></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Antrian - dr. Galih PRO</title>
 <style>
 body{font-family:system-ui; background:#f0f9ff; padding:20px; text-align:center}
