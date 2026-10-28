@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Antrian Hari Ini - dr. Galih</title>
+<style>
+body{font-family: system-ui; background:#f0f9ff; padding:20px; }
+.card{background:white; padding:16px; margin:10px 0; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.1); display:flex; justify-content:space-between; align-items:center}
+.no{font-size:28px; font-weight:bold; background:#0ea5e9; color:white; width:50px; height:50px; display:grid; place-items:center; border-radius:50%}
+.btn{padding:10px 20px; background:#0ea5e9; color:white; border:none; border-radius:8px; cursor:pointer}
+h1{color:#0369a1}
+</style>
+</head>
+<body>
+<h1>Antrian Hari Ini - <span id="tanggal"></span></h1>
+<button class="btn" onclick="load()">🔄 Refresh</button>
+<h2>Total: <span id="total">0</span> pasien</h2>
+<div id="list">Loading...</div>
+<script>
+document.getElementById('tanggal').innerText = new Date().toLocaleDateString('id-ID',{weekday:'long', day:'numeric', month:'long', year:'numeric'})
+async function load(){
+  const res = await fetch('/api/antrian')
+  const j = await res.json()
+  document.getElementById('total').innerText = j.total
+  const listEl = document.getElementById('list')
+  if(j.data.length==0){ listEl.innerHTML='<p>Belum ada pasien hari ini</p>'; return }
+  listEl.innerHTML = j.data.map((p,i)=>`
+    <div class="card">
+      <div style="display:flex; gap:12px; align-items:center">
+        <div class="no">${i+1}</div>
+        <div><b>${p.nama}</b><br>${p.no_hp} - ${p.no_rm}<br><small>${p.alamat}</small></div>
+      </div>
+      <div>${new Date(p.created_at).toLocaleTimeString('id-ID')}</div>
+    </div>
+  `).join('')
+}
+load()
+setInterval(load, 10000)
+</script>
+</body>
+</html>
