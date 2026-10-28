@@ -24,7 +24,24 @@ model Kunjungan {
   tanggal    DateTime @default(now())
   keluhan    String
   diagnosa   String
+  icd10_code String?
+  icd10_nama String?
   terapi     String
   obat       String
+  obatId     Int?
+  qty_obat   Int?     @default(1)
   created_at DateTime @default(now())
+}
+
+model Obat {
+  id         Int      @id @default(autoincrement())
+  nama       String   @unique
+  stok       Int      @default(0)
+  satuan     String   @default("tablet")
+  created_at DateTime @default(now())
+}
+
+model ICD10 {
+  code String @id
+  nama String
 }
