@@ -73,18 +73,24 @@ try{
 var res=await fetch('/api/pasien',{
 method:'POST',
 headers:{'Content-Type':'application/json'},
-body:JSON.stringify({nama:nama, hp:hp, alamat:alamat, sumber:'daftar-online'})
+body:JSON.stringify({nama:nama,nama_lengkap:nama,no_hp:hp,hp:hp,no_wa:hp,alamat:alamat,keluhan:'-',sumber:'daftar-online'})
 });
-var j=await res.json();
+var text=await res.text();
+let j={};
+try{j=JSON.parse(text)}catch{j={raw:text}}
 if(res.ok){
-alert('SUKSES! No Antrian: '+ (j.no_antrian||'-') +' - Datang jam praktek ya!');
+alert('SUKSES! No Antrian: '+ (j.no_antrian||j.nomor_antrian||j.id||'-') +' - Datang jam praktek ya!');
 location.href='./index.html';
-}else{alert(j.error||'Gagal daftar');}
+}else{
+console.error(j);
+alert('Gagal: '+(j.error||j.message||text||'Cek console'));
+}
 }catch(e){
+console.error(e);
+alert('Error koneksi, simpan offline dulu');
 var list=JSON.parse(localStorage.getItem('daftarOnlineV1')||'[]');
-list.push({nama, hp, alamat, tgl:new Date().toISOString()});
+list.push({nama, no_hp:hp, alamat, tgl:new Date().toISOString()});
 localStorage.setItem('daftarOnlineV1',JSON.stringify(list));
-alert('SUKSES (Offline) - Data tersimpan, admin akan cek!');
 location.href='./index.html';
 }
 }
