@@ -1,79 +1,64 @@
-<!DOCTYPE html>
-<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard - dr. Galih</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// === PEMBASMI SETAN LOMBOK - HAPUS TEXT BOCOR ===
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.body.innerHTML = document.body.innerHTML.replace(/!location\.pathname\.includes\("login\.html"\)\)\{location\.href="\/login\.html"\}/g,'');
+  // hapus text node yang isinya setan
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  let node;
+  while(node = walker.nextNode()){
+    if(node.nodeValue.includes('location.pathname.includes')){
+      node.nodeValue = '';
+    }
+  }
+});
+</script>
 <style>
 body{font-family:system-ui; background:#f0f9ff; padding:15px; max-width:1100px; margin:auto}
 .card{background:white; padding:18px; margin:10px 0; border-radius:16px; box-shadow:0 2px 10px rgba(0,0,0,.08)}
 .grid4{display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px}
 @media(max-width:700px){ .grid4{grid-template-columns:1fr 1fr} }
-.stat{ text-align:center } .stat h2{font-size:36px; margin:5px; color:#0369a1}
+.stat{text-align:center} .stat h2{font-size:36px; margin:5px; color:#0369a1}
 .badge{padding:4px 10px; border-radius:20px; color:white; font-size:12px}
 .red{background:#ef4444} .yellow{background:#f59e0b} .green{background:#10b981}
 </style></head>
 <body>
 <script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
-
 <h1>📊 DASHBOARD BOS KLINIK dr. Galih</h1>
 <a href="/">Daftar</a> | <a href="/antrian.html">Antrian</a> | <a href="/riwayat.html">Riwayat</a> | <a href="/log.html">Log</a> | <button onclick="load()">🔄 Refresh</button>
 <span id="roleBadge" style="float:right;background:#0ea5e9;color:white;padding:4px 10px;border-radius:20px;font-size:12px"></span>
-
 <div class="grid4">
-  <div class="card stat"><div>Total Pasien</div><h2 id="totalPasien">-</h2><small>Pasien terdaftar</small></div>
-  <div class="card stat"><div>Hari Ini</div><h2 id="hariIni" style="color:#10b981">-</h2><small>Kunjungan</small></div>
-  <div class="card stat"><div>Total Kunjungan</div><h2 id="totalKunjungan">-</h2><small>Semua waktu</small></div>
-  <div class="card stat"><div>Stok Kritis</div><h2 id="stokKritis" style="color:#ef4444">-</h2><small>Obat ≤10</small></div>
+<div class="card stat"><div>Total Pasien</div><h2 id="totalPasien">-</h2><small>Pasien terdaftar</small></div>
+<div class="card stat"><div>Hari Ini</div><h2 id="hariIni" style="color:#10b981">-</h2><small>Kunjungan</small></div>
+<div class="card stat"><div>Total Kunjungan</div><h2 id="totalKunjungan">-</h2><small>Semua waktu</small></div>
+<div class="card stat"><div>Stok Kritis</div><h2 id="stokKritis" style="color:#ef4444">-</h2><small>Obat ≤10</small></div>
 </div>
-
 <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
-  <div class="card"><h3>📈 Kunjungan 7 Hari Terakhir</h3><canvas id="chart7"></canvas></div>
-  <div class="card"><h3>🏆 Diagnosa Terbanyak</h3><div id="topDiagnosa"></div></div>
+<div class="card"><h3>📈 Kunjungan 7 Hari</h3><canvas id="chart7"></canvas></div>
+<div class="card"><h3>🏆 Diagnosa Terbanyak</h3><div id="topDiagnosa"></div></div>
 </div>
-
 <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
-  <div class="card"><h3>💊 Obat Paling Laku</h3><div id="obatLaku"></div></div>
-  <div class="card"><h3>⚠ Stok Menipis - Beli Lagi!</h3><div id="stokMenipis"></div></div>
+<div class="card"><h3>💊 Obat Paling Laku</h3><div id="obatLaku"></div></div>
+<div class="card"><h3>⚠ Stok Menipis</h3><div id="stokMenipis"></div></div>
 </div>
-
 <script>
 async function load(){
-  try{
-    const res = await fetch('/api/laporan')
-    const d = await res.json()
-    document.getElementById('totalPasien').innerText = d.totalPasien
-    document.getElementById('hariIni').innerText = d.hariIni
-    document.getElementById('totalKunjungan').innerText = d.totalKunjungan
-    document.getElementById('stokKritis').innerText = d.stokMenipis.length
-    const ctx = document.getElementById('chart7')
-    new Chart(ctx, {type:'bar', data:{labels: d.kunjungan7hari.map(x=> new Date(x.tgl).toLocaleDateString('id-ID', {day:'2-digit', month:'short'})), datasets:[{ label:'Pasien', data: d.kunjungan7hari.map(x=>x.jumlah), backgroundColor:'#0ea5e9' }]}})
-    document.getElementById('topDiagnosa').innerHTML = d.topDiagnosa.map((x,i)=>`${i+1}. <b>${x.icd10_code||''} ${x.diagnosa}</b> - ${x._count.diagnosa}x`).join('<br>') || 'Belum ada'
-    document.getElementById('obatLaku').innerHTML = d.obatLaku.map((x,i)=>`${i+1}. <b>${x.obat||'-'}</b> - ${x._count.obat}x`).join('<br>') || 'Belum ada'
-    document.getElementById('stokMenipis').innerHTML = d.stokMenipis.map(o=>`<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #eee"><span>${o.nama}</span><span class="badge ${o.stok==0?'red':o.stok<=5?'red':'yellow'}">${o.stok} ${o.satuan}</span></div>`).join('') || '<span class="badge green">Semua stok aman!</span>'
-  }catch(e){ console.log(e) }
-}
-load()
+ try{
+  const res=await fetch('/api/laporan'); const d=await res.json();
+  totalPasien.innerText=d.totalPasien; hariIni.innerText=d.hariIni; totalKunjungan.innerText=d.totalKunjungan; stokKritis.innerText=d.stokMenipis.length;
+  new Chart(chart7,{type:'bar',data:{labels:d.kunjungan7hari.map(x=>new Date(x.tgl).toLocaleDateString('id-ID',{day:'2-digit',month:'short'})),datasets:[{label:'Pasien',data:d.kunjungan7hari.map(x=>x.jumlah),backgroundColor:'#0ea5e9'}]}});
+  topDiagnosa.innerHTML=d.topDiagnosa.map((x,i)=>`${i+1}. <b>${x.icd10_code||''} ${x.diagnosa}</b> - ${x._count.diagnosa}x`).join('<br>')||'Belum ada';
+  obatLaku.innerHTML=d.obatLaku.map((x,i)=>`${i+1}. <b>${x.obat||'-'}</b> - ${x._count.obat}x`).join('<br>')||'Belum ada';
+  stokMenipis.innerHTML=d.stokMenipis.map(o=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee"><span>${o.nama}</span><span class="badge ${o.stok==0?'red':o.stok<=5?'red':'yellow'}">${o.stok} ${o.satuan}</span></div>`).join('')||'<span class="badge green">Semua aman!</span>';
+ }catch(e){}
+}load();
 </script>
-
 <script>
-const role = localStorage.getItem('role_drg')||'dokter';
-const nama = localStorage.getItem('nama_drg')||'User';
-document.getElementById('roleBadge').innerText = nama + ' ('+role+')';
-if(role==='perawat'){
-  document.querySelectorAll('[onclick*=hapus], [onclick*=delete], .btn-hapus, .btn-danger').forEach(b=>b.style.display='none');
-}
-function logAksi(aksi, detail=''){
-  let logs=JSON.parse(localStorage.getItem('log_aktivitas')||'[]');
-  logs.unshift({waktu:new Date().toLocaleString('id-ID'), user:nama+' ('+role+')', aksi:aksi+' '+detail});
-  localStorage.setItem('log_aktivitas', JSON.stringify(logs.slice(0,100)));
-}
-function logout(){
-  let logs=JSON.parse(localStorage.getItem('log_aktivitas')||'[]');
-  logs.unshift({waktu:new Date().toLocaleString('id-ID'), user:nama, aksi:'Logout'});
-  localStorage.setItem('log_aktivitas', JSON.stringify(logs.slice(0,100)));
-  document.cookie='login_drg=; path=/; max-age=0';
-  localStorage.removeItem('login_drg');
-  location.href='/login.html';
-}
+const role=localStorage.getItem('role_drg')||'dokter'; const nama=localStorage.getItem('nama_drg')||'User';
+roleBadge.innerText=nama+' ('+role+')';
+function logout(){localStorage.removeItem('login_drg');location.href='/login.html';}
 </script>
 <button onclick="logout()" style="position:fixed;bottom:20px;right:20px;background:#ef4444;color:white;border:0;padding:10px 16px;border-radius:10px;font-weight:bold;cursor:pointer;z-index:999">Logout</button>
 </body></html>
