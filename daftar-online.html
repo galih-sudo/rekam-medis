@@ -39,7 +39,7 @@ body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:c
 </picture>
 <div class="hero-text">
 <h1>Daftar Dari Rumah, <span>Tanpa Antre!</span></h1>
-<p>Cukup isi HP & Alamat, datang sesuai jam praktek. Sistem otomatis catat antrian, 50 pasien/hari, real-time di Sengkol.</p>
+<p>Cukup isi HP & Alamat, datang sesuai jam praktek. Sistem otomatis catat antrian.</p>
 </div>
 </div>
 
@@ -59,7 +59,7 @@ body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:c
 <button class="btn" onclick="daftar()">Daftar Sekarang 🚀</button>
 
 <div class="back"><a href="./index.html">← Kembali ke Login</a></div>
-<div class="footer">© Rekam Medis Praktek Mandiri dr.Galih • 50 pasien/hari</div>
+<div class="footer">© Rekam Medis Praktek Mandiri dr.Galih</div>
 </div>
 </div>
 
@@ -70,7 +70,7 @@ var hp=document.getElementById('hp').value.trim();
 var alamat=document.getElementById('alamat').value.trim();
 if(!nama||!hp||!alamat){alert('Lengkapi semua data bro!');return;}
 try{
-var res=await fetch('/api/pasien',{
+var res=await fetch('/api/daftar',{
 method:'POST',
 headers:{'Content-Type':'application/json'},
 body:JSON.stringify({nama:nama,nama_lengkap:nama,no_hp:hp,hp:hp,no_wa:hp,alamat:alamat,keluhan:'-',sumber:'daftar-online'})
