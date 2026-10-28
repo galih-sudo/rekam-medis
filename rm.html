@@ -1,57 +1,93 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RM Pasien</title>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>RM Pasien Lengkap</title>
 <style>
-body{font-family:system-ui; background:#f0f9ff; padding:20px; max-width:800px; margin:auto}
+body{font-family:system-ui; background:#f0f9ff; padding:20px; max-width:850px; margin:auto}
 .card{background:white; padding:16px; margin:12px 0; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.1)}
-input, textarea{width:100%; padding:10px; margin:6px 0; border-radius:8px; border:1px solid #ccc; box-sizing:border-box}
+input, textarea, select{width:100%; padding:10px; margin:6px 0; border-radius:8px; border:1px solid #ccc; box-sizing:border-box}
 .btn{padding:12px 20px; background:#0ea5e9; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold}
 .badge{background:#0ea5e9; color:white; padding:4px 10px; border-radius:20px}
-</style>
-</head>
-<body>
+.suggest{background:white; border:1px solid #ddd; border-radius:8px; max-height:150px; overflow:auto; position:absolute; z-index:10; width:90%}
+.suggest div{padding:8px; cursor:pointer} .suggest div:hover{background:#e0f2fe}
+.row{display:flex; gap:10px} .row>*{flex:1}
+</style></head><body>
 <a href="/riwayat.html">← Kembali ke Riwayat</a>
 <div id="pasien" class="card">Loading...</div>
-
-<h3>Tambah Kunjungan Baru</h3>
-<div class="card">
+<h3>Tambah Kunjungan Baru - Lengkap ICD10 + Stok Obat</h3>
+<div class="card" style="position:relative">
 <textarea id="keluhan" placeholder="Keluhan..."></textarea>
-<input id="diagnosa" placeholder="Diagnosa...">
-<textarea id="terapi" placeholder="Terapi / Tindakan..."></textarea>
-<input id="obat" placeholder="Obat...">
-<button class="btn" onclick="simpan()">💾 Simpan RM</button>
+<div style="position:relative">
+<input id="icd" placeholder="Ketik ICD10: J06, pusing, ISPA..." oninput="searchICD()">
+<div id="icdList" class="suggest" style="display:none"></div>
 </div>
-
+<input id="diagnosa" placeholder="Diagnosa final (otomatis dari ICD10)">
+<div class="row">
+<select id="obatSelect"><option value="">-- Pilih Obat --</option></select>
+<input id="qty" type="number" value="1" min="1" style="max-width:80px" placeholder="Qty">
+</div>
+<textarea id="terapi" placeholder="Terapi / Tindakan..."></textarea>
+<input id="obatFree" placeholder="Obat manual (jika tidak di stok)">
+<button class="btn" onclick="simpan()">💾 Simpan RM + Potong Stok</button>
+</div>
 <h3>Riwayat Kunjungan</h3>
 <div id="riwayat"></div>
-
+<h3>Stok Obat Saat Ini</h3>
+<div id="stok" class="card"></div>
 <script>
 const params = new URLSearchParams(location.search)
 const no_rm = params.get('no_rm')
+let selectedICD = null
 async function load(){
   const res = await fetch('/api/kunjungan?no_rm='+no_rm)
   const p = await res.json()
   document.getElementById('pasien').innerHTML = `<b>${p.nama}</b> <span class="badge">${p.no_rm}</span><br>📱 ${p.no_hp} | 📍 ${p.alamat}<br>Total Kunjungan: ${p.kunjungan.length}`
   document.getElementById('riwayat').innerHTML = p.kunjungan.map(k=>`
     <div class="card">
-      <b>${new Date(k.tanggal).toLocaleString('id-ID')}</b><br>
+      <b>${new Date(k.tanggal).toLocaleString('id-ID')}</b> - ${k.icd10_code||''} <b>${k.diagnosa}</b><br>
       Keluhan: ${k.keluhan}<br>
-      Diagnosa: <b>${k.diagnosa}</b><br>
+      ICD10: ${k.icd10_code||'-'} - ${k.icd10_nama||''}<br>
       Terapi: ${k.terapi}<br>
-      Obat: ${k.obat}
+      Obat: ${k.obat} ${k.qty_obat?'('+k.qty_obat+')':''}
     </div>
-  `).join('') || '<p>Belum ada kunjungan</p>'
+  `).join('') || '<p>Belum ada</p>'
+  const obatRes = await fetch('/api/obat')
+  const obats = await obatRes.json()
+  document.getElementById('obatSelect').innerHTML = '<option value="">-- Pilih Obat dari Stok --</option>' + obats.map(o=>`<option value="${o.id}" data-nama="${o.nama}">${o.nama} (stok: ${o.stok} ${o.satuan})</option>`).join('')
+  document.getElementById('stok').innerHTML = obats.map(o=>`${o.nama}: <b>${o.stok}</b> ${o.satuan}<br>`).join('')
+}
+async function searchICD(){
+  const q = document.getElementById('icd').value
+  if(q.length<2){ document.getElementById('icdList').style.display='none'; return }
+  const res = await fetch('/api/icd10?q='+encodeURIComponent(q))
+  const data = await res.json()
+  const list = document.getElementById('icdList')
+  list.innerHTML = data.map(d=>`<div onclick="pickICD('${d.code}','${d.nama.replace(/'/g,"")}')"><b>${d.code}</b> - ${d.nama}</div>`).join('')
+  list.style.display = data.length?'block':'none'
+}
+function pickICD(code,nama){
+  selectedICD = {code, nama}
+  document.getElementById('icd').value = code + ' - ' + nama
+  document.getElementById('diagnosa').value = nama
+  document.getElementById('icdList').style.display='none'
 }
 async function simpan(){
-  const body = { no_rm, keluhan: keluhan.value, diagnosa: diagnosa.value, terapi: terapi.value, obat: obat.value }
+  const obatEl = document.getElementById('obatSelect')
+  const obatId = obatEl.value
+  const obatNama = obatEl.selectedOptions[0]?.dataset?.nama || document.getElementById('obatFree').value
+  const body = {
+    no_rm,
+    keluhan: document.getElementById('keluhan').value,
+    diagnosa: document.getElementById('diagnosa').value,
+    icd10_code: selectedICD?.code || null,
+    icd10_nama: selectedICD?.nama || null,
+    terapi: document.getElementById('terapi').value,
+    obat: obatNama,
+    obatId,
+    qty_obat: document.getElementById('qty').value
+  }
   if(!body.keluhan || !body.diagnosa) return alert('Keluhan & Diagnosa wajib!')
   const res = await fetch('/api/kunjungan',{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)})
   const j = await res.json()
-  if(j.success){ alert('Tersimpan!'); keluhan.value=''; diagnosa.value=''; terapi.value=''; obat.value=''; load() } else alert(j.error)
+  if(j.success){ alert('Tersimpan! Stok terpotong'); location.reload() } else alert(j.error)
 }
 load()
-</script>
-</body>
-</html>
+</script></body></html>
