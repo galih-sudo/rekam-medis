@@ -15,21 +15,43 @@ body{font-family:system-ui; background:#f0f9ff; padding:20px; text-align:center}
 <h1>🩺 Antrian - dr. Galih</h1>
 <a href="/">Daftar</a> | <a href="/riwayat.html">Riwayat</a> | <a href="/dashboard.html">Dashboard</a> | <button onclick="load()">🔄 Refresh</button>
 <div id="list">Loading...</div>
+<div id="debug" style="font-size:12px;color:#888;margin-top:20px"></div>
 <audio id="player" controls style="margin-top:20px; width:100%; max-width:400px"></audio>
 
 <script>
 let data=[]
 async function load(){
-  const res = await fetch('/api/antrian')
-  data = await res.json()
-  document.getElementById('list').innerHTML = data.map((p,i)=>`
-    <div class="card">
-      <div class="big">#${p.no_antrian}</div>
-      <b style="font-size:20px">${p.nama}</b><br><span>${p.no_rm}</span><br><br>
-      <button class="btn panggil" onclick="panggil(${i})">📢 PANGGIL - Suara Indo</button>
-      <a class="btn rm" href="/rm.html?no_rm=${p.no_rm}" style="text-decoration:none">📝 RM</a>
-    </div>
-  `).join('') || '<p>Belum ada antrian</p>'
+  try{
+    // ANTI CACHE BRO - INI KUNCI UTAMA!
+    const res = await fetch('/api/antrian?t='+Date.now(), { cache: 'no-store' })
+    let raw = await res.json()
+    
+    // HANDLE 2 BENTUK DATA (antrian murni ATAU kunjungan fallback)
+    if(!Array.isArray(raw)) raw = raw.data || []
+    
+    data = raw.map((p,i)=>{
+      // NORMALISASI FIELD BIAR KOMPATIBEL DENGAN DAFTAR-ONLINE LU
+      return {
+        no_antrian: p.no_antrian || p.nomor || p.no || (i+1),
+        nama: p.nama || p.pasien?.nama || p.pasien?.name || p.kunjungan?.pasien?.nama || 'Pasien',
+        no_rm: p.no_rm || p.pasien?.no_rm || p.pasien?.noRM || p.kunjungan?.pasien?.no_rm || p.id,
+        original: p
+      }
+    })
+
+    document.getElementById('debug').innerText = `Loaded ${data.length} antrian - ${new Date().toLocaleTimeString()} - Status: ${res.status}`
+    
+    document.getElementById('list').innerHTML = data.map((p,i)=>`
+      <div class="card">
+        <div class="big">#${p.no_antrian}</div>
+        <b style="font-size:20px">${p.nama}</b><br><span>${p.no_rm}</span><br><br>
+        <button class="btn panggil" onclick="panggil(${i})">📢 PANGGIL - Suara Indo</button>
+        <a class="btn rm" href="/rm.html?no_rm=${p.no_rm}" style="text-decoration:none">📝 RM</a>
+      </div>
+    `).join('') || '<p>Belum ada antrian hari ini. Coba daftar online dulu di <a href="/">/</a></p>'
+  }catch(e){
+    document.getElementById('list').innerHTML = `<p style="color:red">Error load antrian: ${e.message}<br>Cek /api/antrian di browser</p>`
+  }
 }
 async function panggil(i){
   const p = data[i]
@@ -41,6 +63,7 @@ async function panggil(i){
   setTimeout(()=>document.body.style.background='#f0f9ff', 1000)
 }
 load()
+setInterval(load, 5000) // AUTO REFRESH TIAP 5 DETIK BIAR REALTIME
 </script>
 
 <script>
@@ -52,17 +75,10 @@ if(role==='perawat'){
   badge.style='position:fixed;top:10px;right:10px;background:#f59e0b;color:white;padding:6px 12px;border-radius:20px;font-size:11px;z-index:999';
   document.body.appendChild(badge);
 }
-function logAksi(aksi, detail=''){
-  let logs=JSON.parse(localStorage.getItem('log_aktivitas')||'[]');
-  logs.unshift({waktu:new Date().toLocaleString('id-ID'), user:nama+' ('+role+')', aksi:aksi+' '+detail});
-  localStorage.setItem('log_aktivitas', JSON.stringify(logs.slice(0,100)));
-}
 function logout(){
-  logAksi('Logout');
   localStorage.removeItem('login_drg');
   location.href='/login.html';
 }
 </script>
-
 <button onclick="logout()" style="position:fixed;bottom:20px;right:20px;background:#ef4444;color:white;border:0;padding:10px 16px;border-radius:10px;font-weight:bold;cursor:pointer;z-index:999">Logout</button>
 </body></html>
