@@ -4,28 +4,34 @@ const prisma = new PrismaClient()
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store')
   try {
-    const totalPasien = await prisma.pasien.count()
-    const totalKunjungan = await prisma.kunjungan.count()
-    
     const data = await prisma.kunjungan.findMany({
       include: { pasien: true },
-      orderBy: { id: 'desc' },
-      take: 50
+      orderBy: { id: 'asc' }, // yang daftar pertama = #1
+      take: 100
     })
 
-    // JANGAN DI GROUP DULU - LIATIN SEMUA APA ADANYA!
-    const result = data.reverse().map((k,i)=>({
+    // GROUP BY pasienId - 1 PASIEN CUMA 1 ANTRIAN!
+    const map = new Map()
+    data.forEach(k => {
+      if (!k.pasien) return
+      if (!map.has(k.pasienId)) {
+        map.set(k.pasienId, k)
+      }
+    })
+
+    const result = Array.from(map.values()).map((k,i)=>({
       id: k.id,
+      pasienId: k.pasienId,
       no_antrian: i+1,
-      nama: k.pasien?.nama || 'TANPA NAMA',
-      no_rm: k.pasien?.no_rm || 'TANPA RM',
+      nama: k.pasien.nama,
+      no_rm: k.pasien.no_rm,
       pasien: k.pasien,
-      _debug_total_pasien: totalPasien,
-      _debug_total_kunjungan: totalKunjungan
+      tanggal: k.tanggal
     }))
 
     return res.status(200).json(result)
   } catch(e){
-    return res.status(500).json({ error: e.message, total: 0 })
+    console.error(e)
+    return res.status(500).json({ error: e.message })
   }
 }
