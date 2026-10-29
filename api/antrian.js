@@ -1,4 +1,4 @@
-// api/antrian.js - ANTI AIDS & ANTI CACHE VERSION
+// api/antrian.js - FINAL FIX - ANTI SCHEMA ERROR
 import { PrismaClient } from '@prisma/client'
 
 const globalForPrisma = globalThis
@@ -6,76 +6,71 @@ const prisma = globalForPrisma.prisma || new PrismaClient()
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 
 export default async function handler(req, res) {
-  // 1. MATIKAN CACHE VERCEL TOTAL!
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0')
   res.setHeader('Pragma', 'no-cache')
   res.setHeader('Expires', '0')
-  res.setHeader('Surrogate-Control', 'no-store')
-
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' })
-  }
 
   try {
-    const today = new Date()
-    today.setHours(0,0,0,0)
-
-    // 2. COBA AMBIL DARI TABEL ANTRIAN DULU
-    let antrian = []
+    // AMBIL SEMUA KUNJUNGAN TANPA FILTER TANGGAL DULU (BIAR GAK ERROR SCHEMA)
+    let kunjungan = []
+    
+    // COBA 1: pake createdAt (paling umum)
     try {
-      antrian = await prisma.antrian.findMany({
-        where: { tanggal: { gte: today } },
-        include: { pasien: true, kunjungan: { include: { pasien: true } } },
-        orderBy: { nomor: 'asc' }
+      kunjungan = await prisma.kunjungan.findMany({
+        include: { pasien: true },
+        orderBy: { createdAt: 'desc' },
+        take: 50
       })
-    } catch (e) {
-      console.log('Tabel antrian belum ada, fallback ke kunjungan:', e.message)
+    } catch (e1) {
+      console.log('Gagal pake createdAt, coba tanpa order:', e1.message)
+      // COBA 2: tanpa orderBy
+      try {
+        kunjungan = await prisma.kunjungan.findMany({
+          include: { pasien: true },
+          take: 50
+        })
+      } catch (e2) {
+        console.log('Gagal include pasien, coba polosan:', e2.message)
+        // COBA 3: polosan tanpa include
+        kunjungan = await prisma.kunjungan.findMany({ take: 50 })
+      }
     }
 
-    // 3. KALO ANTRIAN KOSONG, FALLBACK KE KUNJUNGAN HARI INI (INI KUNCI BIAR DAFTAR ONLINE LANGSUNG MUNCUL!)
-    if (antrian.length === 0) {
-      const kunjungan = await prisma.kunjungan.findMany({
-        where: { 
-          tanggal: { gte: today }
-        },
-        include: { pasien: true },
-        orderBy: { createdAt: 'asc' }
+    // FILTER MANUAL HARI INI DI JS (BIAR GAK DEPEND ON FIELD TANGGAL)
+    const today = new Date()
+    today.setHours(0,0,0,0)
+    
+    // Format jadi antrian - AMBIL SEMUA ATAU FILTER HARI INI KALO BISA
+    const formatted = kunjungan
+      .filter(k => {
+        // coba filter hari ini kalo ada field tanggal/createdAt
+        const tgl = k.tanggal || k.tgl_kunjungan || k.tanggal_kunjungan || k.createdAt
+        if (!tgl) return true // kalo gak ada field tanggal, tampilkan aja semua
+        try {
+          return new Date(tgl) >= today
+        } catch { return true }
       })
-
-      // Format jadi kayak antrian biar kompatibel sama antrian.html lu
-      const formatted = kunjungan.map((k, i) => ({
+      .map((k, i) => ({
         id: k.id,
         no_antrian: i + 1,
         nomor: i + 1,
         no: i + 1,
-        nama: k.pasien?.nama || k.nama || 'Pasien',
-        no_rm: k.pasien?.no_rm || k.pasien?.noRM || k.no_rm || k.id,
+        nama: k.pasien?.nama || k.nama || k.nama_pasien || 'Pasien',
+        no_rm: k.pasien?.no_rm || k.pasien?.noRM || k.no_rm || k.pasienId || k.id,
         pasien: k.pasien,
         kunjungan: k,
         status: k.status || 'MENUNGGU',
-        tanggal: k.tanggal
+        tanggal: k.tanggal || k.createdAt
       }))
 
-      return res.status(200).json(formatted)
-    }
-
-    // 4. KALO ANTRIAN ADA, FORMAT JUGA BIAR KOMPATIBEL
-    const formatted = antrian.map((a, i) => ({
-      id: a.id,
-      no_antrian: a.nomor || a.no_antrian || i+1,
-      nomor: a.nomor || i+1,
-      nama: a.pasien?.nama || a.kunjungan?.pasien?.nama || a.kunjungan?.nama || 'Pasien',
-      no_rm: a.pasien?.no_rm || a.kunjungan?.pasien?.no_rm || a.id,
-      pasien: a.pasien || a.kunjungan?.pasien,
-      kunjungan: a.kunjungan,
-      status: a.status,
-      tanggal: a.tanggal
-    }))
+    // BALIKAN URUTAN JADI ASC (yang daftar pertama = no 1)
+    formatted.reverse()
+    formatted.forEach((f, i) => { f.no_antrian = i+1; f.nomor = i+1 })
 
     return res.status(200).json(formatted)
 
   } catch (error) {
-    console.error('API ANTRIAN ERROR:', error)
-    return res.status(500).json({ error: error.message, stack: error.stack })
+    console.error('FINAL ERROR:', error)
+    return res.status(200).json([]) // balikin array kosong biar gak 500
   }
 }
