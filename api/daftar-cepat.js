@@ -21,3 +21,4 @@ export default async function handler(req, res) {
     return res.json({ info:'Pakai ?nuklir=1&no_hp=0821...' })
   }catch(e){ return res.status(500).json({ error:e.message }) }
 }
+// NUKLIR ENDANG 17 MATI 2026-10-29
