@@ -1,38 +1,8 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
-
-
-<script>
-// ROLE CHECK
-const role = localStorage.getItem('role_drg')||'dokter';
-const nama = localStorage.getItem('nama_drg')||'User';
-if(role==='perawat'){
-  // sembunyiin tombol hapus
-  document.querySelectorAll('[onclick*=hapus], [onclick*=delete], .btn-hapus, .btn-danger').forEach(b=>b.style.display='none');
-  let badge = document.createElement('div');
-  badge.innerHTML = '👩‍⚕️ Mode Perawat (Read Only)';
-  badge.style='position:fixed;top:10px;right:10px;background:#f59e0b;color:white;padding:6px 12px;border-radius:20px;font-size:11px;z-index:999';
-  document.body.appendChild(badge);
-}
-function logAksi(aksi, detail=''){
-  let logs=JSON.parse(localStorage.getItem('log_aktivitas')||'[]');
-  logs.unshift({waktu:new Date().toLocaleString('id-ID'), user:nama+' ('+role+')', aksi:aksi+' '+detail});
-  localStorage.setItem('log_aktivitas', JSON.stringify(logs.slice(0,100)));
-}
-function logout(){
-  logAksi('Logout');
-  document.cookie='login_drg=; path=/; max-age=0';
-  localStorage.removeItem('login_drg');
-  location.href='/login.html';
-}
-</script>
-<button onclick="logout()" style="position:fixed;bottom:20px;right:20px;background:#ef4444;color:white;border:0;padding:10px 16px;border-radius:10px;font-weight:bold;cursor:pointer;z-index:999">Logout</button>
-</body>
-</html>
-</script><head></script>
+<html lang="id"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Riwayat Pasien - dr. Galih</title>
+<script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
 <style>
 body{font-family:system-ui; background:#f0f9ff; padding:20px}
 input{width:100%; padding:14px; border-radius:10px; border:2px solid #0ea5e9; font-size:16px; box-sizing:border-box}
@@ -40,16 +10,15 @@ input{width:100%; padding:14px; border-radius:10px; border:2px solid #0ea5e9; fo
 .badge{background:#0ea5e9; color:white; padding:4px 10px; border-radius:20px; font-size:12px}
 .btn{padding:8px 14px; border:none; border-radius:8px; background:#0369a1; color:white; cursor:pointer; margin-top:6px; text-decoration:none; display:inline-block}
 a{color:#0369a1; text-decoration:none}
-</style>
-</head>
-<script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
+</style></head>
 <body>
 <h1>🔍 Riwayat Pasien</h1>
-<a href="/antrian.html">← Antrian Hari Ini</a> | <a href="/">← Form Daftar</a>
+<a href="/antrian.html">← Antrian Hari Ini</a> | <a href="/">← Form Daftar</a> | <a href="/dashboard.html">Dashboard</a>
 <br><br>
 <input id="q" placeholder="Ketik Nama / No RM (26-00001) / HP / Alamat..." oninput="cari()" autofocus>
 <h3 id="total"></h3>
 <div id="list"></div>
+
 <script>
 async function cari(){
   const q = document.getElementById('q').value
@@ -69,12 +38,9 @@ async function cari(){
 </script>
 
 <script>
-// ROLE CHECK
 const role = localStorage.getItem('role_drg')||'dokter';
 const nama = localStorage.getItem('nama_drg')||'User';
 if(role==='perawat'){
-  // sembunyiin tombol hapus
-  document.querySelectorAll('[onclick*=hapus], [onclick*=delete], .btn-hapus, .btn-danger').forEach(b=>b.style.display='none');
   let badge = document.createElement('div');
   badge.innerHTML = '👩‍⚕️ Mode Perawat (Read Only)';
   badge.style='position:fixed;top:10px;right:10px;background:#f59e0b;color:white;padding:6px 12px;border-radius:20px;font-size:11px;z-index:999';
@@ -87,11 +53,10 @@ function logAksi(aksi, detail=''){
 }
 function logout(){
   logAksi('Logout');
-  document.cookie='login_drg=; path=/; max-age=0';
   localStorage.removeItem('login_drg');
   location.href='/login.html';
 }
 </script>
+
 <button onclick="logout()" style="position:fixed;bottom:20px;right:20px;background:#ef4444;color:white;border:0;padding:10px 16px;border-radius:10px;font-weight:bold;cursor:pointer;z-index:999">Logout</button>
-</body>
-</html>
+</body></html>
