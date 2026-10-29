@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="id"><head>
-
-</body></html>
-</script><head></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Stok Obat - dr Galih</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Stok Obat - dr Galih</title>
+<script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
 <style>
 *{box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif}
 body{margin:0;min-height:100vh;background:linear-gradient(135deg,#dbeafe 0%,#f0fdfa 50%,#fef9c3 100%);background-attachment:fixed}
@@ -17,21 +16,19 @@ body{margin:0;min-height:100vh;background:linear-gradient(135deg,#dbeafe 0%,#f0f
 .input:focus{outline:none;border-color:#3b82f6;background:#fff}
 .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 table{width:100%;border-collapse:collapse;margin-top:12px}th{font-size:9px;color:#94a3b8;text-align:left;padding:10px 8px;border-bottom:1px solid #f1f5f9;text-transform:uppercase}td{padding:10px 8px;border-bottom:1px solid #f8fafc;font-size:12px}
-</style>
-</head>
-<script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
+</style></head>
 <body>
 <div class="header"><b>💊 Stok Obat & ED - dr Galih</b><div style="display:flex;gap:8px"><button onclick="location.href='./dashboard.html'" class="btn btn-back">← Dashboard</button><button onclick="logout()" class="btn" style="background:linear-gradient(90deg,#ef4444,#dc2626);color:#fff">Logout</button></div></div>
 <div class="container">
 <div id="aksesDitolak" style="display:none" class="card"><h3 style="color:#dc2626">🔒 Akses Ditolak</h3><p style="font-size:13px;color:#64748b">Halaman Stok Obat hanya bisa diakses oleh <b>Dokter</b>. Akun <b>Perawat</b> tidak diizinkan. Silakan login sebagai Dokter.</p><button onclick="location.href='./dashboard.html'" class="btn btn-back">Kembali ke Dashboard</button></div>
 <div id="kontenObat">
-<div class="card"><b style="font-size:14px">➕ Entri Stok Obat Baru</b><div style="margin-top:12px"><input id="namaObat" class="input" placeholder="Nama Obat (contoh: Amoxicillin 500mg)" autocomplete="off" autocorrect="off" spellcheck="false"><div class="grid"><input id="stokObat" class="input" type="number" placeholder="Stok Awal"><input id="hargaObat" class="input" type="number" placeholder="Harga"><input id="edObat" class="input" type="date"></div><button onclick="simpanObat()" class="btn btn-save" style="width:100%;padding:12px">💾 Simpan Obat</button></div></div>
-<div class="card"><b style="font-size:14px">📦 Daftar Stok & ED</b><input id="cariObat" class="input" placeholder="🔍 Cari obat..." oninput="renderObat()" style="margin-top:10px" autocomplete="off" autocorrect="off" spellcheck="false"><table><thead><tr><th>Nama Obat</th><th>Stok</th><th>Harga</th><th>ED</th><th>Aksi</th></tr></thead><tbody id="listObat"></tbody></table></div>
+<div class="card"><b style="font-size:14px">➕ Entri Stok Obat Baru</b><div style="margin-top:12px"><input id="namaObat" class="input" placeholder="Nama Obat (contoh: Amoxicillin 500mg)"><div class="grid"><input id="stokObat" class="input" type="number" placeholder="Stok Awal"><input id="hargaObat" class="input" type="number" placeholder="Harga"><input id="edObat" class="input" type="date"></div><button onclick="simpanObat()" class="btn btn-save" style="width:100%;padding:12px">💾 Simpan Obat</button></div></div>
+<div class="card"><b style="font-size:14px">📦 Daftar Stok & ED</b><input id="cariObat" class="input" placeholder="🔍 Cari obat..." oninput="renderObat()" style="margin-top:10px"><table><thead><tr><th>Nama Obat</th><th>Stok</th><th>Harga</th><th>ED</th><th>Aksi</th></tr></thead><tbody id="listObat"></tbody></table></div>
 </div>
 </div>
 <script>
-if(!localStorage.getItem('isLogin')){location.href='./login.html';}
-var role=localStorage.getItem('role')||'dokter';
+// FIX KUNCI - PAKAI role_drg YANG BENER
+var role=localStorage.getItem('role_drg')||'dokter';
 if(role!=='dokter'){
 document.getElementById('aksesDitolak').style.display='block';
 document.getElementById('kontenObat').style.display='none';
@@ -78,7 +75,7 @@ html+='<tr><td><b>'+o.nama+'</b> '+edStatus+'</td><td style="color:'+stokColor+'
 if(!html)html='<tr><td colspan="5" style="text-align:center;padding:20px;color:#94a3b8;font-size:12px">Belum ada data obat</td></tr>';
 tbody.innerHTML=html;
 }
-function logout(){localStorage.removeItem('isLogin');location.href='./login.html';}
+function logout(){localStorage.removeItem('login_drg');location.href='./login.html';}
 renderObat();
 </script>
 </body></html>
