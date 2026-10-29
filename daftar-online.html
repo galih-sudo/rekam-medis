@@ -1,5 +1,35 @@
 <!DOCTYPE html>
 <html lang="id"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daftar Online - AVICENA dr Galih</title>
+<style>
+body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#e0f7fa,#f0fdfa);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;margin:0}
+.card{background:white;padding:28px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.08);max-width:420px;width:100%}
+h2{margin:0 0 16px;color:#0f2e2e;text-align:center}
+input, textarea{width:100%;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:12px;box-sizing:border-box;font-size:14px}
+input:focus, textarea:focus{outline:none;border-color:#14a798}
+.btn{width:100%;padding:14px;background:#14a798;color:white;border:0;border-radius:999px;font-weight:800;font-size:15px;cursor:pointer}
+.btn:hover{background:#0f8a86}
+.small{font-size:12px;color:#64748b;text-align:center;margin-top:12px}
+a{color:#14a798;text-decoration:none;font-weight:600}
+</style></head>
+<body>
+<div class="card">
+<h2>📅 Daftar Online<br><span style="font-size:14px;font-weight:500;color:#64748b">Praktek Mandiri dr. Galih - AVICENA</span></h2>
+<form id="formDaftar" onsubmit="return daftar(event)">
+<input id="nama" placeholder="Nama Lengkap *" required>
+<input id="hp" placeholder="No HP / WA *" required>
+<textarea id="keluhan" placeholder="Keluhan (opsional)"></textarea>
+<button type="submit" class="btn">✅ Daftar Sekarang</button>
+</form>
+<div class="small">Sudah daftar? <a href="./index.html">Kembali ke Beranda</a></div>
+<div id="sukses" style="display:none;text-align:center;margin-top:16px">
+<div style="font-size:48px">🎉</div>
+<b style="color:#14a798">Berhasil Daftar!</b><br>
+<span style="font-size:13px;color:#334155">Nomor antrian Anda akan dipanggil sesuai urutan. Terima kasih!</span><br><br>
+<a href="./index.html" class="btn" style="display:inline-block;text-decoration:none;text-align:center">Kembali ke Beranda</a>
+</div>
+</div>
 
 <script>
 function simpanKeAntrian(nama, hp, keluhan){
@@ -11,17 +41,17 @@ function simpanKeAntrian(nama, hp, keluhan){
   logs.unshift({waktu:new Date().toLocaleString('id-ID'), user:'Pasien '+nama, aksi:'Daftar Online'});
   localStorage.setItem('log_aktivitas', JSON.stringify(logs.slice(0,100)));
 }
-// Override fungsi daftar yang lama kalau ada
-document.addEventListener('DOMContentLoaded', ()=>{
-  const form = document.querySelector('form');
-  if(form){
-    form.addEventListener('submit', (e)=>{
-      const nama = document.querySelector('[name=nama], #nama')?.value || 'Pasien';
-      const hp = document.querySelector('[name=hp], #hp, [name=wa]')?.value || '';
-      const keluhan = document.querySelector('[name=keluhan], #keluhan')?.value || '';
-      simpanKeAntrian(nama, hp, keluhan);
-    });
-  }
-});
+
+function daftar(e){
+  e.preventDefault();
+  const nama = document.getElementById('nama').value.trim();
+  const hp = document.getElementById('hp').value.trim();
+  const keluhan = document.getElementById('keluhan').value.trim();
+  if(!nama || !hp){alert('Nama & HP wajib!');return false;}
+  simpanKeAntrian(nama, hp, keluhan);
+  document.getElementById('formDaftar').style.display='none';
+  document.getElementById('sukses').style.display='block';
+  return false;
+}
 </script>
 </body></html>
