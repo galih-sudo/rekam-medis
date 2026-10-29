@@ -1,33 +1,7 @@
 <!DOCTYPE html>
 <html lang="id"><head>
-
-<script>
-// ROLE CHECK
-const role = localStorage.getItem('role_drg')||'dokter';
-const nama = localStorage.getItem('nama_drg')||'User';
-if(role==='perawat'){
-  // sembunyiin tombol hapus
-  document.querySelectorAll('[onclick*=hapus], [onclick*=delete], .btn-hapus, .btn-danger').forEach(b=>b.style.display='none');
-  let badge = document.createElement('div');
-  badge.innerHTML = '👩‍⚕️ Mode Perawat (Read Only)';
-  badge.style='position:fixed;top:10px;right:10px;background:#f59e0b;color:white;padding:6px 12px;border-radius:20px;font-size:11px;z-index:999';
-  document.body.appendChild(badge);
-}
-function logAksi(aksi, detail=''){
-  let logs=JSON.parse(localStorage.getItem('log_aktivitas')||'[]');
-  logs.unshift({waktu:new Date().toLocaleString('id-ID'), user:nama+' ('+role+')', aksi:aksi+' '+detail});
-  localStorage.setItem('log_aktivitas', JSON.stringify(logs.slice(0,100)));
-}
-function logout(){
-  logAksi('Logout');
-  document.cookie='login_drg=; path=/; max-age=0';
-  localStorage.removeItem('login_drg');
-  location.href='/login.html';
-}
-</script>
-<button onclick="logout()" style="position:fixed;bottom:20px;right:20px;background:#ef4444;color:white;border:0;padding:10px 16px;border-radius:10px;font-weight:bold;cursor:pointer;z-index:999">Logout</button>
-</body></html>
-</script><head></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>RM Pasien Lengkap</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>RM Pasien Lengkap</title>
+<script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
 <style>
 body{font-family:system-ui; background:#f0f9ff; padding:20px; max-width:850px; margin:auto}
 .card{background:white; padding:16px; margin:12px 0; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.1)}
@@ -37,10 +11,11 @@ input, textarea, select{width:100%; padding:10px; margin:6px 0; border-radius:8p
 .suggest{background:white; border:1px solid #ddd; border-radius:8px; max-height:150px; overflow:auto; position:absolute; z-index:10; width:90%}
 .suggest div{padding:8px; cursor:pointer} .suggest div:hover{background:#e0f2fe}
 .row{display:flex; gap:10px} .row>*{flex:1}
-</style></head><script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
+</style></head>
 <body>
-<a href="/riwayat.html">← Kembali ke Riwayat</a>
+<a href="/riwayat.html">← Kembali ke Riwayat</a> | <a href="/dashboard.html">Dashboard</a>
 <div id="pasien" class="card">Loading...</div>
+
 <h3>Tambah Kunjungan Baru - Lengkap ICD10 + Stok Obat</h3>
 <div class="card" style="position:relative">
 <textarea id="keluhan" placeholder="Keluhan..."></textarea>
@@ -57,10 +32,13 @@ input, textarea, select{width:100%; padding:10px; margin:6px 0; border-radius:8p
 <input id="obatFree" placeholder="Obat manual (jika tidak di stok)">
 <button class="btn" onclick="simpan()">💾 Simpan RM + Potong Stok</button>
 </div>
+
 <h3>Riwayat Kunjungan</h3>
 <div id="riwayat"></div>
+
 <h3>Stok Obat Saat Ini</h3>
 <div id="stok" class="card"></div>
+
 <script>
 const params = new URLSearchParams(location.search)
 const no_rm = params.get('no_rm')
@@ -120,13 +98,11 @@ async function simpan(){
 }
 load()
 </script>
+
 <script>
-// ROLE CHECK
 const role = localStorage.getItem('role_drg')||'dokter';
 const nama = localStorage.getItem('nama_drg')||'User';
 if(role==='perawat'){
-  // sembunyiin tombol hapus
-  document.querySelectorAll('[onclick*=hapus], [onclick*=delete], .btn-hapus, .btn-danger').forEach(b=>b.style.display='none');
   let badge = document.createElement('div');
   badge.innerHTML = '👩‍⚕️ Mode Perawat (Read Only)';
   badge.style='position:fixed;top:10px;right:10px;background:#f59e0b;color:white;padding:6px 12px;border-radius:20px;font-size:11px;z-index:999';
@@ -139,10 +115,10 @@ function logAksi(aksi, detail=''){
 }
 function logout(){
   logAksi('Logout');
-  document.cookie='login_drg=; path=/; max-age=0';
   localStorage.removeItem('login_drg');
   location.href='/login.html';
 }
 </script>
+
 <button onclick="logout()" style="position:fixed;bottom:20px;right:20px;background:#ef4444;color:white;border:0;padding:10px 16px;border-radius:10px;font-weight:bold;cursor:pointer;z-index:999">Logout</button>
 </body></html>
