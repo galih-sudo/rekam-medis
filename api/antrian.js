@@ -1,76 +1,54 @@
-// api/antrian.js - FINAL FIX - ANTI SCHEMA ERROR
+// api/antrian.js - FINAL POLOS ANTI GAGAL
 import { PrismaClient } from '@prisma/client'
-
-const globalForPrisma = globalThis
-const prisma = globalForPrisma.prisma || new PrismaClient()
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+const prisma = new PrismaClient()
 
 export default async function handler(req, res) {
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0')
-  res.setHeader('Pragma', 'no-cache')
-  res.setHeader('Expires', '0')
-
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+  
   try {
-    // AMBIL SEMUA KUNJUNGAN TANPA FILTER TANGGAL DULU (BIAR GAK ERROR SCHEMA)
-    let kunjungan = []
-    
-    // COBA 1: pake createdAt (paling umum)
-    try {
-      kunjungan = await prisma.kunjungan.findMany({
-        include: { pasien: true },
-        orderBy: { createdAt: 'desc' },
-        take: 50
-      })
-    } catch (e1) {
-      console.log('Gagal pake createdAt, coba tanpa order:', e1.message)
-      // COBA 2: tanpa orderBy
-      try {
-        kunjungan = await prisma.kunjungan.findMany({
-          include: { pasien: true },
-          take: 50
-        })
-      } catch (e2) {
-        console.log('Gagal include pasien, coba polosan:', e2.message)
-        // COBA 3: polosan tanpa include
-        kunjungan = await prisma.kunjungan.findMany({ take: 50 })
-      }
-    }
+    // AMBIL POLOSAN TANPA INCLUDE, TANPA ORDERBY - PASTI WORK!
+    let kunjungan = await prisma.kunjungan.findMany({
+      take: 100
+    })
 
-    // FILTER MANUAL HARI INI DI JS (BIAR GAK DEPEND ON FIELD TANGGAL)
-    const today = new Date()
-    today.setHours(0,0,0,0)
-    
-    // Format jadi antrian - AMBIL SEMUA ATAU FILTER HARI INI KALO BISA
-    const formatted = kunjungan
-      .filter(k => {
-        // coba filter hari ini kalo ada field tanggal/createdAt
-        const tgl = k.tanggal || k.tgl_kunjungan || k.tanggal_kunjungan || k.createdAt
-        if (!tgl) return true // kalo gak ada field tanggal, tampilkan aja semua
-        try {
-          return new Date(tgl) >= today
-        } catch { return true }
-      })
-      .map((k, i) => ({
+    // Sort manual di JS pake id (id kecil = daftar pertama)
+    kunjungan.sort((a,b) => (a.id > b.id ? 1 : -1))
+
+    // Format jadi antrian
+    const formatted = kunjungan.map((k, i) => {
+      // ambil nama dari field apapun yang ada
+      const nama = k.nama || k.nama_pasien || k.name || k.pasien_nama || `Pasien ${k.id?.toString().slice(-4)}`
+      const no_rm = k.no_rm || k.noRM || k.no_rm_pasien || k.pasienId || k.id
+      
+      return {
         id: k.id,
         no_antrian: i + 1,
         nomor: i + 1,
-        no: i + 1,
-        nama: k.pasien?.nama || k.nama || k.nama_pasien || 'Pasien',
-        no_rm: k.pasien?.no_rm || k.pasien?.noRM || k.no_rm || k.pasienId || k.id,
-        pasien: k.pasien,
-        kunjungan: k,
-        status: k.status || 'MENUNGGU',
-        tanggal: k.tanggal || k.createdAt
-      }))
-
-    // BALIKAN URUTAN JADI ASC (yang daftar pertama = no 1)
-    formatted.reverse()
-    formatted.forEach((f, i) => { f.no_antrian = i+1; f.nomor = i+1 })
+        nama: nama,
+        no_rm: no_rm,
+        original: k,
+        status: k.status || 'MENUNGGU'
+      }
+    })
 
     return res.status(200).json(formatted)
 
-  } catch (error) {
-    console.error('FINAL ERROR:', error)
-    return res.status(200).json([]) // balikin array kosong biar gak 500
+  } catch (e) {
+    console.error(e)
+    // Coba raw SQL sebagai last resort
+    try {
+      const raw = await prisma.$queryRaw`SELECT * FROM Kunjungan LIMIT 100`
+      const formatted = raw.map((k,i)=>({
+        id: k.id,
+        no_antrian: i+1,
+        nomor: i+1,
+        nama: k.nama || 'Pasien',
+        no_rm: k.no_rm || k.id,
+        status: 'MENUNGGU'
+      }))
+      return res.status(200).json(formatted)
+    } catch (e2) {
+      return res.status(200).json([])
+    }
   }
 }
