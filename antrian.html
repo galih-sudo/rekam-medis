@@ -1,84 +1,106 @@
 <!DOCTYPE html>
-<html lang="id"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Antrian - dr. Galih PRO</title>
-<script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
 <style>
-body{font-family:system-ui; background:#f0f9ff; padding:20px; text-align:center}
-.card{background:white; padding:20px; margin:12px auto; border-radius:16px; max-width:600px; box-shadow:0 4px 12px rgba(0,0,0,.1)}
-.big{font-size:48px; font-weight:bold; color:#0369a1}
-.btn{padding:14px 24px; border:none; border-radius:12px; font-weight:bold; cursor:pointer; margin:5px}
-.panggil{background:#0ea5e9; color:white; font-size:18px}
-.rm{background:#10b981; color:white}
-</style></head>
+  body{font-family:system-ui;background:#f5f7fb;margin:0;padding:20px}
+  .header{text-align:center;margin-bottom:20px}
+  .nav a{margin:0 5px;text-decoration:none;color:#0d6efd;font-size:14px}
+  .card{background:#fff;border-radius:12px;padding:15px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);text-align:center}
+  .no{font-size:28px;font-weight:800;color:#333}
+  .nama{font-weight:600;margin:4px 0}
+  .rm{color:#666;font-size:13px;margin-bottom:8px}
+  .btn{border:none;padding:8px 14px;border-radius:20px;font-size:12px;cursor:pointer;margin:2px}
+  .btn-call{background:#0dcaf0;color:#000}
+  .btn-rm{background:#d1f0e0;color:#000}
+  .btn-hapus{background:#ff6b6b;color:#fff}
+</style>
+</head>
 <body>
-<h1>🩺 Antrian - dr. Galih</h1>
-<a href="/">Daftar</a> | <a href="/riwayat.html">Riwayat</a> | <a href="/dashboard.html">Dashboard</a> | <button onclick="load()">🔄 Refresh</button>
-<div id="list">Loading...</div>
-<div id="debug" style="font-size:12px;color:#888;margin-top:20px"></div>
-<audio id="player" controls style="margin-top:20px; width:100%; max-width:400px"></audio>
+
+<div class="header">
+  <h2>🩺 Antrian - dr. Galih PRO</h2>
+  <div class="nav">
+    <a href="/">Daftar</a> | 
+    <a href="/riwayat.html">Riwayat</a> | 
+    <a href="/dashboard.html">Dashboard</a> | 
+    <a href="/antrian.html"><b>Antrian</b></a>
+  </div>
+  <p id="jam" style="font-size:12px;color:#888"></p>
+</div>
+
+<div id="antrian-list">
+  <div style="text-align:center;padding:40px">Loading antrian...</div>
+</div>
 
 <script>
-let data=[]
-async function load(){
-  try{
-    // ANTI CACHE BRO - INI KUNCI UTAMA!
-    const res = await fetch('/api/antrian?t='+Date.now(), { cache: 'no-store' })
-    let raw = await res.json()
-    
-    // HANDLE 2 BENTUK DATA (antrian murni ATAU kunjungan fallback)
-    if(!Array.isArray(raw)) raw = raw.data || []
-    
-    data = raw.map((p,i)=>{
-      // NORMALISASI FIELD BIAR KOMPATIBEL DENGAN DAFTAR-ONLINE LU
-      return {
-        no_antrian: p.no_antrian || p.nomor || p.no || (i+1),
-        nama: p.nama || p.pasien?.nama || p.pasien?.name || p.kunjungan?.pasien?.nama || 'Pasien',
-        no_rm: p.no_rm || p.pasien?.no_rm || p.pasien?.noRM || p.kunjungan?.pasien?.no_rm || p.id,
-        original: p
-      }
-    })
+let lastDataString = ''
+let isLoading = false
 
-    document.getElementById('debug').innerText = `Loaded ${data.length} antrian - ${new Date().toLocaleTimeString()} - Status: ${res.status}`
+function updateJam(){
+  document.getElementById('jam').innerText = new Date().toLocaleString('id-ID')
+}
+setInterval(updateJam, 1000)
+updateJam()
+
+async function loadAntrian(){
+  if(isLoading) return
+  isLoading = true
+  try{
+    const res = await fetch('/api/antrian?t='+Date.now(), {cache:'no-store'})
+    const data = await res.json()
     
-    document.getElementById('list').innerHTML = data.map((p,i)=>`
+    // ANTI KEDIP: kalau data sama, jangan render ulang
+    const str = JSON.stringify(data)
+    if(str === lastDataString){
+      isLoading = false
+      return
+    }
+    lastDataString = str
+
+    const container = document.getElementById('antrian-list')
+    
+    if(!data || data.length === 0){
+      container.innerHTML = '<div style="text-align:center;padding:40px;color:#999">Belum ada antrian hari ini</div>'
+      isLoading = false
+      return
+    }
+
+    container.innerHTML = data.map(item => `
       <div class="card">
-        <div class="big">#${p.no_antrian}</div>
-        <b style="font-size:20px">${p.nama}</b><br><span>${p.no_rm}</span><br><br>
-        <button class="btn panggil" onclick="panggil(${i})">📢 PANGGIL - Suara Indo</button>
-        <a class="btn rm" href="/rm.html?no_rm=${p.no_rm}" style="text-decoration:none">📝 RM</a>
+        <div class="no">#${item.no_antrian}</div>
+        <div class="nama">${item.nama}</div>
+        <div class="rm">${item.no_rm}</div>
+        <button class="btn btn-call" onclick="panggil('${item.no_antrian}','${item.nama}')">🔊 PANGGIL - Suara Indo</button>
+        <button class="btn btn-rm" onclick="location.href='/riwayat.html?no_rm=${item.no_rm}'">RM</button>
       </div>
-    `).join('') || '<p>Belum ada antrian hari ini. Coba daftar online dulu di <a href="/">/</a></p>'
+    `).join('')
+
   }catch(e){
-    document.getElementById('list').innerHTML = `<p style="color:red">Error load antrian: ${e.message}<br>Cek /api/antrian di browser</p>`
+    console.error(e)
+  }
+  isLoading = false
+}
+
+function panggil(no, nama){
+  if('speechSynthesis' in window){
+    const text = `Nomor antrian ${no}, atas nama ${nama}, silakan masuk ke ruang pemeriksaan`
+    const utter = new SpeechSynthesisUtterance(text)
+    utter.lang = 'id-ID'
+    utter.rate = 0.9
+    speechSynthesis.cancel()
+    speechSynthesis.speak(utter)
+  } else {
+    alert(`Panggil No ${no} - ${nama}`)
   }
 }
-async function panggil(i){
-  const p = data[i]
-  const teks = `Nomor antrian ${p.no_antrian}, ${p.nama}, silakan masuk ke ruang periksa dokter Galih`
-  const player = document.getElementById('player')
-  player.src = `/api/tts?text=${encodeURIComponent(teks)}`
-  await player.play()
-  document.body.style.background = '#fef3c7'
-  setTimeout(()=>document.body.style.background='#f0f9ff', 1000)
-}
-load()
-setInterval(load, 5000) // AUTO REFRESH TIAP 5 DETIK BIAR REALTIME
+
+// POLLING 3 DETIK - JANGAN 1 DETIK BIAR GAK BEREBUT / SALTO
+setInterval(loadAntrian, 3000)
+loadAntrian()
 </script>
 
-<script>
-const role = localStorage.getItem('role_drg')||'dokter';
-const nama = localStorage.getItem('nama_drg')||'User';
-if(role==='perawat'){
-  let badge = document.createElement('div');
-  badge.innerHTML = '👩‍⚕️ Mode Perawat (Read Only)';
-  badge.style='position:fixed;top:10px;right:10px;background:#f59e0b;color:white;padding:6px 12px;border-radius:20px;font-size:11px;z-index:999';
-  document.body.appendChild(badge);
-}
-function logout(){
-  localStorage.removeItem('login_drg');
-  location.href='/login.html';
-}
-</script>
-<button onclick="logout()" style="position:fixed;bottom:20px;right:20px;background:#ef4444;color:white;border:0;padding:10px 16px;border-radius:10px;font-weight:bold;cursor:pointer;z-index:999">Logout</button>
-</body></html>
+</body>
+</html>
