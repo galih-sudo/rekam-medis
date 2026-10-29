@@ -1,3 +1,68 @@
 <!DOCTYPE html><html><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Log Aktivitas</title><style>body{font-family:system-ui;background:#f8fafc;margin:0;padding:20px} table{width:100%;background:white;border-radius:12px;overflow:hidden;border-collapse:collapse} th{background:#0f172a;color:white;padding:12px;text-align:left;font-size:12px} td{padding:10px;border-bottom:1px solid #eee;font-size:13px} h2{margin:0 0 16px}</style></head><script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
-<body></body></html>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Log Aktivitas - AVICENA</title>
+<script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
+<style>
+body{font-family:system-ui;background:#f8fafc;margin:0;padding:20px;max-width:900px;margin:auto}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.btn{padding:8px 14px;border:0;border-radius:999px;font-weight:700;cursor:pointer;font-size:12px}
+.btn-back{background:white;border:1px solid #e2e8f0;color:#334155}
+.btn-red{background:#ef4444;color:white}
+.btn-clear{background:#f59e0b;color:white}
+table{width:100%;background:white;border-radius:12px;overflow:hidden;border-collapse:collapse;box-shadow:0 4px 12px rgba(0,0,0,.05)}
+th{background:#0f172a;color:white;padding:12px;text-align:left;font-size:11px;text-transform:uppercase}
+td{padding:10px;border-bottom:1px solid #f1f5f9;font-size:13px}
+h2{margin:0;font-size:18px}
+.badge{padding:2px 8px;border-radius:999px;font-size:10px;font-weight:800}
+</style></head>
+<body>
+<div class="header">
+<div><h2>📋 Log Aktivitas - AVICENA</h2><span id="count" style="font-size:12px;color:#64748b"></span></div>
+<div style="display:flex;gap:8px">
+<button onclick="location.href='./dashboard.html'" class="btn btn-back">← Dashboard</button>
+<button onclick="hapusLog()" class="btn btn-clear">🗑️ Hapus Log</button>
+<button onclick="logout()" class="btn btn-red">Logout</button>
+</div>
+</div>
+
+<table>
+<thead><tr><th>Waktu</th><th>User</th><th>Aksi</th></tr></thead>
+<tbody id="tbody"><tr><td colspan=3 style="text-align:center;padding:20px;color:#94a3b8">Loading...</td></tr></tbody>
+</table>
+
+<script>
+function load(){
+  let logs = JSON.parse(localStorage.getItem('log_aktivitas')||'[]');
+  document.getElementById('count').innerText = 'Total: '+logs.length+' aktivitas terakhir';
+  if(logs.length==0){
+    document.getElementById('tbody').innerHTML = '<tr><td colspan=3 style="text-align:center;padding:30px;color:#94a3b8">Belum ada aktivitas</td></tr>';
+    return;
+  }
+  document.getElementById('tbody').innerHTML = logs.map(l=>{
+    let warna = l.user.includes('dokter') ? '#2563eb' : l.user.includes('perawat') ? '#f59e0b' : '#10b981';
+    return `<tr>
+      <td style="font-size:11px;color:#64748b">${l.waktu}</td>
+      <td><span class="badge" style="background:${warna}20;color:${warna}">${l.user}</span></td>
+      <td><b>${l.aksi}</b></td>
+    </tr>`;
+  }).join('');
+}
+
+function hapusLog(){
+  if(!confirm('Hapus semua log aktivitas?'))return;
+  localStorage.removeItem('log_aktivitas');
+  load();
+}
+
+function logout(){
+  let logs=JSON.parse(localStorage.getItem('log_aktivitas')||'[]');
+  let nama=localStorage.getItem('nama_drg')||'User';
+  let role=localStorage.getItem('role_drg')||'dokter';
+  logs.unshift({waktu:new Date().toLocaleString('id-ID'), user:nama+' ('+role+')', aksi:'Logout'});
+  localStorage.setItem('log_aktivitas', JSON.stringify(logs.slice(0,100)));
+  localStorage.removeItem('login_drg');
+  location.href='/login.html';
+}
+
+load();
+</script>
+</body></html>
