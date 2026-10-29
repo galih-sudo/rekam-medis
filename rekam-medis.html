@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="id"><head>
-
-</body></html>
-</script><head></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>SOAP + Stok + ED - dr Galih</title><style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>SOAP + Stok + ED - dr Galih</title>
+<script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
+<style>
 *{font-family:sans-serif;box-sizing:border-box}body{margin:0;background:#f0f7ff}.header{background:#3b82f6;color:#fff;padding:14px 20px;display:flex;justify-content:space-between}
 .container{max-width:900px;margin:0 auto;padding:16px}.card{background:#fff;border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 2px 10px rgba(0,0,0,.04);border:1px solid #eef2ff}
 .label{font-size:10px;font-weight:800;color:#64748b;margin-bottom:6px}.input{width:100%;padding:10px 12px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc;font-size:13px}
@@ -13,9 +13,9 @@
 .icd-item{padding:10px 12px;border-bottom:1px solid #f1f5f9;cursor:pointer;font-size:12px}.icd-item:hover{background:#eff6ff}
 table.obat{width:100%;border-collapse:collapse;margin-top:10px}table.obat th{font-size:9px;color:#94a3b8;padding:8px;text-align:left;border-bottom:1px solid #e2e8f0}table.obat td{padding:10px 8px;border-bottom:1px solid #f1f5f9;font-size:12px}
 textarea.input{min-height:80px;resize:vertical}.stok-warn{font-size:11px;font-weight:800;padding:6px 10px;border-radius:8px;margin-top:6px;display:inline-block}
-</style></head><script>if(!localStorage.getItem("login_drg"))location.href="/login.html";</script>
+</style></head>
 <body>
-<div class="header"><div style="display:flex;gap:10px;align-items:center"><a href="./dashboard.html" style="text-decoration:none"><button class="btn" style="background:#fff;color:#3b82f6">← Dashboard</button></a><b>SOAP - Stok+ED</b></div><div><span id="rmDisplay" class="badge-rm">260001</span></div></div>
+<div class="header"><div style="display:flex;gap:10px;align-items:center"><a href="./dashboard.html" style="text-decoration:none"><button class="btn" style="background:#fff;color:#3b82f6">← Dashboard</button></a><b>SOAP - Stok+ED</b></div><div><span id="rmDisplay" class="badge-rm">260001</span> <button onclick="logout()" class="btn btn-red" style="margin-left:8px">Logout</button></div></div>
 <div class="container">
 <div class="card"><div class="label">DATA PASIEN</div><div class="grid2"><div><div class="label">NAMA AUTO</div><input id="nama" class="input"></div><div><div class="label">NO RM - AUTO</div><input id="norm" class="input" readonly style="background:#eff6ff;font-weight:800;color:#3b82f6"></div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px"><div><div class="label">TGL LAHIR</div><input id="tglLahir" type="date" class="input" onchange="hitungUmur()"></div><div><div class="label">UMUR</div><input id="umur" class="input" oninput="hitungTglLahir()"></div><div><div class="label">JK</div><select id="jk" class="input"><option>L</option><option>P</option></select></div></div><div class="grid2" style="margin-top:12px"><div><div class="label">TGL KUNJUNGAN</div><input id="tanggal" type="date" class="input"></div><div><div class="label">PEKERJAAN</div><input id="pekerjaan" class="input"></div></div></div>
 <div class="card" style="border-left:4px solid #10b981"><div class="label">S - VITAL SIGN</div><div class="grid4" style="margin-bottom:10px"><div><div class="label">TENSI</div><input id="tensi" class="input" placeholder="120/80"></div><div><div class="label">NADI</div><input id="nadi" class="input" placeholder="80"></div><div><div class="label">RR</div><input id="rr" class="input" placeholder="20"></div><div><div class="label">TEMP</div><input id="temp" class="input" placeholder="36.5"></div></div><textarea id="subyektif" class="input" placeholder="Keluhan utama..."></textarea></div>
@@ -32,17 +32,12 @@ textarea.input{min-height:80px;resize:vertical}.stok-warn{font-size:11px;font-we
 <table class="obat"><thead><tr><th>NAMA OBAT</th><th>JUMLAH</th><th>ATURAN</th><th>STOK SISA + ED</th><th></th></tr></thead><tbody id="listObat"></tbody></table>
 <div style="margin-top:16px;padding:14px;background:#fef9e7;border:1.5px solid #fde68a;border-radius:12px">
 <div class="label" style="color:#92400e;font-size:11px">📋 KOTAK KETERANGAN - KONTROL, EDUKASI, ANJURAN</div>
-<textarea id="keteranganKontrol" class="input" placeholder="Contoh:
-- Kontrol 1 minggu lagi jika keluhan belum membaik
-- Jaga makan berminyak, kurangi gorengan
-- Olahraga ringan 30 menit / hari
-- Istirahat cukup, minum air putih 2L
-- Jika demam tinggi >38.5 segera kembali" style="min-height:120px;background:#fffbeb;border-color:#fde68a;margin-top:6px"></textarea>
+<textarea id="keteranganKontrol" class="input" placeholder="Contoh:&#10;- Kontrol 1 minggu lagi&#10;- Jaga makan berminyak&#10;- Olahraga ringan 30 menit / hari" style="min-height:120px;background:#fffbeb;border-color:#fde68a;margin-top:6px"></textarea>
 <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
 <button onclick="isiTemplate('kontrol1minggu')" class="btn" style="background:#fef3c7;color:#92400e;font-size:10px;padding:6px 10px">+ Kontrol 1 mgg</button>
-<button onclick="isiTemplate('jagaMakan')" class="btn" style="background:#dcfce7;color:#166534;font-size:10px;padding:6px 10px">+ Jaga makan berminyak</button>
-<button onclick="isiTemplate('olahraga')" class="btn" style="background:#dbeafe;color:#1e40af;font-size:10px;padding:6px 10px">+ Olahraga ringan</button>
-<button onclick="isiTemplate('istirahat')" class="btn" style="background:#f3e8ff;color:#6b21a8;font-size:10px;padding:6px 10px">+ Istirahat cukup</button>
+<button onclick="isiTemplate('jagaMakan')" class="btn" style="background:#dcfce7;color:#166534;font-size:10px;padding:6px 10px">+ Jaga makan</button>
+<button onclick="isiTemplate('olahraga')" class="btn" style="background:#dbeafe;color:#1e40af;font-size:10px;padding:6px 10px">+ Olahraga</button>
+<button onclick="isiTemplate('istirahat')" class="btn" style="background:#f3e8ff;color:#6b21a8;font-size:10px;padding:6px 10px">+ Istirahat</button>
 </div>
 </div>
 <div style="margin-top:12px"><div class="label">CATATAN PLAN TAMBAHAN</div><textarea id="plan" class="input" placeholder="Terapi tambahan..."></textarea></div>
@@ -54,78 +49,21 @@ let icdData=[]; let obatMaster=[]; let resepList=[]; let selectedObat=null;
 function getData(){return JSON.parse(localStorage.getItem('rekamMedisV8')||'[]')}
 function getObatMaster(){let data=localStorage.getItem('obatList'); if(!data){return [];} return JSON.parse(data);}
 function generateRM(){var th=new Date().getFullYear().toString().slice(-2);var data=getData();var max=0;for(var i=0;i<data.length;i++){var rm=data[i].norm||'';if(rm.startsWith(th)&&rm.length>=6){var num=parseInt(rm.slice(-4))||0;if(num>max)max=num}}if(max==0)return th+'0001';return th+String(max+1).padStart(4,'0');}
-function hitungED(edStr){
-if(!edStr) return {status:'no-ed',text:'No ED',days:9999,warna:'#94a3b8'};
-let today=new Date(); today.setHours(0,0,0,0);
-let ed=new Date(edStr); ed.setHours(0,0,0,0);
-let diff=Math.ceil((ed - today)/ (1000*60*60*24));
-if(diff<0) return {status:'expired',text:'❌ EXPIRED '+Math.abs(diff)+' hari lalu! JANGAN DIPAKE! ('+edStr+')',days:diff,warna:'#dc2626',bg:'#fef2f2',border:'#fecaca'};
-if(diff<=30) return {status:'dekat-banget',text:'⚠️ ED DEKAT BANGET '+diff+' hari lagi! ('+edStr+')',days:diff,warna:'#d97706',bg:'#fffbeb',border:'#fde68a'};
-if(diff<=90) return {status:'dekat',text:'⚠️ ED '+diff+' hari lagi ('+edStr+')',days:diff,warna:'#d97706',bg:'#fffbeb',border:'#fde68a'};
-return {status:'aman',text:'✅ ED Aman '+diff+' hari ('+edStr+')',days:diff,warna:'#16a34a',bg:'#f0fdf4',border:'#bbf7d0'};
-}
-function init(){
-var params=new URLSearchParams(location.search);
-var namaParam=params.get('nama')||localStorage.getItem('pasienBaruNama')||'';
-var rmParam=params.get('rm')||localStorage.getItem('nextRM')||generateRM();
-var idParam=params.get('id');
-var ulangParam=params.get('ulang');
-document.getElementById('nama').value=namaParam;
-document.getElementById('norm').value=rmParam;
-document.getElementById('rmDisplay').textContent=rmParam;
-document.getElementById('rmSave').textContent=rmParam;
-document.getElementById('tanggal').value=new Date().toISOString().slice(0,10);
-obatMaster=getObatMaster();
-if(idParam){var all=getData();var found=all.find(function(x){return x.id==idParam});if(found){document.getElementById('nama').value=found.nama;document.getElementById('norm').value=found.norm;document.getElementById('rmDisplay').textContent=found.norm+(ulangParam?' (Ulang)':'');document.getElementById('rmSave').textContent=found.norm;document.getElementById('umur').value=found.umur||'';document.getElementById('tglLahir').value=found.tglLahir||'';document.getElementById('jk').value=found.jk||'L';if(!ulangParam){document.getElementById('subyektif').value=found.subyektif||'';document.getElementById('obyektif').value=found.obyektif||'';document.getElementById('keteranganBaru').value=found.keteranganBaru||'';document.getElementById('kode_icd').value=found.kode_icd||'';document.getElementById('nama_diagnosa').value=found.nama_diagnosa||'';document.getElementById('plan').value=found.plan||'';document.getElementById('keteranganKontrol').value=found.keteranganKontrol||'';document.getElementById('tensi').value=found.tensi||'';document.getElementById('nadi').value=found.nadi||'';document.getElementById('rr').value=found.rr||'';document.getElementById('temp').value=found.temp||'';if(found.resepList){resepList=found.resepList;renderResep();}}}}
-loadICD();
-}
+function hitungED(edStr){if(!edStr) return {status:'no-ed',text:'No ED',days:9999,warna:'#94a3b8'};let today=new Date(); today.setHours(0,0,0,0);let ed=new Date(edStr); ed.setHours(0,0,0,0);let diff=Math.ceil((ed - today)/ (1000*60*60*24));if(diff<0) return {status:'expired',text:'❌ EXPIRED '+Math.abs(diff)+' hari lalu! ('+edStr+')',days:diff,warna:'#dc2626',bg:'#fef2f2',border:'#fecaca'};if(diff<=30) return {status:'dekat-banget',text:'⚠️ ED DEKAT '+diff+' hari ('+edStr+')',days:diff,warna:'#d97706',bg:'#fffbeb',border:'#fde68a'};if(diff<=90) return {status:'dekat',text:'⚠️ ED '+diff+' hari ('+edStr+')',days:diff,warna:'#d97706',bg:'#fffbeb',border:'#fde68a'};return {status:'aman',text:'✅ ED Aman '+diff+' hari ('+edStr+')',days:diff,warna:'#16a34a',bg:'#f0fdf4',border:'#bbf7d0'};}
+function init(){var params=new URLSearchParams(location.search);var namaParam=params.get('nama')||localStorage.getItem('pasienBaruNama')||'';var rmParam=params.get('rm')||localStorage.getItem('nextRM')||generateRM();var idParam=params.get('id');var ulangParam=params.get('ulang');document.getElementById('nama').value=namaParam;document.getElementById('norm').value=rmParam;document.getElementById('rmDisplay').textContent=rmParam;document.getElementById('rmSave').textContent=rmParam;document.getElementById('tanggal').value=new Date().toISOString().slice(0,10);obatMaster=getObatMaster();if(idParam){var all=getData();var found=all.find(function(x){return x.id==idParam});if(found){document.getElementById('nama').value=found.nama;document.getElementById('norm').value=found.norm;document.getElementById('rmDisplay').textContent=found.norm+(ulangParam?' (Ulang)':'');document.getElementById('rmSave').textContent=found.norm;document.getElementById('umur').value=found.umur||'';document.getElementById('tglLahir').value=found.tglLahir||'';document.getElementById('jk').value=found.jk||'L';if(!ulangParam){document.getElementById('subyektif').value=found.subyektif||'';document.getElementById('obyektif').value=found.obyektif||'';document.getElementById('keteranganBaru').value=found.keteranganBaru||'';document.getElementById('kode_icd').value=found.kode_icd||'';document.getElementById('nama_diagnosa').value=found.nama_diagnosa||'';document.getElementById('plan').value=found.plan||'';document.getElementById('keteranganKontrol').value=found.keteranganKontrol||'';document.getElementById('tensi').value=found.tensi||'';document.getElementById('nadi').value=found.nadi||'';document.getElementById('rr').value=found.rr||'';document.getElementById('temp').value=found.temp||'';if(found.resepList){resepList=found.resepList;renderResep();}}}}loadICD();}
 function hitungUmur(){var tgl=document.getElementById('tglLahir').value;if(!tgl)return;var lahir=new Date(tgl);var now=new Date();var umur=now.getFullYear()-lahir.getFullYear();var m=now.getMonth()-lahir.getMonth();if(m<0||(m==0&&now.getDate()<lahir.getDate()))umur--;document.getElementById('umur').value=umur;}
 function hitungTglLahir(){var umur=parseInt(document.getElementById('umur').value)||0;if(!umur)return;var now=new Date();now.setFullYear(now.getFullYear()-umur);document.getElementById('tglLahir').value=now.toISOString().slice(0,10);}
 function loadICD(){fetch('./icd_master.csv').then(r=>r.text()).then(txt=>{var lines=txt.split('\n');icdData=[];for(var i=1;i<lines.length;i++){var line=lines[i].trim();if(!line)continue;var parts=line.split(',');if(parts.length>=2){var kode=parts[0].replace(/"/g,'').trim();var nama=parts.slice(1).join(',').replace(/"/g,'').trim();if(kode)icdData.push({kode:kode,nama:nama})}}}).catch(()=>{icdData=[{kode:'J06.9',nama:'ISPA'}]})}
 function autoSearchICD(){var q=document.getElementById('kode_icd').value.trim().toLowerCase();var box=document.getElementById('icdResult');if(q.length<2){box.style.display='none';return}var filtered=icdData.filter(function(x){return x.kode.toLowerCase().indexOf(q)!==-1||x.nama.toLowerCase().indexOf(q)!==-1}).slice(0,20);if(filtered.length==0){box.innerHTML='<div class="icd-item">Tidak ada</div>';box.style.display='block';return}var html='';for(var i=0;i<filtered.length;i++){var it=filtered[i];html+='<div class="icd-item" onclick="pilihICD(\''+it.kode.replace(/'/g,"\\'")+'\',\''+it.nama.replace(/'/g,"\\'").replace(/"/g,'&quot;')+'\')"><b style="color:#3b82f6">'+it.kode+'</b> - '+it.nama+'</div>'}box.innerHTML=html;box.style.display='block';}
 function pilihICD(kode,nama){document.getElementById('kode_icd').value=kode;document.getElementById('nama_diagnosa').value=nama;document.getElementById('icdResult').style.display='none';}
-function searchObat(){
-var q=document.getElementById('obat_nama').value.trim().toLowerCase();
-var box=document.getElementById('obatResult');
-var info=document.getElementById('stokInfo');
-if(q.length<1){box.style.display='none';info.innerHTML='';selectedObat=null;return}
-var filtered=obatMaster.filter(function(x){return x.nama.toLowerCase().indexOf(q)!==-1}).slice(0,10);
-if(filtered.length==0){box.innerHTML='<div class="icd-item" style="color:#94a3b8">Obat tidak ada - bisa tambah manual</div>';box.style.display='block';info.innerHTML='';selectedObat=null;return}
-var html='';for(var i=0;i<filtered.length;i++){var it=filtered[i];var edI=hitungED(it.ed);var stokColor=it.stok<10?'color:#ef4444;font-weight:800':'';var edColor=edI.status=='expired'?'color:#dc2626':edI.status.includes('dekat')?'color:#d97706':'';html+='<div class="icd-item" onclick="pilihObat(\''+it.id+'\')"><b>'+it.nama+'</b><br><span style="'+stokColor+'">Stok: '+it.stok+' '+it.satuan+'</span> | <span style="'+edColor+'">'+edI.text+'</span></div>'}box.innerHTML=html;box.style.display='block';
-}
-function pilihObat(id){
-var ob=obatMaster.find(function(x){return x.id==id});
-if(!ob)return;
-selectedObat=ob;
-document.getElementById('obat_nama').value=ob.nama;
-document.getElementById('obatResult').style.display='none';
-var edI=hitungED(ob.ed);
-var info=document.getElementById('stokInfo');
-var html='';
-if(ob.stok<10){html+='<div class="stok-warn" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca">📦 STOK MENIPIS! Sisa '+ob.stok+' '+ob.satuan+'</div> ';}else{html+='<div class="stok-warn" style="background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0">📦 Stok: '+ob.stok+' '+ob.satuan+'</div> ';}
-html+='<div class="stok-warn" style="background:'+edI.bg+';color:'+edI.warna+';border:1px solid '+edI.border+'">'+edI.text+'</div>';
-if(edI.status=='expired'){html+='<div class="stok-warn" style="background:#dc2626;color:#fff">🚨 EXPIRED - JANGAN DIPAKE!</div>';}
-info.innerHTML=html;
-document.getElementById('obat_jumlah').focus();
-}
-function tambahObat(){
-var nama=document.getElementById('obat_nama').value.trim();
-var jumlah=parseInt(document.getElementById('obat_jumlah').value)||0;
-var aturan=document.getElementById('obat_aturan').value.trim();
-if(!nama||!jumlah){alert('Isi nama obat dan jumlah!');return}
-if(selectedObat){
-if(jumlah>selectedObat.stok){alert('❌ Stok tidak cukup! Sisa '+selectedObat.stok);return}
-let edI=hitungED(selectedObat.ed);
-if(edI.status=='expired'){if(!confirm('⚠️ OBAT INI SUDAH EXPIRED ('+selectedObat.ed+')! Yakin tetap pakai?'))return;}
-if(edI.status=='dekat-banget'){if(!confirm('⚠️ ED DEKAT '+edI.days+' hari lagi! Yakin pakai?'))return;}
-}
-var item={id:Date.now().toString(),nama:nama,jumlah:jumlah,aturan:aturan,obatId:selectedObat?selectedObat.id:null,ed:selectedObat?selectedObat.ed:null};
-resepList.push(item);renderResep();document.getElementById('obat_nama').value='';document.getElementById('obat_jumlah').value='';document.getElementById('obat_aturan').value='';document.getElementById('stokInfo').innerHTML='';selectedObat=null;
-}
-function renderResep(){var tbody=document.getElementById('listObat');var html='';for(var i=0;i<resepList.length;i++){var r=resepList[i];var edI=r.ed?hitungED(r.ed):{text:'No ED',warna:'#94a3b8'};var sisa='-';if(r.obatId){var master=obatMaster.find(function(x){return x.id==r.obatId});if(master)sisa=(master.stok - r.jumlah)+' '+master.satuan+'<br><span style="font-size:10px;color:'+edI.warna+'">'+edI.text+'</span>';}html+='<tr><td><b>'+r.nama+'</b></td><td>'+r.jumlah+'</td><td>'+r.aturan+'</td><td style="font-size:11px">'+sisa+'</td><td><button onclick="hapusObat(\''+r.id+'\')" class="btn btn-red" style="padding:4px 8px">x</button></td></tr>';}if(!html)html='<tr><td colspan="5" style="text-align:center;color:#94a3b8;font-size:11px">Belum ada obat</td></tr>';tbody.innerHTML=html;}
-function hapusObat(id){resepList=resepList.filter(function(x){return x.id!=id});renderResep();}
+function searchObat(){var q=document.getElementById('obat_nama').value.trim().toLowerCase();var box=document.getElementById('obatResult');var info=document.getElementById('stokInfo');if(q.length<1){box.style.display='none';info.innerHTML='';selectedObat=null;return}var filtered=obatMaster.filter(function(x){return x.nama.toLowerCase().indexOf(q)!==-1}).slice(0,10);if(filtered.length==0){box.innerHTML='<div class="icd-item" style="color:#94a3b8">Obat tidak ada - bisa tambah manual</div>';box.style.display='block';info.innerHTML='';selectedObat=null;return}var html='';for(var i=0;i<filtered.length;i++){var it=filtered[i];var edI=hitungED(it.ed);var stokColor=it.stok<10?'color:#ef4444;font-weight:800':'';var edColor=edI.status=='expired'?'color:#dc2626':edI.status.includes('dekat')?'color:#d97706':'';html+='<div class="icd-item" onclick="pilihObat(\''+it.id+'\')"><b>'+it.nama+'</b><br><span style="'+stokColor+'">Stok: '+it.stok+' '+it.satuan+'</span> | <span style="'+edColor+'">'+edI.text+'</span></div>'}box.innerHTML=html;box.style.display='block';}
+function pilihObat(id){var ob=obatMaster.find(function(x){return x.id==id});if(!ob)return;selectedObat=ob;document.getElementById('obat_nama').value=ob.nama;document.getElementById('obatResult').style.display='none';var edI=hitungED(ob.ed);var info=document.getElementById('stokInfo');var html='';if(ob.stok<10){html+='<div class="stok-warn" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca">📦 STOK MENIPIS! Sisa '+ob.stok+' '+ob.satuan+'</div> ';}else{html+='<div class="stok-warn" style="background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0">📦 Stok: '+ob.stok+' '+ob.satuan+'</div> ';}html+='<div class="stok-warn" style="background:'+edI.bg+';color:'+edI.warna+';border:1px solid '+edI.border+'">'+edI.text+'</div>';if(edI.status=='expired'){html+='<div class="stok-warn" style="background:#dc2626;color:#fff">🚨 EXPIRED - JANGAN DIPAKE!</div>';}info.innerHTML=html;document.getElementById('obat_jumlah').focus();}
+function tambahObat(){var nama=document.getElementById('obat_nama').value.trim();var jumlah=parseInt(document.getElementById('obat_jumlah').value)||0;var aturan=document.getElementById('obat_aturan').value.trim();if(!nama||!jumlah){alert('Isi nama obat dan jumlah!');return}if(selectedObat){if(jumlah>selectedObat.stok){alert('❌ Stok tidak cukup! Sisa '+selectedObat.stok);return}let edI=hitungED(selectedObat.ed);if(edI.status=='expired'){if(!confirm('⚠️ OBAT INI SUDAH EXPIRED ('+selectedObat.ed+')! Yakin tetap pakai?'))return;}if(edI.status=='dekat-banget'){if(!confirm('⚠️ ED DEKAT '+edI.days+' hari lagi! Yakin pakai?'))return;}}var item={id:Date.now().toString(),nama:nama,jumlah:jumlah,aturan:aturan,obatId:selectedObat?selectedObat.id:null,ed:selectedObat?selectedObat.ed:null};resepList.push(item);renderResep();document.getElementById('obat_nama').value='';document.getElementById('obat_jumlah').value='';document.getElementById('obat_aturan').value='';document.getElementById('stokInfo').innerHTML='';selectedObat=null;}
+function renderResep(){var tbody=document.getElementById('listObat');var html='';for(var i=0;i<resepList.length;i++){var r=resepList[i];var edI=r.ed?hitungED(r.ed):{text:'No ED',warna:'#94a3b8'};var sisa='-';if(r.obatId){var master=obatMaster.find(function(x){return x.id==r.obatId});if(master)sisa=(master.stok - r.jumlah)+' '+master.satuan+'<br><span style="font-size:10px;color:'+edI.warna+'">'+edI.text+'</span>';}html+='<tr><td><b>'+r.nama+'</b></td><td>'+r.jumlah+'</td><td>'+r.aturan+'</td><td style="font-size:11px">'+sisa+'</td><td><button onclick="hapusObatResep(\''+r.id+'\')" class="btn btn-red" style="padding:4px 8px">x</button></td></tr>';}if(!html)html='<tr><td colspan="5" style="text-align:center;color:#94a3b8;font-size:11px">Belum ada obat</td></tr>';tbody.innerHTML=html;}
+function hapusObatResep(id){resepList=resepList.filter(function(x){return x.id!=id});renderResep();}
 function isiTemplate(tipe){var ta=document.getElementById('keteranganKontrol');var cur=ta.value;if(tipe=='kontrol1minggu'){cur+= (cur?'\n':'')+'- Kontrol 1 minggu lagi jika keluhan belum membaik';}if(tipe=='jagaMakan'){cur+= (cur?'\n':'')+'- Jaga makan berminyak, kurangi gorengan, santan, dan makanan pedas';}if(tipe=='olahraga'){cur+= (cur?'\n':'')+'- Olahraga ringan 30 menit/hari, jalan pagi';}if(tipe=='istirahat'){cur+= (cur?'\n':'')+'- Istirahat cukup 7-8 jam, minum air putih 2L/hari, hindari rokok & alkohol';}ta.value=cur;}
 function simpan(){var data=getData();var params=new URLSearchParams(location.search);var isUlang=params.get('ulang');var id=(isUlang?Date.now().toString():(params.get('id')||Date.now().toString()));var master=JSON.parse(localStorage.getItem('obatList')||'[]');for(var i=0;i<resepList.length;i++){var r=resepList[i];if(r.obatId){var idx=master.findIndex(function(m){return m.id==r.obatId});if(idx>=0){master[idx].stok = Math.max(0, master[idx].stok - r.jumlah);}}}localStorage.setItem('obatList',JSON.stringify(master));var obj={id:id,nama:document.getElementById('nama').value,norm:document.getElementById('norm').value,tglLahir:document.getElementById('tglLahir').value,umur:document.getElementById('umur').value,jk:document.getElementById('jk').value,tanggal:document.getElementById('tanggal').value,pekerjaan:document.getElementById('pekerjaan').value,tensi:document.getElementById('tensi').value,nadi:document.getElementById('nadi').value,rr:document.getElementById('rr').value,temp:document.getElementById('temp').value,subyektif:document.getElementById('subyektif').value,obyektif:document.getElementById('obyektif').value,keteranganBaru:document.getElementById('keteranganBaru').value,kode_icd:document.getElementById('kode_icd').value,nama_diagnosa:document.getElementById('nama_diagnosa').value,plan:document.getElementById('plan').value,keteranganKontrol:document.getElementById('keteranganKontrol').value,resepList:resepList};if(!isUlang){var idx2=data.findIndex(function(x){return x.id==id});if(idx2>=0)data[idx2]=obj;else data.push(obj);}else{data.push(obj);}localStorage.setItem('rekamMedisV8',JSON.stringify(data));localStorage.removeItem('pasienBaruNama');localStorage.removeItem('nextRM');alert('✅ Tersimpan RM '+obj.norm+' - '+resepList.length+' obat - Stok terpotong!');location.href='./dashboard.html';}
+function logout(){localStorage.removeItem('login_drg');location.href='./login.html';}
 init();
 document.addEventListener('click',function(e){var box1=document.getElementById('icdResult');var input1=document.getElementById('kode_icd');if(e.target!==box1&&e.target!==input1&&!box1.contains(e.target)){box1.style.display='none';}var box2=document.getElementById('obatResult');var input2=document.getElementById('obat_nama');if(e.target!==box2&&e.target!==input2&&!box2.contains(e.target)){box2.style.display='none';}});
 </script>
