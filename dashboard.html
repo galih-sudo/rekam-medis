@@ -1,6 +1,27 @@
-<script>if(!localStorage.getItem("token")&&!localStorage.getItem("user")&&!localStorage.getItem("login_user")){location.href="/login.html"}</script>
-<div class="header"><div>🏥 Praktek Mandiri dr. Galih | Rekam Medis</div><div><span id="jam"></span> | 30-10-2026 | dr_galih Dokter | <a href="/login.html" style="color:white">Logout</a></div></div>
-<div class="menu"><a class="active" href="/dashboard.html">🏠 Dashboard</a><a href="/antrian.html">🔢 Antrian</a><a href="/pasien.html">📋 Pasien</a><a href="/tambah.html">➕ Tambah</a><a href="/cari.html">🔍 Cari</a><a href="/obat.html">💊 Obat</a><a href="/icd10.html">📚 ICD-10</a><a href="/user.html">👥 User</a><a href="#">📊 Laporan ▼</a></div>
-<div class="marquee-bar" style="width:100%;background:#f0f9ff;overflow:hidden;white-space:nowrap;padding:9px 0;border-bottom:1px solid #dbeafe"><span style="display:inline-block;padding-left:100%;animation:marquee 20s linear infinite;color:#1d4ed8;font-size:13px;font-weight:700">🏥 Praktek Mandiri dr.Galih | 📍 Jl.Raya Sengkol Aikdarek | 😊 Melayani dengan senyum | 🕕 Buka setiap hari kerja jam 06.00-11.00 dan 17.00-21.00 WITA |</span></div><style>@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}</style>
-<div class="card"><div class="grid"><div class="stat"><b id="totalPasien">-</b>Total Pasien</div><div class="stat"><b id="hariIni">-</b>Hari Ini</div><div class="stat"><b id="totalKunjungan">-</b>Total Kunjungan</div><div class="stat"><b id="stokKritis">-</b>Stok Kritis</div></div><canvas id="chart7" style="margin-top:20px;max-height:280px"></canvas></div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script><script>setInterval(()=>{let d=new Date();document.getElementById('jam').innerText=d.toLocaleTimeString('id-ID')},1000);async function load(){const r=await fetch('/api/laporan');const d=await r.json();totalPasien.innerText=d.totalPasien;hariIni.innerText=d.hariIni;totalKunjungan.innerText=d.totalKunjungan;stokKritis.innerText=d.stokMenipis.length;new Chart(chart7,{type:'bar',data:{labels:d.kunjungan7hari.map(x=>new Date(x.tgl).toLocaleDateString('id-ID',{day:'2-digit',month:'short'})),datasets:[{data:d.kunjungan7hari.map(x=>x.jumlah),backgroundColor:'#3b82f6',borderRadius:8}]},options:{plugins:{legend:{display:false}}}})}load()</script></body></html>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard - Praktek Mandiri dr. Galih</title>
+<script>if(!localStorage.getItem('token')&&!localStorage.getItem('user')&&!localStorage.getItem('login_user'))location.href='/login.html'</script>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui;background:#f8fafc}
+.header{background:linear-gradient(90deg,#2563eb,#1e40af);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
+.marquee-bar{width:100%;background:#eff6ff;overflow:hidden;white-space:nowrap;padding:10px 0;border-bottom:1px solid #dbeafe}
+.marquee-bar span{display:inline-block;padding-left:100%;animation:marquee 25s linear infinite;color:#1d4ed8;font-size:13px;font-weight:600}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+.nav{background:#fff;margin:14px 16px 0;border-radius:12px;padding:8px;display:flex;gap:6px;flex-wrap:wrap;box-shadow:0 1px 3px #0001}
+.nav a{padding:8px 14px;border-radius:20px;background:#f1f5f9;text-decoration:none;color:#475569;font-size:13px;font-weight:600}.nav a.active{background:#2563eb;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 16px}
+.stat{background:#fff;border-radius:14px;padding:18px;box-shadow:0 1px 3px #0001}.stat b{font-size:28px;color:#1e40af}.stat div{font-size:13px;color:#64748b;margin-top:4px}
+.card{background:#fff;margin:14px 16px;border-radius:14px;padding:20px;box-shadow:0 1px 3px #0001}
+.copy{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
+</style></head><body>
+<div class="header"><div><b>🏥 Praktek Mandiri dr. Galih</b></div><div><span id="jam"></span> | <a href="#" onclick="localStorage.clear();location.href='/login.html'" style="color:#fff;text-decoration:none;font-weight:600">Logout</a></div></div>
+<div class="marquee-bar"><span>🏥 Praktek Mandiri dr.Galih | 📍 Jl.Raya Sengkol Aikdarek | 😊 Melayani dengan senyum | 🕕 Buka setiap hari kerja jam 06.00-11.00 dan 17.00-21.00 WITA |</span></div>
+<div class="nav"><a class="active">🏠 Dashboard</a><a href="/antrian.html">🔢 Antrian</a><a href="/pasien.html">👥 Pasien</a><a href="/obat.html">💊 Obat</a><a href="/daftar-online.html">📝 Daftar Online</a></div>
+<div class="grid"><div class="stat"><b id="s1">-</b><div>Antrian Hari Ini</div></div><div class="stat"><b id="s2">-</b><div>Total Pasien</div></div><div class="stat"><b id="s3">-</b><div>Obat</div></div></div>
+<div class="card"><h3>Selamat Datang, <span id="user"></span> 👋</h3><p style="color:#64748b;font-size:14px">Sistem Rekam Medis Praktek Mandiri dr. Galih - Jl.Raya Sengkol Aikdarek</p></div>
+<div class="copy">Copyright - Vercel.Postgres + AI @2026</div>
+<script>
+document.getElementById('user').innerText=localStorage.getItem('login_user')||'Dokter';
+setInterval(()=>{let e=document.getElementById('jam'); if(e) e.innerText=new Date().toLocaleString('id-ID')},1000);
+async function load(){try{let a=await fetch('/api/antrian').then(r=>r.json());document.getElementById('s1').innerText=Array.isArray(a)?a.length:0;let p=await fetch('/api/pasien').then(r=>r.json());document.getElementById('s2').innerText=Array.isArray(p)?p.length:p.data?.length||0;let o=await fetch('/api/obat').then(r=>r.json());document.getElementById('s3').innerText=Array.isArray(o)?o.length:0;}catch{}}load();
+</script></body></html>
