@@ -1,76 +1,41 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Praktek Mandiri dr. Galih | Antrian</title><style>body{margin:0;font-family:system-ui;background:#eef2f7}.header{background:linear-gradient(90deg,#3b82f6,#1e40af);color:#fff;padding:12px 18px;display:flex;justify-content:space-between;flex-wrap:wrap}.menu{background:#fff;margin:12px 16px 0;border-radius:14px;padding:10px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;box-shadow:0 2px 10px #0001}.menu a{padding:8px 14px;border-radius:20px;background:#f1f5f9;text-decoration:none;color:#334155;font-size:13px}.menu a.active{background:#3b82f6;color:#fff}.card{background:#fff;margin:16px;border-radius:14px;padding:18px;box-shadow:0 2px 10px #0001}.antri-item{border:1px solid #e2e8f0;border-radius:14px;padding:16px;margin:10px 0;display:flex;justify-content:space-between;align-items:center;background:#f8fafc}.antri-no{font-size:36px;font-weight:800;color:#1e40af}.btn{padding:10px 16px;border-radius:20px;border:none;cursor:pointer;font-size:13px;font-weight:600}.btn-panggil{background:#ec4899;color:#fff}.btn-rm{background:#e2e8f0;color:#334155}#status{margin-top:8px;font-size:12px;color:#64748b}</style></head><body>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Praktek Mandiri dr. Galih | Antrian</title><style>body{margin:0;font-family:system-ui;background:#eef2f7}.header{background:linear-gradient(90deg,#3b82f6,#1e40af);color:#fff;padding:12px 18px;display:flex;justify-content:space-between;flex-wrap:wrap}.menu{background:#fff;margin:12px 16px 0;border-radius:14px;padding:10px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;box-shadow:0 2px 10px #0001}.menu a{padding:8px 14px;border-radius:20px;background:#f1f5f9;text-decoration:none;color:#334155;font-size:13px}.menu a.active{background:#3b82f6;color:#fff}.card{background:#fff;margin:16px;border-radius:14px;padding:18px;box-shadow:0 2px 10px #0001}.antri-item{border:1px solid #e2e8f0;border-radius:14px;padding:16px;margin:10px 0;display:flex;justify-content:space-between;align-items:center;background:#f8fafc}.antri-no{font-size:36px;font-weight:800;color:#1e40af}.btn{padding:10px 16px;border-radius:20px;border:none;cursor:pointer;font-size:13px;font-weight:600}.btn-panggil{background:#ec4899;color:#fff}.btn-rm{background:#e2e8f0;color:#334155}</style></head><body>
 <div class="header"><div>🏥 Praktek Mandiri dr. Galih | Rekam Medis</div><div><span id="jam"></span> | dr_galih Dokter | <a href="/login.html" style="color:white">Logout</a></div></div>
 <div class="menu"><a href="/dashboard.html">🏠 Dashboard</a><a class="active" href="/antrian.html">🔢 Antrian</a><a href="/pasien.html">📋 Pasien</a><a href="/tambah.html">➕ Tambah</a><a href="/cari.html">🔍 Cari</a><a href="/obat.html">💊 Obat</a><a href="/icd10.html">📚 ICD-10</a><a href="/user.html">👥 User</a><a href="#">📊 Laporan ▼</a></div>
-<div class="card"><h3 style="margin:0">🔢 Antrian Hari Ini - Praktek Mandiri</h3><div style="color:#64748b;margin-top:6px" id="info">Loading...</div><div id="status">Loading voice...</div><div id="list" style="margin-top:16px"></div></div>
+<div class="card"><h3 style="margin:0">🔢 Antrian Hari Ini - Praktek Mandiri</h3><div style="color:#64748b;margin-top:6px" id="info">Loading...</div><div id="status" style="margin-top:6px;font-size:11px;color:#64748b"></div><div id="list" style="margin-top:16px"></div></div>
 <script>
 let voices=[]; let cewek=null;
 function loadVoices(){
   voices=speechSynthesis.getVoices();
-  // PRIORITAS CEWEK
   cewek = voices.find(v=>v.lang==='id-ID'&&v.name.toLowerCase().includes('female')) ||
-          voices.find(v=>v.name.toLowerCase().includes('google')&&v.lang==='id-ID') ||
           voices.find(v=>v.lang==='id-ID') ||
+          voices.find(v=>v.name.toLowerCase().includes('google')&&v.name.toLowerCase().includes('female')) ||
           voices.find(v=>v.name.toLowerCase().includes('female')) ||
           voices[0];
-  let isLinux = navigator.userAgent.toLowerCase().includes('linux');
-  document.getElementById('status').innerHTML = (isLinux?'🖥️ CachyOS Linux | ':'📱 ')+(cewek?`Voice: ${cewek.name} (${cewek.lang}) ${cewek.name.toLowerCase().includes('female')?'💖 CEWEK':'⚠️ LAKI?'}`:'No voice')+'<br><small>Kalo diblock, klik PANGGIL lagi, atau pakai Chrome + aktifkan flag: chrome://flags/#enable-speech-synthesis</small>';
+  document.getElementById('status').innerText='Voice: '+(cewek?cewek.name+' '+cewek.lang:'loading - klik PANGGIL lagi kalo belum muncul')+' | Device: '+(navigator.userAgent.toLowerCase().includes('linux')?'CachyOS Linux':'HP Android');
 }
-speechSynthesis.onvoiceschanged=loadVoices; setTimeout(loadVoices,1000); loadVoices();
+speechSynthesis.onvoiceschanged=loadVoices; setTimeout(loadVoices,500); loadVoices();
 setInterval(()=>{let d=new Date();let el=document.getElementById('jam');if(el)el.innerText=d.toLocaleTimeString('id-ID')},1000)
-
-function speakNative(text){
-  return new Promise(resolve=>{
-    speechSynthesis.cancel();
-    let u=new SpeechSynthesisUtterance(text);
-    if(cewek){u.voice=cewek; u.lang=cewek.lang;} else u.lang='id-ID';
-    // BIAR CEWEK BANGET DI LINUX
-    u.rate=0.9; u.pitch=1.3; u.volume=1;
-    u.onend=()=>resolve();
-    u.onerror=()=>resolve();
-    speechSynthesis.speak(u);
-  });
-}
-
-// GOOGLE CLOUD TTS VIA AUDIO - ANTI BLOCK DENGAN BLOB
-async function speakCloud(text){
-  let status=document.getElementById('status');
-  try{
-    let q=encodeURIComponent(text);
-    // endpoint yang paling gak diblock
-    let url=`https://translate.googleapis.com/translate_tts?ie=UTF-8&q=${q}&tl=id-ID&client=gtx`;
-    status.innerText='☁️ Loading cloud voice...';
-    let res=await fetch(url);
-    if(!res.ok) throw new Error('fetch fail');
-    let blob=await res.blob();
-    let blobUrl=URL.createObjectURL(blob);
-    let audio=new Audio(blobUrl);
-    audio.onended=()=>{URL.revokeObjectURL(blobUrl); status.innerText='✅ Cloud voice selesai';};
-    audio.onerror=()=>{status.innerText='❌ Cloud gagal, pakai native'; speakNative(text);};
-    await audio.play();
-    status.innerText='🔊 Playing cloud: '+text.substring(0,30)+'...';
-  }catch(e){
-    console.log('cloud error',e);
-    status.innerText='⚠️ Cloud diblock CORS, fallback ke native cewek. Coba pakai Firefox atau aktifkan flag Chrome.';
-    // FALLBACK KE NATIVE YANG UDAH DIPAKSA CEWEK
-    speakNative(text);
-  }
-}
-
-async function speak(text){
-  // Coba native dulu - kalo di CachyOS eSpeak jelek, baru cloud
-  let isLinux = navigator.userAgent.toLowerCase().includes('linux');
-  if(isLinux){
-    // DI CACHYOS LANGSUNG CLOUD, TAPI KALO BLOCK FALLBACK NATIVE
-    await speakCloud(text);
-  } else {
-    await speakNative(text);
-  }
-}
 
 function panggil(nama,no){
   if(!nama||nama==='undefined') nama='pasien';
-  let kalimat=`Nomor antrian ${no}, atas nama ${nama}, silakan masuk ke ruang dokter.`;
-  speak(kalimat);
+  // HILANGKAN KOMA DAN TITIK BIAR GAK KEPOTONG SATU KATA!
+  // TANPA KOMA = GAK KEPOTONG!
+  let namaBersih=nama.replace(/[^a-zA-Z0-9 ]/g,' ').substring(0,20);
+  let teks=`Nomor antrian ${no} atas nama ${namaBersih} silakan masuk ke ruang dokter`;
+  
+  speechSynthesis.cancel();
+  setTimeout(()=>{
+    let u=new SpeechSynthesisUtterance(teks);
+    if(cewek){u.voice=cewek; u.lang='id-ID';} else {u.lang='id-ID';}
+    // FIX HP CUMA SATU KATA + LAPTOP DESIS BISIK
+    let isLinux=navigator.userAgent.toLowerCase().includes('linux');
+    if(isLinux){
+      u.rate=1.0; u.pitch=1.0; u.volume=1; // LINUX JANGAN PITCH TINGGI NANTI DESIS BISIK!
+    } else {
+      u.rate=0.9; u.pitch=1.15; u.volume=1; // HP ANDROID BOLEH AGAK CEWEK
+    }
+    speechSynthesis.speak(u);
+  },100);
 }
 async function load(){const r=await fetch('/api/antrian');const d=await r.json();document.getElementById('info').innerText=d.length+' pasien antri hari ini';document.getElementById('list').innerHTML=d.map(k=>{
 let nm=(k.nama||(k.pasien&&k.pasien.nama)||'pasien').replace(/'/g,'');
