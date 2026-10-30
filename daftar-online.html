@@ -1,57 +1,38 @@
 <!DOCTYPE html>
-<html lang="id"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daftar Online - AVICENA dr Galih</title>
-<style>
-body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#e0f7fa,#f0fdfa);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;margin:0}
-.card{background:white;padding:28px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.08);max-width:420px;width:100%}
-h2{margin:0 0 16px;color:#0f2e2e;text-align:center}
-input, textarea{width:100%;padding:12px 14px;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:12px;box-sizing:border-box;font-size:14px}
-input:focus, textarea:focus{outline:none;border-color:#14a798}
-.btn{width:100%;padding:14px;background:#14a798;color:white;border:0;border-radius:999px;font-weight:800;font-size:15px;cursor:pointer}
-.btn:hover{background:#0f8a86}
-.small{font-size:12px;color:#64748b;text-align:center;margin-top:12px}
-a{color:#14a798;text-decoration:none;font-weight:600}
-</style></head>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Daftar Online</title>
+<style>body{font-family:system-ui;padding:20px;max-width:480px;margin:auto}input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ccc;border-radius:8px}button{width:100%;padding:14px;background:#16a34a;color:white;border:none;border-radius:8px;font-weight:bold}</style>
+</head>
 <body>
-<div class="card">
-<h2>📅 Daftar Online<br><span style="font-size:14px;font-weight:500;color:#64748b">Praktek Mandiri dr. Galih - AVICENA</span></h2>
+<h2>Daftar Antrian Online</h2>
 <form id="formDaftar" onsubmit="return daftar(event)">
-<input id="nama" placeholder="Nama Lengkap *" required>
-<input id="hp" placeholder="No HP / WA *" required>
-<textarea id="keluhan" placeholder="Keluhan (opsional)"></textarea>
-<button type="submit" class="btn">✅ Daftar Sekarang</button>
+<input name="nama" placeholder="Nama Lengkap" required>
+<input name="no_hp" placeholder="No HP">
+<input name="alamat" placeholder="Alamat">
+<textarea name="keluhan" placeholder="Keluhan"></textarea>
+<button type="submit" id="btn">Daftar Sekarang</button>
 </form>
-<div class="small">Sudah daftar? <a href="./index.html">Kembali ke Beranda</a></div>
-<div id="sukses" style="display:none;text-align:center;margin-top:16px">
-<div style="font-size:48px">🎉</div>
-<b style="color:#14a798">Berhasil Daftar!</b><br>
-<span style="font-size:13px;color:#334155">Nomor antrian Anda akan dipanggil sesuai urutan. Terima kasih!</span><br><br>
-<a href="./index.html" class="btn" style="display:inline-block;text-decoration:none;text-align:center">Kembali ke Beranda</a>
-</div>
-</div>
-
+<div id="msg" style="margin-top:16px;font-weight:bold"></div>
 <script>
-function simpanKeAntrian(nama, hp, keluhan){
-  let antri = JSON.parse(localStorage.getItem('antrian_drg')||'[]');
-  antri.push({id:Date.now(), nama:nama, hp:hp, keluhan:keluhan||'-', waktu:new Date().toLocaleString('id-ID'), status:'Menunggu', sumber:'Online'});
-  localStorage.setItem('antrian_drg', JSON.stringify(antri));
-  // LOG
-  let logs=JSON.parse(localStorage.getItem('log_aktivitas')||'[]');
-  logs.unshift({waktu:new Date().toLocaleString('id-ID'), user:'Pasien '+nama, aksi:'Daftar Online'});
-  localStorage.setItem('log_aktivitas', JSON.stringify(logs.slice(0,100)));
-}
-
-function daftar(e){
-  e.preventDefault();
-  const nama = document.getElementById('nama').value.trim();
-  const hp = document.getElementById('hp').value.trim();
-  const keluhan = document.getElementById('keluhan').value.trim();
-  if(!nama || !hp){alert('Nama & HP wajib!');return false;}
-  simpanKeAntrian(nama, hp, keluhan);
-  document.getElementById('formDaftar').style.display='none';
-  document.getElementById('sukses').style.display='block';
-  return false;
+async function daftar(e){
+ e.preventDefault();
+ const btn=document.getElementById('btn'); btn.disabled=true; btn.innerText='Mendaftar...';
+ const fd=new FormData(e.target);
+ const body=Object.fromEntries(fd.entries());
+ try{
+  const res=await fetch('/api/daftar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const j=await res.json();
+  console.log(j);
+  if(j.success){
+    document.getElementById('msg').innerHTML='✅ Berhasil Daftar! No RM: '+j.pasien.no_rm+'<br><a href="./antrian.html">Lihat Antrian</a>';
+    e.target.reset();
+  } else {
+    document.getElementById('msg').innerText='❌ Gagal: '+(j.error||'error');
+  }
+ }catch(err){ document.getElementById('msg').innerText='❌ Error: '+err.message; }
+ btn.disabled=false; btn.innerText='Daftar Sekarang';
+ return false;
 }
 </script>
-</body></html>
+</body>
+</html>
