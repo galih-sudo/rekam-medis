@@ -1,29 +1,58 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Antrian - Praktek dr Galih</title><style>body{margin:0;font-family:system-ui;background:#eef2f7}.header{background:linear-gradient(90deg,#3b82f6,#1e40af);color:#fff;padding:12px 18px;display:flex;justify-content:space-between;flex-wrap:wrap}.menu{background:#fff;margin:12px 16px 0;border-radius:14px;padding:10px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;box-shadow:0 2px 10px #0001}.menu a{padding:8px 14px;border-radius:20px;background:#f1f5f9;text-decoration:none;color:#334155;font-size:13px}.menu a.active{background:#3b82f6;color:#fff}.card{background:#fff;margin:16px;border-radius:14px;padding:18px;box-shadow:0 2px 10px #0001}.antri-item{border:1px solid #e2e8f0;border-radius:14px;padding:16px;margin:10px 0;display:flex;justify-content:space-between;align-items:center;background:#f8fafc}.antri-no{font-size:36px;font-weight:800;color:#1e40af}.btn{padding:10px 16px;border-radius:20px;border:none;cursor:pointer;font-size:13px;font-weight:600}.btn-panggil{background:#ec4899;color:#fff}</style></head><body>
-<div class="header"><div>🏥 Praktek dr Galih | Antrian</div><div><span id="jam"></span> | dr_galih | <a href="/login.html" style="color:white">Logout</a></div></div>
-<div class="menu"><a href="/dashboard.html">🏠 Dashboard</a><a class="active">🔢 Antrian</a><a href="/pasien.html">📋 Pasien</a><a href="/tambah.html">➕ Tambah</a><a href="/cari.html">🔍 Cari</a><a href="/obat.html">💊 Obat</a><a href="/icd10.html">📚 ICD-10</a></div>
-<div class="card"><h3 style="margin:0">🔢 Antrian - Mode IGD Ringan</h3><div style="color:#64748b" id="info">Loading...</div><div id="status" style="font-size:11px;color:#ec4899;margin-top:6px">Ringan 3KB - Tanpa download model - Anti limit</div><div id="list" style="margin-top:16px"></div></div>
-<audio id="p" style="display:none"></audio>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Antrian - Praktek dr Galih</title><style>body{margin:0;font-family:system-ui;background:#eef2f7}.header{background:linear-gradient(90deg,#3b82f6,#1e40af);color:#fff;padding:12px 18px;display:flex;justify-content:space-between;flex-wrap:wrap}.menu{background:#fff;margin:12px 16px 0;border-radius:14px;padding:10px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center}.menu a{padding:8px 14px;border-radius:20px;background:#f1f5f9;text-decoration:none;color:#334155;font-size:13px}.menu a.active{background:#3b82f6;color:#fff}.card{background:#fff;margin:16px;border-radius:14px;padding:18px;box-shadow:0 2px 10px #0001}.antri-item{border:1px solid #e2e8f0;border-radius:14px;padding:16px;margin:10px 0;display:flex;justify-content:space-between;align-items:center;background:#f8fafc}.antri-no{font-size:32px;font-weight:800;color:#1e40af}.btn{padding:10px 14px;border-radius:20px;border:none;cursor:pointer;font-weight:600}.btn-p{background:#ec4899;color:#fff}.btn-t{background:#f59e0b;color:#fff}</style></head><body>
+<div class="header"><div>🏥 Praktek dr Galih</div><div><span id="jam"></span> | <a href="/login.html" style="color:#fff">Logout</a></div></div>
+<div class="menu"><a href="/dashboard.html">🏠 Dashboard</a><a class="active">🔢 Antrian</a><a href="/pasien.html">📋 Pasien</a></div>
+<div class="card"><h3>🔢 Antrian - Fix Bisu</h3><div id="info">Loading...</div><div id="log" style="font-size:11px;color:#ef4444;margin-top:6px"></div><div style="margin-top:10px"><button class="btn btn-t" onclick="testSuara()">🔊 TEST SUARA DULU (WAJIB KLIK)</button></div><div id="list" style="margin-top:16px"></div></div>
+<audio id="aud" controls style="width:100%;margin-top:10px;display:none"></audio>
 <script>
-setInterval(()=>{let d=new Date();let e=document.getElementById('jam');if(e)e.innerText=d.toLocaleTimeString('id-ID')},1000)
-let player=document.getElementById('p'); let q=[]; let play=false;
-function playQ(){ if(play||q.length==0) return; play=true; let u=q.shift(); player.src=u; player.onended=()=>{play=false; playQ()}; player.onerror=()=>{play=false; playQ()}; player.play().catch(()=>play=false) }
+let jamEl=document.getElementById('jam'); setInterval(()=>{if(jamEl) jamEl.innerText=new Date().toLocaleTimeString('id-ID')},1000);
+let voices=[]; function loadV(){voices=speechSynthesis.getVoices()} speechSynthesis.onvoiceschanged=loadV; loadV();
+let aud=document.getElementById('aud');
+function log(m){document.getElementById('log').innerText=m; console.log(m)}
+function testSuara(){
+  log('Test... unmute & buka suara...');
+  speechSynthesis.cancel(); speechSynthesis.resume();
+  // JURUS 1: NATIVE DULU BIAR UNLOCK AUDIO
+  let u=new SpeechSynthesisUtterance('Tes suara praktek dokter Galih');
+  u.lang='id-ID'; u.rate=0.9; u.volume=1;
+  let idVoice=voices.find(v=>v.lang.includes('id'))||voices[0];
+  if(idVoice) u.voice=idVoice;
+  u.onend=()=>log('✅ Native bunyi! Sekarang coba panggil pasien');
+  u.onerror=(e)=>log('❌ Native error: '+e.error+' -> coba MP3');
+  speechSynthesis.speak(u);
+  // JURUS 2: MP3 JUGA DI TEST
+  setTimeout(()=>{
+    let t='Nomor antrian satu tes';
+    let url=`https://translate.google.com/translate_tts?ie=UTF-8&tl=id&client=tw-ob&q=${encodeURIComponent(t)}`;
+    aud.style.display='block';
+    aud.src=url;
+    aud.play().then(()=>log('✅ MP3 Google bunyi!')).catch(e=>log('❌ MP3 block: '+e.message+' - pake native aja'));
+  },1500);
+}
 function panggil(nama,no){
   if(!nama) nama='pasien';
-  let n=nama.replace(/[^a-zA-Z0-9 ]/g,' ').substring(0,18);
-  let t=`Nomor antrian ${no} atas nama ${n} silakan masuk ke ruang dokter`;
-  document.getElementById('status').innerText='🔊 '+t+' (3KB)';
-  // VERSI SUPER RINGAN - MP3 GOOGLE CUMA 3-8KB PER KALIMAT! GAK DOWNLOAD MODEL 100MB!
-  q=[];
-  // pecah biar gak error google limit 200 char
-  let parts=t.match(/.{1,100}(\s|$)/g)||[t];
-  parts.forEach(pt=>{
-    let url=`https://translate.googleapis.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(pt.trim())}&tl=id&client=gtx`;
-    q.push(url);
+  let bersih=nama.replace(/[^a-zA-Z0-9 ]/g,' ').substring(0,16);
+  let teks=`Nomor antrian ${no} atas nama ${bersih} silakan masuk`;
+  log('Memanggil: '+teks);
+  speechSynthesis.cancel(); speechSynthesis.resume();
+  aud.pause();
+  // PAKSA BUNYI: COBA MP3 DULU - KALO GAGAL PAKE NATIVE
+  let url=`https://translate.google.com/translate_tts?ie=UTF-8&tl=id&client=tw-ob&q=${encodeURIComponent(teks)}`;
+  aud.style.display='block';
+  aud.src=url;
+  aud.volume=1;
+  aud.play().then(()=>{
+    log('🔊 MP3 memanggil (3KB)');
+  }).catch(()=>{
+    log('MP3 diblock, pakai native speaker...');
+    let u=new SpeechSynthesisUtterance(teks);
+    u.lang='id-ID'; u.rate=0.85; u.pitch=1.1; u.volume=1;
+    let idV=voices.find(v=>v.lang.includes('id'))||voices[0];
+    if(idV) u.voice=idV;
+    speechSynthesis.speak(u);
   });
-  playQ();
 }
-async function load(){const r=await fetch('/api/antrian');const d=await r.json();document.getElementById('info').innerText=d.length+' pasien antri';document.getElementById('list').innerHTML=d.map(k=>{
+async function load(){try{const r=await fetch('/api/antrian');const d=await r.json();document.getElementById('info').innerText=d.length+' pasien antri - Klik TEST SUARA dulu biar gak bisu!';document.getElementById('list').innerHTML=d.map(k=>{
 let nm=(k.nama||(k.pasien&&k.pasien.nama)||'pasien').replace(/'/g,'');
-return `<div class="antri-item"><div style="display:flex;gap:16px;align-items:center"><div class="antri-no">#${k.no_antrian}</div><div><b>${nm}</b><br><small>${k.pasien?.no_rm||''}</small></div></div><div><button class="btn btn-panggil" onclick="panggil('${nm}','${k.no_antrian}')">🔊 PANGGIL RINGAN</button></div></div>`
-}).join('')||'<p>Tidak ada antrian</p>'}load()
+return `<div class="antri-item"><div style="display:flex;gap:12px;align-items:center"><div class="antri-no">#${k.no_antrian}</div><div><b>${nm}</b></div></div><button class="btn btn-p" onclick="panggil('${nm}','${k.no_antrian}')">🔊 PANGGIL</button></div>`
+}).join('')||'<p>Tidak ada antrian</p>'}catch(e){document.getElementById('info').innerText='Error load: '+e}}load()
 </script></body></html>
