@@ -1,1 +1,0 @@
-export default async function handler(req,res){res.setHeader('Cache-Control','no-store'); return res.json([{username:'admin',email:'admin@django.pe',role:''},{username:'dr_galih',email:'galih@klinik.com',role:'Dokter'},{username:'staf1',email:'staf@klinik.com',role:'Staf'}])}
