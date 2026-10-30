@@ -1,29 +1,58 @@
-import { PrismaClient } from '@prisma/client'
-const globalForPrisma = globalThis
-const prisma = globalForPrisma.prisma || new PrismaClient()
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
-
+import { sql } from '@vercel/postgres';
 export default async function handler(req,res){
- res.setHeader('Cache-Control','no-store')
  try{
-  const today=new Date(); today.setHours(0,0,0,0)
-  const data=await prisma.kunjungan.findMany({
-    where:{ tanggal:{ gte: today } },
-    include:{ pasien:true },
-    orderBy:{ id:'asc' },
-    take:100
-  })
-  const map=new Map()
-  data.forEach(k=>{
-    if(!k.pasien) return
-    if(!map.has(k.pasienId)) map.set(k.pasienId,k)
-  })
-  const result=Array.from(map.values()).map((k,i)=>({
-    id:k.id, pasienId:k.pasienId, no_antrian:i+1,
-    nama:k.pasien.nama, no_rm:k.pasien.no_rm,
-    pasien:k.pasien, tanggal:k.tanggal,
-    keluhan:k.keluhan
-  }))
-  return res.status(200).json(result)
- }catch(e){ return res.status(500).json({error:e.message}) }
+  // BIKIN TABEL KALO BELUM ADA - INI KUNCINYA!
+  await sql`
+    CREATE TABLE IF NOT EXISTS antrian (
+      id SERIAL PRIMARY KEY,
+      pasien_id INTEGER,
+      nama TEXT,
+      nama_pasien TEXT,
+      no_antrian INTEGER,
+      nomor INTEGER,
+      alamat TEXT,
+      keluhan TEXT,
+      status TEXT DEFAULT 'menunggu',
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `;
+  await sql`
+    CREATE TABLE IF NOT EXISTS pasien (
+      id SERIAL PRIMARY KEY,
+      no_rm TEXT,
+      nama TEXT,
+      alamat TEXT,
+      no_hp TEXT,
+      umur TEXT,
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `;
+
+  if(req.method==='GET'){
+    const r = await sql`SELECT * FROM antrian WHERE DATE(created_at)=CURRENT_DATE ORDER BY no_antrian ASC, created_at ASC`;
+    return res.status(200).json(r.rows);
+  }
+  if(req.method==='POST'){
+    const {pasien_id,nama,nama_pasien,alamat,keluhan} = req.body;
+    const namaFinal = nama || nama_pasien || 'Pasien';
+    const c = await sql`SELECT COALESCE(MAX(no_antrian),0)+1 as next FROM antrian WHERE DATE(created_at)=CURRENT_DATE`;
+    const no_antrian = c.rows[0].next || 1;
+    
+    const ins = await sql`
+      INSERT INTO antrian (pasien_id,nama,nama_pasien,no_antrian,nomor,alamat,keluhan,status,created_at)
+      VALUES (${pasien_id||null},${namaFinal},${namaFinal},${no_antrian},${no_antrian},${alamat||''},${keluhan||''},'menunggu',NOW())
+      RETURNING *
+    `;
+    return res.status(200).json(ins.rows[0]);
+  }
+  if(req.method==='DELETE'){
+    const id = req.query.id;
+    if(id){ await sql`DELETE FROM antrian WHERE id::text=${id} OR no_antrian::text=${id}`; }
+    return res.status(200).json({ok:true});
+  }
+  return res.status(405).json({message:'method not allowed'});
+ }catch(err){
+  console.error('ANTRIAN ERROR', err);
+  return res.status(500).json({message: err.message, stack: err.stack});
+ }
 }

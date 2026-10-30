@@ -16,12 +16,14 @@
 .btn-p{background:#ec4899;color:#fff}.btn-s{background:#10b981;color:#fff}.btn-del{background:#fee2e2;color:#dc2626}
 .top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
 .copy{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
+.debug{background:#fef3c7;border:1px solid #fcd34d;padding:10px;border-radius:8px;font-size:12px;margin-bottom:12px;white-space:pre-wrap;display:none}
 </style></head><body>
 <div class="header"><div><b>🏥 Praktek dr Galih | Antrian</b></div><div><span id="jam"></span> | <a href="#" onclick="localStorage.clear();location.href='/login.html'" style="color:#fff;text-decoration:none;font-weight:600">Logout</a></div></div>
 <div class="marquee-bar"><span>🏥 Praktek Mandiri dr.Galih | 📍 Jl.Raya Sengkol Aikdarek | 😊 Melayani dengan senyum | 🕕 Buka setiap hari kerja jam 06.00-11.00 dan 17.00-21.00 WITA |</span></div>
 <div class="nav"><a href="/dashboard.html">🏠 Dashboard</a><a class="active">🔢 Antrian</a><a href="/pasien.html">👥 Pasien</a><a href="/obat.html">💊 Obat</a><a href="/daftar-online.html">📝 Daftar Online</a></div>
 <div class="card">
-<div class="top"><h3 style="margin:0">🔢 Antrian Hari Ini - <span id="tgl"></span></h3><div><button class="btn btn-s" onclick="load()">🔄 Refresh</button> <span id="info" style="font-size:13px;color:#64748b;margin-left:8px"></span></div></div>
+<div class="top"><h3 style="margin:0">🔢 Antrian Hari Ini - <span id="tgl"></span></h3><div><button class="btn btn-s" onclick="load()">🔄 Refresh</button><button class="btn btn-del" onclick="clearAll()">🗑️ Clear Hari Ini</button><span id="info" style="font-size:13px;color:#64748b;margin-left:8px"></span></div></div>
+<div id="debug" class="debug"></div>
 <div id="list" style="margin-top:16px">Loading...</div>
 </div>
 <div class="copy">Copyright - Vercel.Postgres + AI @2026</div>
@@ -29,22 +31,30 @@
 document.getElementById('tgl').innerText=new Date().toLocaleDateString('id-ID');
 setInterval(()=>{let e=document.getElementById('jam'); if(e) e.innerText=new Date().toLocaleTimeString('id-ID')},1000);
 let voices=[]; function loadV(){voices=speechSynthesis.getVoices()} speechSynthesis.onvoiceschanged=loadV; loadV();
-let sedang=false;
-function panggil(nama,no){if(sedang){speechSynthesis.cancel(); sedang=false; return;} sedang=true; let bersih=nama.replace(/[^a-zA-Z0-9 ]/g,' ').trim().substring(0,25); let teks=`Nomor antrian ${no}, atas nama ${bersih}, silakan masuk ke ruang dokter.`; speechSynthesis.cancel(); setTimeout(()=>{let u=new SpeechSynthesisUtterance(teks); u.lang='id-ID'; u.rate=0.85; let best=voices.find(v=>v.lang.toLowerCase().includes('id')); if(best) u.voice=best; u.onend=()=>{sedang=false;}; speechSynthesis.speak(u);},100);}
+function panggil(nama,no){speechSynthesis.cancel(); let t=`Nomor antrian ${no}, atas nama ${nama}, silakan masuk ke ruang dokter.`; let u=new SpeechSynthesisUtterance(t); u.lang='id-ID'; u.rate=0.85; speechSynthesis.speak(u);}
 
 async function load(){
+ const dbg=document.getElementById('debug');
  try{
-  const r=await fetch('/api/antrian'); const d=await r.json();
-  let data=Array.isArray(d)?d:d.data||[];
-  document.getElementById('info').innerText=data.length+' antrian';
-  if(data.length==0){document.getElementById('list').innerHTML='<p style="color:#64748b;text-align:center;padding:20px">Belum ada antrian hari ini. Tambah dari Pasien atau Daftar Online.</p>';return;}
-  document.getElementById('list').innerHTML=data.map(k=>{
-    let nm=(k.nama||k.nama_pasien||(k.pasien&&k.pasien.nama)||'pasien').replace(/'/g,'');
+  const r=await fetch('/api/antrian');
+  const text=await r.text();
+  let data;
+  try{ data=JSON.parse(text); }catch(e){ dbg.style.display='block'; dbg.innerText='API BUKAN JSON! Response:\n'+text.substring(0,500); throw e; }
+  if(!r.ok){ dbg.style.display='block'; dbg.innerText='API Error: '+JSON.stringify(data); throw new Error(data.message); }
+  dbg.style.display='none';
+  let rows=Array.isArray(data)?data:data.data||[];
+  document.getElementById('info').innerText=rows.length+' antrian';
+  if(rows.length==0){document.getElementById('list').innerHTML='<p style="color:#64748b;text-align:center;padding:30px">Belum ada antrian hari ini.<br><br>👉 Tambah dari <a href="/pasien.html">Pasien > +Antri</a> atau dari <a href="/daftar-online.html">Daftar Online</a></p>';return;}
+  document.getElementById('list').innerHTML=rows.map(k=>{
+    let nm=(k.nama||k.nama_pasien||'pasien').replace(/'/g,'');
     let no=k.no_antrian||k.nomor||'-';
-    return `<div class="antri-item"><div style="display:flex;gap:14px;align-items:center"><div class="antri-no">#${no}</div><div><b style="font-size:15px">${nm}</b><div style="font-size:12px;color:#64748b">${k.alamat||k.no_rm||''}</div></div></div><div style="display:flex;gap:6px"><button class="btn btn-p" onclick="panggil('${nm}','${no}')">🔊 PANGGIL</button><button class="btn btn-s" onclick="selesai('${k.id||no}')">✅ Selesai</button></div></div>`
+    return `<div class="antri-item"><div style="display:flex;gap:14px;align-items:center"><div class="antri-no">#${no}</div><div><b>${nm}</b><div style="font-size:12px;color:#64748b">${k.alamat||''}</div></div></div><div style="display:flex;gap:6px"><button class="btn btn-p" onclick="panggil('${nm}','${no}')">🔊 PANGGIL</button><button class="btn btn-del" onclick="hapus('${k.id}')">❌</button></div></div>`
   }).join('');
- }catch(e){document.getElementById('list').innerHTML='Error: '+e}
+ }catch(e){
+  document.getElementById('list').innerHTML='<p style="color:#ef4444">Error load antrian: '+e.message+'<br>Cek debug di atas. Coba refresh.</p>';
+ }
 }
-async function selesai(id){ if(!confirm('Selesaikan antrian ini?')) return; try{ await fetch('/api/antrian/'+id,{method:'DELETE'}); }catch{}; try{ await fetch('/api/antrian?id='+id,{method:'DELETE'}); }catch{}; load(); }
-load(); setInterval(load,10000);
+async function hapus(id){ if(!confirm('Hapus?')) return; await fetch('/api/antrian?id='+id,{method:'DELETE'}); load(); }
+async function clearAll(){ if(!confirm('Hapus semua antrian hari ini?')) return; let list=document.querySelectorAll('.antri-item'); alert('Gunakan tombol X per item untuk hapus - atau tunggu besok auto ganti hari'); }
+load(); setInterval(load,8000);
 </script></body></html>
