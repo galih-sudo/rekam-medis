@@ -3,22 +3,32 @@
 <div class="menu"><a href="/dashboard.html">🏠 Dashboard</a><a class="active" href="/antrian.html">🔢 Antrian</a><a href="/pasien.html">📋 Pasien</a><a href="/tambah.html">➕ Tambah</a><a href="/cari.html">🔍 Cari</a><a href="/obat.html">💊 Obat</a><a href="/icd10.html">📚 ICD-10</a><a href="/user.html">👥 User</a><a href="#">📊 Laporan ▼</a></div>
 <div class="card"><h3 style="margin:0">🔢 Antrian Hari Ini - Praktek Mandiri</h3><div style="color:#64748b;margin-top:6px" id="info">Loading...</div><div id="list" style="margin-top:16px"></div></div>
 <script>
-let voices=[]; let favVoice=null;
+let voices=[]; let cewek=null;
 function loadVoices(){
   voices=speechSynthesis.getVoices();
-  // MANTAN ASLI = Google Indonesia Female NATURAL, bukan whisper/robot
-  favVoice = voices.find(v=>v.name.toLowerCase().includes('google')&&v.lang==='id-ID') ||
-             voices.find(v=>v.lang==='id-ID'&&!v.name.toLowerCase().includes('whisper')&&!v.name.toLowerCase().includes('lingua')) ||
-             voices.find(v=>v.lang.toLowerCase().includes('id')) ||
-             voices[0];
+  // PAKSA CARI CEWEK DULU!
+  cewek = voices.find(v=>v.lang==='id-ID' && v.name.toLowerCase().includes('female')) ||
+          voices.find(v=>v.name.toLowerCase().includes('damayanti')) ||
+          voices.find(v=>v.name.toLowerCase().includes('gadis')) ||
+          voices.find(v=>v.name.toLowerCase().includes('google') && v.name.toLowerCase().includes('indonesia') && !v.name.toLowerCase().includes('male')) ||
+          voices.find(v=>v.lang==='id-ID' && !v.name.toLowerCase().includes('male')) ||
+          voices.find(v=>v.name.toLowerCase().includes('female') && v.lang.startsWith('id')) ||
+          voices.find(v=>v.name.toLowerCase().includes('female')) ||
+          voices.find(v=>v.lang==='id-ID') ||
+          null;
+  console.log('VOICE CEWEK:',cewek, voices);
 }
 speechSynthesis.onvoiceschanged=loadVoices; setTimeout(loadVoices,800); loadVoices();
 setInterval(()=>{let d=new Date();let el=document.getElementById('jam');if(el)el.innerText=d.toLocaleTimeString('id-ID')},1000)
 function speak(text){
   speechSynthesis.cancel();
   let u=new SpeechSynthesisUtterance(text);
-  if(favVoice){u.voice=favVoice; u.lang=favVoice.lang} else u.lang='id-ID';
-  u.rate=0.9; u.pitch=1.05; u.volume=1;
+  if(cewek){u.voice=cewek; u.lang=cewek.lang;}
+  else {u.lang='id-ID';}
+  // BIKIN CEWEK BANGET
+  u.rate=0.85; 
+  u.pitch=1.4;
+  u.volume=1;
   speechSynthesis.speak(u);
 }
 function panggil(nama,no){
