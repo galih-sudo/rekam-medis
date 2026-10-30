@@ -1,0 +1,10 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Cetak Resep - Praktek Mandiri dr. Galih</title><style>body{font-family:system-ui;margin:20px;max-width:700px}@media print{button{display:none}} .kop{border-bottom:3px solid #1e40af;padding-bottom:10px;margin-bottom:20px;display:flex;justify-content:space-between} .kop b{color:#1e40af;font-size:18px}</style></head><body>
+<div class="kop"><div><b>🏥 Praktek Mandiri dr. Galih</b><br><small>Jl. Mataram | HP: 08xx | Mataram, NTB</small></div><div style="text-align:right"><small id="tgl"></small><br><b>RESEP OBAT</b></div></div>
+<div id="isi">Loading...</div>
+<button onclick="window.print()" style="margin-top:20px;padding:12px 20px;background:#10b981;color:white;border:none;border-radius:10px">🖨️ Cetak / Save PDF</button>
+<script>
+const p=new URLSearchParams(location.search); const id=p.get('id'); const obat=p.get('obat')||''; const nama=p.get('nama')||''; const rm=p.get('rm')||'';
+document.getElementById('tgl').innerText=new Date().toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
+document.getElementById('isi').innerHTML=`<p>Nama: <b>${nama}</b> | No RM: ${rm}</p><div style="border:1px solid #000;padding:16px;min-height:200px;border-radius:8px"><b>R/</b><br><br>${decodeURIComponent(obat).replaceAll(',','<br>')}<br><br><br></div><div style="margin-top:40px;text-align:right">Hormat Saya,<br><br><br><br><b>dr. Galih</b></div>`;
+setTimeout(()=>window.print(),800)
+</script></body></html>

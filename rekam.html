@@ -1,48 +1,13 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Praktek Mandiri dr. Galih | Rekam Medis</title><style>body{margin:0;font-family:system-ui;background:#eef2f7}.header{background:linear-gradient(90deg,#3b82f6,#1e40af);color:#fff;padding:12px 18px;display:flex;justify-content:space-between}.menu{background:#fff;margin:12px 16px 0;border-radius:14px;padding:10px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;box-shadow:0 2px 10px #0001}.menu a{padding:8px 14px;border-radius:20px;background:#f1f5f9;text-decoration:none;color:#334155;font-size:13px}.menu a.active{background:#3b82f6;color:#fff}.card{background:#fff;margin:16px;border-radius:14px;padding:18px;box-shadow:0 2px 10px #0001}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}label{font-size:13px;font-weight:600;color:#334155}textarea,input,select{width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:10px;margin:6px 0;font-size:14px}.soap{border-left:4px solid #3b82f6;padding-left:12px;margin:12px 0}.btn-simpan{width:100%;padding:14px;background:#10b981;color:white;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer}</style></head><body>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Praktek Mandiri dr. Galih | Rekam Medis</title><style>body{margin:0;font-family:system-ui;background:#eef2f7}.header{background:linear-gradient(90deg,#3b82f6,#1e40af);color:#fff;padding:12px 18px;display:flex;justify-content:space-between}.menu{background:#fff;margin:12px 16px 0;border-radius:14px;padding:10px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;box-shadow:0 2px 10px #0001}.menu a{padding:8px 14px;border-radius:20px;background:#f1f5f9;text-decoration:none;color:#334155;font-size:13px}.menu a.active{background:#3b82f6;color:#fff}.card{background:#fff;margin:16px;border-radius:14px;padding:18px;box-shadow:0 2px 10px #0001}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}label{font-size:13px;font-weight:600;color:#334155}textarea,input{width:100%;padding:10px;border:1px solid #e2e8f0;border-radius:10px;margin:6px 0;font-size:14px}.soap{border-left:4px solid #3b82f6;padding-left:12px;margin:12px 0}.btn{padding:10px 14px;border:none;border-radius:10px;cursor:pointer;font-weight:600}.btn-simpan{width:100%;padding:14px;background:#10b981;color:white;border-radius:12px;font-size:16px}.btn-cetak{margin:6px 4px}</style></head><body>
 <div class="header"><div>🏥 Praktek Mandiri dr. Galih | Rekam Medis</div><div>dr_galih Dokter | <a href="/login.html" style="color:white">Logout</a></div></div>
 <div class="menu"><a href="/dashboard.html">🏠 Dashboard</a><a href="/antrian.html">🔢 Antrian</a><a href="/pasien.html">📋 Pasien</a><a href="/tambah.html">➕ Tambah</a><a href="/cari.html">🔍 Cari</a><a href="/obat.html">💊 Obat</a><a href="/icd10.html">📚 ICD-10</a><a href="/user.html">👥 User</a><a class="active" href="#">📋 Rekam</a></div>
-
 <div class="card" id="infoPasien">Loading pasien...</div>
-
-<div class="card">
-<h3 style="margin-top:0">📝 Rekam Medis SOAP</h3>
-<div class="grid2">
-<div class="soap" style="border-color:#f59e0b"><label>S - Subjective (Keluhan Pasien)</label><textarea id="S" rows="4" placeholder="Pasien mengeluh..."></textarea></div>
-<div class="soap" style="border-color:#10b981"><label>O - Objective (Pemeriksaan Fisik, TTV, Lab)</label><textarea id="O" rows="4" placeholder="TD: 120/80, Nadi: 80, Suhu: 36.5..."></textarea></div>
-</div>
-<div class="grid2">
-<div class="soap" style="border-color:#3b82f6"><label>A - Assessment (Diagnosa / ICD-10)</label><input id="A" list="icdList" placeholder="Ketik A09, E11..."><datalist id="icdList"></datalist><textarea id="A2" rows="2" placeholder="Detail diagnosa"></textarea></div>
-<div class="soap" style="border-color:#8b5cf6"><label>P - Plan (Terapi, Obat, Rujukan, Edukasi)</label><textarea id="P" rows="4" placeholder="Resep: Amoksisilin 3x1, Paracetamol..."></textarea><input id="obat" placeholder="Pilih Obat (auto stok berkurang)"></div>
-</div>
-<button class="btn-simpan" onclick="simpan()">💾 SIMPAN REKAM MEDIS</button>
-<div id="msg" style="margin-top:12px"></div>
-</div>
-
-<div class="card"><h3>🕘 Riwayat Kunjungan</h3><div id="riwayat"></div></div>
-
+<div class="card"><h3 style="margin-top:0">📝 Rekam Medis SOAP</h3><div class="grid2"><div class="soap" style="border-color:#f59e0b"><label>S - Subjective</label><textarea id="S" rows="4"></textarea></div><div class="soap" style="border-color:#10b981"><label>O - Objective</label><textarea id="O" rows="4"></textarea></div></div><div class="grid2"><div class="soap" style="border-color:#3b82f6"><label>A - Assessment (ICD-10)</label><input id="A" list="icdList"><datalist id="icdList"></datalist><textarea id="A2" rows="2"></textarea></div><div class="soap" style="border-color:#8b5cf6"><label>P - Plan + Obat</label><textarea id="P" rows="4"></textarea></div></div><button class="btn btn-simpan" onclick="simpan()">💾 SIMPAN REKAM MEDIS</button><div style="margin-top:12px"><button class="btn btn-cetak" style="background:#dbeafe" onclick="cetak('resep')">🖨️ Cetak Resep</button><button class="btn btn-cetak" style="background:#fef3c7" onclick="cetak('surat')">📄 Surat Sakit</button><button class="btn btn-cetak" style="background:#e2e8f0" onclick="cetak('antrian')">🎫 Karcis Antrian</button></div><div id="msg" style="margin-top:12px"></div></div>
+<div class="card"><h3>🕘 Riwayat</h3><div id="riwayat"></div></div>
 <script>
-const params=new URLSearchParams(location.search); const pasienId=params.get('id')||params.get('pasienId')
-async function loadPasien(){
- if(!pasienId){infoPasien.innerHTML='Pilih pasien dari menu Pasien / Antrian';return}
- const r=await fetch('/api/pasien'); const all=await r.json(); const p=all.find(x=>x.id==pasienId)
- if(p) infoPasien.innerHTML=`<b>${p.nama}</b> | No RM: ${p.no_rm||'-'} | Umur: ${p.umur||'-'} | Alamat: ${p.alamat||''} | HP: ${p.hp||''}`
- // load icd10 untuk autocomplete
- const ri=await fetch('/api/icd10'); const icd=await ri.json(); icdList.innerHTML=icd.map(i=>`<option value="${i.kode} - ${i.nama}">`).join('')
- // load obat
- const ro=await fetch('/api/obat'); const obatList=await ro.json()
- // riwayat
- const rh=await fetch('/api/rekam?pasienId='+pasienId); const h=await rh.json()
- riwayat.innerHTML=h.map(k=>{
-   let cat={}; try{cat=JSON.parse(k.catatan||'{}')}catch{}
-   return `<div style="border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin:8px 0"><small>${new Date(k.tanggal).toLocaleString('id-ID')}</small><br><b>S:</b> ${cat.subjective||k.keluhan||''}<br><b>O:</b> ${cat.objective||''}<br><b>A:</b> ${cat.assessment||k.diagnosa||''}<br><b>P:</b> ${cat.plan||k.tindakan||''}</div>`
- }).join('')||'Belum ada kunjungan'
-}
-async function simpan(){
- if(!pasienId){alert('Pilih pasien dulu!');return}
- const payload={pasienId,subjective:S.value,objective:O.value,assessment:A.value+' '+A2.value,plan:P.value,obat:obat.value,diagnosa:A.value}
- const r=await fetch('/api/rekam',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
- const j=await r.json()
- if(r.ok){msg.innerHTML='<b style="color:green">✅ Rekam berhasil disimpan!</b>'; S.value=O.value=A.value=A2.value=P.value=''; loadPasien()} else msg.innerHTML='❌ '+j.error
-}
+const params=new URLSearchParams(location.search); const pasienId=params.get('id'); let curPasien=null;
+async function loadPasien(){if(!pasienId){infoPasien.innerHTML='Pilih pasien dari Antrian / Pasien';return} const r=await fetch('/api/pasien'); const all=await r.json(); curPasien=all.find(x=>x.id==pasienId); if(curPasien) infoPasien.innerHTML=`<b>${curPasien.nama}</b> | RM: ${curPasien.no_rm||'-'} | Umur: ${curPasien.umur||'-'} | ${curPasien.alamat||''}`; const ri=await fetch('/api/icd10'); const icd=await ri.json(); icdList.innerHTML=icd.map(i=>`<option value="${i.kode} - ${i.nama}">`).join(''); const rh=await fetch('/api/rekam?pasienId='+pasienId); const h=await rh.json(); riwayat.innerHTML=h.map(k=>{let cat={};try{cat=JSON.parse(k.catatan||'{}')}catch{};return `<div style="border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin:8px 0"><small>${new Date(k.tanggal).toLocaleString('id-ID')}</small><br><b>S:</b> ${cat.subjective||''}<br><b>O:</b> ${cat.objective||''}<br><b>A:</b> ${cat.assessment||k.diagnosa||''}<br><b>P:</b> ${cat.plan||k.tindakan||''}</div>`}).join('')||'Belum ada'}
+async function simpan(){if(!pasienId){alert('Pilih pasien!');return} const payload={pasienId,subjective:S.value,objective:O.value,assessment:A.value+' '+A2.value,plan:P.value,diagnosa:A.value}; const r=await fetch('/api/rekam',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); const j=await r.json(); if(r.ok){msg.innerHTML='<b style=color:green>✅ Tersimpan!</b>'; S.value=O.value=A.value=A2.value=P.value=''; loadPasien()} else msg.innerHTML='❌ '+j.error}
+function cetak(t){if(!curPasien){alert('Pilih pasien dulu');return} if(t==='resep'){window.open(`/cetak-resep.html?nama=${encodeURIComponent(curPasien.nama)}&rm=${curPasien.no_rm||''}&obat=${encodeURIComponent(P.value||'Paracetamol 3x1')}`,'_blank')} if(t==='surat'){let h=prompt('Berapa hari istirahat?','2'); window.open(`/cetak-surat.html?nama=${encodeURIComponent(curPasien.nama)}&umur=${curPasien.umur||''}&diagnosa=${encodeURIComponent(A.value||'')}&hari=${h}`,'_blank')} if(t==='antrian'){window.open(`/cetak-antrian.html?no=${pasienId}&nama=${encodeURIComponent(curPasien.nama)}&rm=${curPasien.no_rm||''}`,'_blank')}}
 loadPasien()
 </script></body></html>
