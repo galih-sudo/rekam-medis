@@ -4,22 +4,19 @@
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui;background:#f8fafc}
 .header{background:linear-gradient(90deg,#2563eb,#1e40af);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
-.header b{font-size:15px}.header a{color:#fff;text-decoration:none;margin-left:14px;font-weight:600;font-size:13px}
 .marquee-bar{width:100%;background:#eff6ff;overflow:hidden;white-space:nowrap;padding:10px 0;border-bottom:1px solid #dbeafe}
 .marquee-bar span{display:inline-block;padding-left:100%;animation:marquee 25s linear infinite;color:#1d4ed8;font-size:13px;font-weight:600}
 @keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
 .nav{background:#fff;margin:14px 16px 0;border-radius:12px;padding:8px;display:flex;gap:6px;flex-wrap:wrap;box-shadow:0 1px 3px #0001}
 .nav a{padding:8px 14px;border-radius:20px;background:#f1f5f9;text-decoration:none;color:#475569;font-size:13px;font-weight:600}.nav a.active{background:#2563eb;color:#fff}
 .card{background:#fff;margin:14px 16px;border-radius:14px;padding:20px;box-shadow:0 1px 3px #0001}
-h3{margin:0 0 14px;color:#0f172a}
 .table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;padding:10px 8px;background:#f8fafc;color:#475569;border-bottom:2px solid #e2e8f0}td{padding:10px 8px;border-bottom:1px solid #f1f5f9}
-.btn{padding:6px 10px;border-radius:6px;text-decoration:none;font-size:12px;font-weight:600;cursor:pointer;border:none}.btn-r{background:#dbeafe;color:#1d4ed8}.btn-e{background:#fef3c7;color:#92400e}
+.btn{padding:6px 10px;border-radius:6px;text-decoration:none;font-size:12px;font-weight:600;cursor:pointer;border:none}.btn-r{background:#dbeafe;color:#1d4ed8}.btn-e{background:#fef3c7;color:#92400e}.btn-antri{background:#10b981;color:#fff}
 .top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}
-.search{padding:10px 14px;border-radius:10px;border:1px solid #e2e8f0;width:280px;max-width:100%}.btn-add{background:#10b981;color:#fff;padding:10px 16px;border-radius:10px;font-weight:700;font-size:13px;border:none;cursor:pointer}
+.search{padding:10px 14px;border-radius:10px;border:1px solid #e2e8f0;width:260px}.btn-add{background:#10b981;color:#fff;padding:10px 16px;border-radius:10px;font-weight:700;font-size:13px;border:none;cursor:pointer}
 .copy{text-align:center;padding:14px;font-size:11px;color:#94a3b8}
-/* MODAL */
 .modal-bg{position:fixed;inset:0;background:#0006;display:none;align-items:center;justify-content:center;z-index:99}
-.modal-bg.show{display:flex}.modal{background:#fff;width:90%;max-width:420px;border-radius:16px;padding:22px;box-shadow:0 20px 40px #0003}
+.modal-bg.show{display:flex}.modal{background:#fff;width:90%;max-width:420px;border-radius:16px;padding:22px}
 .modal h4{margin:0 0 14px}.modal input{width:100%;padding:12px;border-radius:10px;border:1px solid #e2e8f0;margin:6px 0;font-size:14px}
 .modal .row{display:flex;gap:8px}.modal .row input{flex:1}
 .btn-save{width:100%;padding:12px;background:#2563eb;color:#fff;border:none;border-radius:10px;font-weight:700;margin-top:10px;cursor:pointer}
@@ -29,61 +26,40 @@ h3{margin:0 0 14px;color:#0f172a}
 <div class="marquee-bar"><span>🏥 Praktek Mandiri dr.Galih | 📍 Jl.Raya Sengkol Aikdarek | 😊 Melayani dengan senyum | 🕕 Buka setiap hari kerja jam 06.00-11.00 dan 17.00-21.00 WITA |</span></div>
 <div class="nav"><a href="/dashboard.html">🏠 Dashboard</a><a href="/antrian.html">🔢 Antrian</a><a class="active">👥 Pasien</a><a href="/obat.html">💊 Obat</a><a href="/daftar-online.html">📝 Daftar Online</a></div>
 <div class="card">
-<div class="top-bar"><h3>📋 Daftar Pasien</h3><div style="display:flex;gap:8px;align-items:center"><input id="q" class="search" placeholder="🔍 Cari nama / RM / alamat..." oninput="filter()"><button class="btn-add" onclick="openModal()">+ Tambah</button></div></div>
-<div class="table-wrap"><table><thead><tr><th>NO RM</th><th>NAMA</th><th>UMUR</th><th>ALAMAT</th><th>AKSI</th></tr></thead><tbody id="tbody"><tr><td colspan=5>Loading...</td></tr></tbody></table></div>
+<div class="top-bar"><h3>📋 Daftar Pasien</h3><div style="display:flex;gap:8px"><input id="q" class="search" placeholder="🔍 Cari..." oninput="filter()"><button class="btn-add" onclick="openModal()">+ Tambah</button></div></div>
+<div class="table-wrap"><table><thead><tr><th>NO RM</th><th>NAMA</th><th>ALAMAT</th><th>AKSI</th></tr></thead><tbody id="tbody"><tr><td colspan=4>Loading...</td></tr></tbody></table></div>
 </div>
 <div class="copy">Copyright - Vercel.Postgres + AI @2026</div>
-
-<div id="modal" class="modal-bg" onclick="if(event.target==this)closeModal()">
-<div class="modal">
-<h4>➕ Tambah Pasien Baru</h4>
-<input id="m_no" placeholder="No RM (auto jika kosong)">
-<input id="m_nama" placeholder="Nama Lengkap *">
-<div class="row"><input id="m_umur" placeholder="Umur" type="number"><input id="m_hp" placeholder="No HP"></div>
-<input id="m_alamat" placeholder="Alamat">
-<div id="m_msg" style="font-size:12px;margin-top:8px;min-height:16px"></div>
-<button class="btn-save" onclick="savePasien()">Simpan</button>
-<button class="btn-cancel" onclick="closeModal()">Batal</button>
-</div>
-</div>
-
+<div id="modal" class="modal-bg" onclick="if(event.target==this)closeModal()"><div class="modal"><h4>➕ Tambah Pasien + Antrian</h4><input id="m_nama" placeholder="Nama Lengkap *"><div class="row"><input id="m_umur" placeholder="Umur" type="number"><input id="m_hp" placeholder="No HP"></div><input id="m_alamat" placeholder="Alamat"><label style="font-size:12px;display:flex;gap:6px;margin-top:8px"><input type="checkbox" id="m_antri" checked> Langsung masuk antrian hari ini</label><div id="m_msg" style="font-size:12px;margin-top:8px;min-height:16px"></div><button class="btn-save" onclick="savePasien()">Simpan & Masuk Antrian</button><button class="btn-cancel" onclick="closeModal()">Batal</button></div></div>
 <script>
 let allData=[];
 function openModal(){document.getElementById('modal').classList.add('show');}
-function closeModal(){document.getElementById('modal').classList.remove('show');document.getElementById('m_msg').innerText='';}
-async function load(){
+function closeModal(){document.getElementById('modal').classList.remove('show');}
+async function load(){try{const r=await fetch('/api/pasien'); const d=await r.json(); allData=Array.isArray(d)?d:d.data||[]; render(allData);}catch(e){document.getElementById('tbody').innerHTML='<tr><td colspan=4>Error: '+e+'</td></tr>'}}
+function render(data){document.getElementById('tbody').innerHTML=data.map(p=>`<tr><td><b>${p.no_rm||p.id||'-'}</b></td><td>${p.nama||'-'}</td><td>${p.alamat||'-'}</td><td><button class="btn btn-antri" onclick="masukAntrian('${p.id}','${(p.nama||'').replace(/'/g,'')}')">+ Antri</button> <a class="btn btn-r" href="/rekam-medis.html?id=${p.id||''}">Rekam</a></td></tr>`).join('')||'<tr><td colspan=4>Kosong</td></tr>'}
+function filter(){let q=document.getElementById('q').value.toLowerCase(); render(allData.filter(p=> (p.nama||'').toLowerCase().includes(q)))}
+async function masukAntrian(id,nama){
  try{
-  const r=await fetch('/api/pasien'); const d=await r.json();
-  allData=Array.isArray(d)?d:d.data||[];
-  render(allData);
- }catch(e){ document.getElementById('tbody').innerHTML=`<tr><td colspan=5>Error: ${e}</td></tr>`; }
-}
-function render(data){
- document.getElementById('tbody').innerHTML=data.map(p=>`
-  <tr>
-   <td><b>${p.no_rm||p.id||'-'}</b></td>
-   <td>${p.nama||'-'}</td>
-   <td>${p.umur||'-'}</td>
-   <td>${p.alamat||'-'}</td>
-   <td><a class="btn btn-r" href="/rekam-medis.html?id=${p.id||''}">Rekam</a> <button class="btn btn-e" onclick="alert('Edit: ${p.nama}')">Edit</button></td>
-  </tr>
- `).join('') || '<tr><td colspan=5>Belum ada pasien</td></tr>';
-}
-function filter(){
- let q=document.getElementById('q').value.toLowerCase();
- render(allData.filter(p=> (p.nama||'').toLowerCase().includes(q) || (p.no_rm||'').toLowerCase().includes(q) || (p.alamat||'').toLowerCase().includes(q) ));
+  let r=await fetch('/api/antrian',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pasien_id:id,nama:nama})});
+  if(r.ok){alert(nama+' masuk antrian!'); location.href='/antrian.html';} else {let t=await r.text(); alert('Gagal: '+t.substring(0,200));}
+ }catch(e){alert('Error: '+e)}
 }
 async function savePasien(){
- let nama=document.getElementById('m_nama').value.trim();
- if(!nama){document.getElementById('m_msg').style.color='#ef4444';document.getElementById('m_msg').innerText='Nama wajib diisi!';return;}
- let payload={no_rm:document.getElementById('m_no').value.trim(),nama:nama,umur:document.getElementById('m_umur').value.trim(),no_hp:document.getElementById('m_hp').value.trim(),alamat:document.getElementById('m_alamat').value.trim()};
- document.getElementById('m_msg').style.color='#64748b';document.getElementById('m_msg').innerText='Menyimpan...';
+ let nama=document.getElementById('m_nama').value.trim(); if(!nama){document.getElementById('m_msg').innerText='Nama wajib!';return;}
+ let payload={nama:nama,umur:document.getElementById('m_umur').value.trim(),no_hp:document.getElementById('m_hp').value.trim(),alamat:document.getElementById('m_alamat').value.trim()};
+ document.getElementById('m_msg').innerText='Menyimpan...';
  try{
   const r=await fetch('/api/pasien',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
   const d=await r.json();
-  if(r.ok){document.getElementById('m_msg').style.color='#059669';document.getElementById('m_msg').innerText='Berhasil disimpan!';setTimeout(()=>{closeModal();load();document.getElementById('m_nama').value='';document.getElementById('m_alamat').value='';},700);}
-  else{document.getElementById('m_msg').style.color='#ef4444';document.getElementById('m_msg').innerText=d.message||'Gagal simpan';}
- }catch(e){document.getElementById('m_msg').style.color='#ef4444';document.getElementById('m_msg').innerText='Error: '+e;}
+  let newId=d.id||d.data?.id||'';
+  if(r.ok){
+    document.getElementById('m_msg').style.color='#059669';document.getElementById('m_msg').innerText='Pasien disimpan!';
+    if(document.getElementById('m_antri').checked){
+      await fetch('/api/antrian',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pasien_id:newId,nama:nama,alamat:payload.alamat})});
+    }
+    setTimeout(()=>{closeModal();load();},700);
+  }else{document.getElementById('m_msg').innerText=d.message||'Gagal';}
+ }catch(e){document.getElementById('m_msg').innerText='Error: '+e;}
 }
 load();
 </script></body></html>
