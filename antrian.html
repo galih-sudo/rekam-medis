@@ -1,73 +1,29 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Praktek Mandiri dr. Galih | Antrian</title><style>body{margin:0;font-family:system-ui;background:#eef2f7}.header{background:linear-gradient(90deg,#3b82f6,#1e40af);color:#fff;padding:12px 18px;display:flex;justify-content:space-between;flex-wrap:wrap}.menu{background:#fff;margin:12px 16px 0;border-radius:14px;padding:10px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;box-shadow:0 2px 10px #0001}.menu a{padding:8px 14px;border-radius:20px;background:#f1f5f9;text-decoration:none;color:#334155;font-size:13px}.menu a.active{background:#3b82f6;color:#fff}.card{background:#fff;margin:16px;border-radius:14px;padding:18px;box-shadow:0 2px 10px #0001}.antri-item{border:1px solid #e2e8f0;border-radius:14px;padding:16px;margin:10px 0;display:flex;justify-content:space-between;align-items:center;background:#f8fafc}.antri-no{font-size:36px;font-weight:800;color:#1e40af}.btn{padding:10px 16px;border-radius:20px;border:none;cursor:pointer;font-size:13px;font-weight:600}.btn-panggil{background:#ec4899;color:#fff}.btn-rm{background:#e2e8f0;color:#334155}</style></head><body>
-<div class="header"><div>🏥 Praktek Mandiri dr. Galih | Rekam Medis</div><div><span id="jam"></span> | dr_galih Dokter | <a href="/login.html" style="color:white">Logout</a></div></div>
-<div class="menu"><a href="/dashboard.html">🏠 Dashboard</a><a class="active" href="/antrian.html">🔢 Antrian</a><a href="/pasien.html">📋 Pasien</a><a href="/tambah.html">➕ Tambah</a><a href="/cari.html">🔍 Cari</a><a href="/obat.html">💊 Obat</a><a href="/icd10.html">📚 ICD-10</a><a href="/user.html">👥 User</a><a href="#">📊 Laporan ▼</a></div>
-<div class="card"><h3 style="margin:0">🔢 Antrian Hari Ini - Praktek Mandiri</h3><div style="color:#64748b;margin-top:6px" id="info">Loading...</div><div id="status" style="margin-top:6px;font-size:11px;color:#ec4899">CachyOS Aduhai Mode - Cloud MP3 Female</div><div id="list" style="margin-top:16px"></div></div>
-<audio id="player" style="display:none"></audio>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Antrian - Praktek dr Galih</title><style>body{margin:0;font-family:system-ui;background:#eef2f7}.header{background:linear-gradient(90deg,#3b82f6,#1e40af);color:#fff;padding:12px 18px;display:flex;justify-content:space-between;flex-wrap:wrap}.menu{background:#fff;margin:12px 16px 0;border-radius:14px;padding:10px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;box-shadow:0 2px 10px #0001}.menu a{padding:8px 14px;border-radius:20px;background:#f1f5f9;text-decoration:none;color:#334155;font-size:13px}.menu a.active{background:#3b82f6;color:#fff}.card{background:#fff;margin:16px;border-radius:14px;padding:18px;box-shadow:0 2px 10px #0001}.antri-item{border:1px solid #e2e8f0;border-radius:14px;padding:16px;margin:10px 0;display:flex;justify-content:space-between;align-items:center;background:#f8fafc}.antri-no{font-size:36px;font-weight:800;color:#1e40af}.btn{padding:10px 16px;border-radius:20px;border:none;cursor:pointer;font-size:13px;font-weight:600}.btn-panggil{background:#ec4899;color:#fff}</style></head><body>
+<div class="header"><div>🏥 Praktek dr Galih | Antrian</div><div><span id="jam"></span> | dr_galih | <a href="/login.html" style="color:white">Logout</a></div></div>
+<div class="menu"><a href="/dashboard.html">🏠 Dashboard</a><a class="active">🔢 Antrian</a><a href="/pasien.html">📋 Pasien</a><a href="/tambah.html">➕ Tambah</a><a href="/cari.html">🔍 Cari</a><a href="/obat.html">💊 Obat</a><a href="/icd10.html">📚 ICD-10</a></div>
+<div class="card"><h3 style="margin:0">🔢 Antrian - Mode IGD Ringan</h3><div style="color:#64748b" id="info">Loading...</div><div id="status" style="font-size:11px;color:#ec4899;margin-top:6px">Ringan 3KB - Tanpa download model - Anti limit</div><div id="list" style="margin-top:16px"></div></div>
+<audio id="p" style="display:none"></audio>
 <script>
-setInterval(()=>{let d=new Date();let el=document.getElementById('jam');if(el)el.innerText=d.toLocaleTimeString('id-ID')},1000)
-let voices=[]; let cewek=null;
-function loadVoices(){voices=speechSynthesis.getVoices(); cewek=voices.find(v=>v.lang==='id-ID'&&v.name.toLowerCase().includes('female'))||voices.find(v=>v.lang==='id-ID')||voices[0];}
-speechSynthesis.onvoiceschanged=loadVoices; setTimeout(loadVoices,500);
-
-const player=document.getElementById('player');
-let queue=[]; let playing=false;
-
-function playQueue(){
-  if(playing||queue.length===0) return;
-  playing=true;
-  let url=queue.shift();
-  player.src=url;
-  player.onended=()=>{playing=false; playQueue();};
-  player.onerror=()=>{
-    playing=false;
-    // fallback native kalo MP3 gagal
-    let txt=player.getAttribute('data-text')||'Nomor antrian';
-    let u=new SpeechSynthesisUtterance(txt); if(cewek){u.voice=cewek; u.lang='id-ID';} u.rate=0.9; u.pitch=1.1; speechSynthesis.speak(u);
-    playQueue();
-  };
-  player.play().catch(()=>{playing=false;});
-}
-
-function speakAduhai(text){
-  // BAGI JADI 2 KALIMAT BIAR GOOGLE GAK POTONG
-  // Pakai translate.googleapis - ini MP3 langsung, bukan eSpeak bisik!
-  let parts=text.match(/.{1,90}(\s|$)/g)||[text];
-  queue=[];
-  parts.forEach(p=>{
-    let q=encodeURIComponent(p.trim());
-    // INI YANG BIKIN ADUHAI - MP3 GOOGLE FEMALE - BUKAN eSpeak!
-    let url=`https://translate.googleapis.com/translate_tts?ie=UTF-8&q=${q}&tl=id&client=gtx&ttsspeed=0.9`;
-    queue.push(url);
-  });
-  // simpan text buat fallback
-  player.setAttribute('data-text',text);
-  playQueue();
-}
-
+setInterval(()=>{let d=new Date();let e=document.getElementById('jam');if(e)e.innerText=d.toLocaleTimeString('id-ID')},1000)
+let player=document.getElementById('p'); let q=[]; let play=false;
+function playQ(){ if(play||q.length==0) return; play=true; let u=q.shift(); player.src=u; player.onended=()=>{play=false; playQ()}; player.onerror=()=>{play=false; playQ()}; player.play().catch(()=>play=false) }
 function panggil(nama,no){
-  if(!nama||nama==='undefined') nama='pasien';
-  let namaBersih=nama.replace(/[^a-zA-Z0-9 ]/g,' ').substring(0,20);
-  // KALIMAT ADUHAI TANPA KOMA!
-  let teks=`Nomor antrian ${no} atas nama ${namaBersih} silakan masuk ke ruang dokter`;
-  document.getElementById('status').innerText='🔊 Aduhai memanggil: '+teks;
-  
-  let isLinux=navigator.userAgent.toLowerCase().includes('linux');
-  if(isLinux){
-    // CACHYOS = PAKAI MP3 GOOGLE ADUHAI - GAK BISIK LAGI!
-    speakAduhai(teks);
-  } else {
-    // HP & WINDOWS = NATIVE UDAH ADUHAI
-    speechSynthesis.cancel();
-    setTimeout(()=>{
-      let u=new SpeechSynthesisUtterance(teks);
-      if(cewek){u.voice=cewek; u.lang='id-ID';} else u.lang='id-ID';
-      u.rate=0.9; u.pitch=1.15; u.volume=1;
-      speechSynthesis.speak(u);
-    },100);
-  }
+  if(!nama) nama='pasien';
+  let n=nama.replace(/[^a-zA-Z0-9 ]/g,' ').substring(0,18);
+  let t=`Nomor antrian ${no} atas nama ${n} silakan masuk ke ruang dokter`;
+  document.getElementById('status').innerText='🔊 '+t+' (3KB)';
+  // VERSI SUPER RINGAN - MP3 GOOGLE CUMA 3-8KB PER KALIMAT! GAK DOWNLOAD MODEL 100MB!
+  q=[];
+  // pecah biar gak error google limit 200 char
+  let parts=t.match(/.{1,100}(\s|$)/g)||[t];
+  parts.forEach(pt=>{
+    let url=`https://translate.googleapis.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(pt.trim())}&tl=id&client=gtx`;
+    q.push(url);
+  });
+  playQ();
 }
-async function load(){const r=await fetch('/api/antrian');const d=await r.json();document.getElementById('info').innerText=d.length+' pasien antri hari ini';document.getElementById('list').innerHTML=d.map(k=>{
+async function load(){const r=await fetch('/api/antrian');const d=await r.json();document.getElementById('info').innerText=d.length+' pasien antri';document.getElementById('list').innerHTML=d.map(k=>{
 let nm=(k.nama||(k.pasien&&k.pasien.nama)||'pasien').replace(/'/g,'');
-return `<div class="antri-item"><div style="display:flex;gap:16px;align-items:center"><div class="antri-no">#${k.no_antrian}</div><div><b>${nm}</b><br><small style="color:#64748b">${k.pasien?.no_rm||k.no_rm||''} - ${k.keluhan||''}</small></div></div><div><button class="btn btn-panggil" onclick="panggil('${nm}','${k.no_antrian}')">🔊 PANGGIL ADUHAI</button> <a class="btn btn-rm" href="/rekam.html?id=${k.pasienId}" style="text-decoration:none">RM</a></div></div>`
-}).join('')||'<p style=text-align:center;color:#64748b>Tidak ada antrian</p>'}load();setInterval(load,10000)
+return `<div class="antri-item"><div style="display:flex;gap:16px;align-items:center"><div class="antri-no">#${k.no_antrian}</div><div><b>${nm}</b><br><small>${k.pasien?.no_rm||''}</small></div></div><div><button class="btn btn-panggil" onclick="panggil('${nm}','${k.no_antrian}')">🔊 PANGGIL RINGAN</button></div></div>`
+}).join('')||'<p>Tidak ada antrian</p>'}load()
 </script></body></html>
