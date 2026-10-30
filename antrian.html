@@ -1,58 +1,54 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Antrian - Praktek dr Galih</title><style>body{margin:0;font-family:system-ui;background:#eef2f7}.header{background:linear-gradient(90deg,#3b82f6,#1e40af);color:#fff;padding:12px 18px;display:flex;justify-content:space-between;flex-wrap:wrap}.menu{background:#fff;margin:12px 16px 0;border-radius:14px;padding:10px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center}.menu a{padding:8px 14px;border-radius:20px;background:#f1f5f9;text-decoration:none;color:#334155;font-size:13px}.menu a.active{background:#3b82f6;color:#fff}.card{background:#fff;margin:16px;border-radius:14px;padding:18px;box-shadow:0 2px 10px #0001}.antri-item{border:1px solid #e2e8f0;border-radius:14px;padding:16px;margin:10px 0;display:flex;justify-content:space-between;align-items:center;background:#f8fafc}.antri-no{font-size:32px;font-weight:800;color:#1e40af}.btn{padding:10px 14px;border-radius:20px;border:none;cursor:pointer;font-weight:600}.btn-p{background:#ec4899;color:#fff}.btn-t{background:#f59e0b;color:#fff}</style></head><body>
-<div class="header"><div>🏥 Praktek dr Galih</div><div><span id="jam"></span> | <a href="/login.html" style="color:#fff">Logout</a></div></div>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Antrian - Praktek dr Galih</title><style>body{margin:0;font-family:system-ui;background:#eef2f7}.header{background:linear-gradient(90deg,#3b82f6,#1e40af);color:#fff;padding:12px 18px;display:flex;justify-content:space-between;flex-wrap:wrap}.menu{background:#fff;margin:12px 16px 0;border-radius:14px;padding:10px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center}.menu a{padding:8px 14px;border-radius:20px;background:#f1f5f9;text-decoration:none;color:#334155;font-size:13px}.menu a.active{background:#3b82f6;color:#fff}.card{background:#fff;margin:16px;border-radius:14px;padding:18px;box-shadow:0 2px 10px #0001}.antri-item{border:1px solid #e2e8f0;border-radius:14px;padding:16px;margin:10px 0;display:flex;justify-content:space-between;align-items:center;background:#f8fafc}.antri-no{font-size:32px;font-weight:800;color:#1e40af}.btn{padding:10px 14px;border-radius:20px;border:none;cursor:pointer;font-weight:600}.btn-p{background:#ec4899;color:#fff}.badge{background:#22c55e;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px}</style></head><body>
+<div class="header"><div>🏥 Praktek dr Galih <span class="badge">EDGE LANCAR JAYA</span></div><div><span id="jam"></span> | <a href="/login.html" style="color:#fff">Logout</a></div></div>
 <div class="menu"><a href="/dashboard.html">🏠 Dashboard</a><a class="active">🔢 Antrian</a><a href="/pasien.html">📋 Pasien</a></div>
-<div class="card"><h3>🔢 Antrian - Fix Bisu</h3><div id="info">Loading...</div><div id="log" style="font-size:11px;color:#ef4444;margin-top:6px"></div><div style="margin-top:10px"><button class="btn btn-t" onclick="testSuara()">🔊 TEST SUARA DULU (WAJIB KLIK)</button></div><div id="list" style="margin-top:16px"></div></div>
-<audio id="aud" controls style="width:100%;margin-top:10px;display:none"></audio>
+<div class="card"><h3>🔢 Antrian - Mode Hybrid Move On</h3><div id="info">Loading...</div><div id="list" style="margin-top:16px"></div><div style="margin-top:12px;font-size:12px;color:#64748b">💡 Tips: Buka halaman ini di <b>Microsoft Edge CachyOS</b> biar suara Gadis Windows aduhai. Halaman lain bebas pake Firefox/Chrome.</div></div>
+<audio id="aud" style="display:none"></audio>
 <script>
 let jamEl=document.getElementById('jam'); setInterval(()=>{if(jamEl) jamEl.innerText=new Date().toLocaleTimeString('id-ID')},1000);
 let voices=[]; function loadV(){voices=speechSynthesis.getVoices()} speechSynthesis.onvoiceschanged=loadV; loadV();
 let aud=document.getElementById('aud');
-function log(m){document.getElementById('log').innerText=m; console.log(m)}
-function testSuara(){
-  log('Test... unmute & buka suara...');
-  speechSynthesis.cancel(); speechSynthesis.resume();
-  // JURUS 1: NATIVE DULU BIAR UNLOCK AUDIO
-  let u=new SpeechSynthesisUtterance('Tes suara praktek dokter Galih');
-  u.lang='id-ID'; u.rate=0.9; u.volume=1;
-  let idVoice=voices.find(v=>v.lang.includes('id'))||voices[0];
-  if(idVoice) u.voice=idVoice;
-  u.onend=()=>log('✅ Native bunyi! Sekarang coba panggil pasien');
-  u.onerror=(e)=>log('❌ Native error: '+e.error+' -> coba MP3');
+let q=[]; let lagi=false;
+function playQ(){
+  if(lagi||q.length==0) return;
+  lagi=true;
+  let {teks, mp3} = q.shift();
+  // JURUS EDGE: MP3 GOOGLE DULU (ADUHAI & LANCAR DI EDGE)
+  if(mp3){
+    aud.src=mp3;
+    aud.onended=()=>{lagi=false; playQ()};
+    aud.onerror=()=>{ // fallback ke native kalo MP3 gagal
+      lagi=false;
+      panggilNative(teks);
+    };
+    aud.play().catch(()=>{
+      lagi=false;
+      panggilNative(teks);
+    });
+  } else {
+    panggilNative(teks);
+  }
+}
+function panggilNative(teks){
+  speechSynthesis.cancel();
+  let u=new SpeechSynthesisUtterance(teks);
+  u.lang='id-ID'; u.rate=0.9; u.pitch=1.05; u.volume=1;
+  // EDGE DI LINUX TETAP DAPET VOICE LEBIH BAGUS DARI FIREFOX
+  let best = voices.find(v=>v.name.includes('Google')&&v.lang.includes('id')) || voices.find(v=>v.lang.includes('id')) || voices.find(v=>v.name.includes('Microsoft')) || voices[0];
+  if(best) u.voice=best;
+  u.onend=()=>{lagi=false; playQ()};
   speechSynthesis.speak(u);
-  // JURUS 2: MP3 JUGA DI TEST
-  setTimeout(()=>{
-    let t='Nomor antrian satu tes';
-    let url=`https://translate.google.com/translate_tts?ie=UTF-8&tl=id&client=tw-ob&q=${encodeURIComponent(t)}`;
-    aud.style.display='block';
-    aud.src=url;
-    aud.play().then(()=>log('✅ MP3 Google bunyi!')).catch(e=>log('❌ MP3 block: '+e.message+' - pake native aja'));
-  },1500);
 }
 function panggil(nama,no){
   if(!nama) nama='pasien';
-  let bersih=nama.replace(/[^a-zA-Z0-9 ]/g,' ').substring(0,16);
-  let teks=`Nomor antrian ${no} atas nama ${bersih} silakan masuk`;
-  log('Memanggil: '+teks);
-  speechSynthesis.cancel(); speechSynthesis.resume();
-  aud.pause();
-  // PAKSA BUNYI: COBA MP3 DULU - KALO GAGAL PAKE NATIVE
-  let url=`https://translate.google.com/translate_tts?ie=UTF-8&tl=id&client=tw-ob&q=${encodeURIComponent(teks)}`;
-  aud.style.display='block';
-  aud.src=url;
-  aud.volume=1;
-  aud.play().then(()=>{
-    log('🔊 MP3 memanggil (3KB)');
-  }).catch(()=>{
-    log('MP3 diblock, pakai native speaker...');
-    let u=new SpeechSynthesisUtterance(teks);
-    u.lang='id-ID'; u.rate=0.85; u.pitch=1.1; u.volume=1;
-    let idV=voices.find(v=>v.lang.includes('id'))||voices[0];
-    if(idV) u.voice=idV;
-    speechSynthesis.speak(u);
-  });
+  let bersih=nama.replace(/[^a-zA-Z0-9 ]/g,' ').substring(0,18);
+  let teks=`Nomor antrian ${no} atas nama ${bersih} silakan masuk ke ruang dokter`;
+  let teksMP3=encodeURIComponent(teks);
+  let mp3=`https://translate.google.com/translate_tts?ie=UTF-8&tl=id&client=tw-ob&q=${teksMP3}`;
+  q.push({teks, mp3});
+  playQ();
 }
-async function load(){try{const r=await fetch('/api/antrian');const d=await r.json();document.getElementById('info').innerText=d.length+' pasien antri - Klik TEST SUARA dulu biar gak bisu!';document.getElementById('list').innerHTML=d.map(k=>{
+async function load(){try{const r=await fetch('/api/antrian');const d=await r.json();document.getElementById('info').innerText=d.length+' pasien antri - Mode Edge Lancar Jaya';document.getElementById('list').innerHTML=d.map(k=>{
 let nm=(k.nama||(k.pasien&&k.pasien.nama)||'pasien').replace(/'/g,'');
-return `<div class="antri-item"><div style="display:flex;gap:12px;align-items:center"><div class="antri-no">#${k.no_antrian}</div><div><b>${nm}</b></div></div><button class="btn btn-p" onclick="panggil('${nm}','${k.no_antrian}')">🔊 PANGGIL</button></div>`
-}).join('')||'<p>Tidak ada antrian</p>'}catch(e){document.getElementById('info').innerText='Error load: '+e}}load()
+return `<div class="antri-item"><div style="display:flex;gap:12px;align-items:center"><div class="antri-no">#${k.no_antrian}</div><div><b>${nm}</b></div></div><button class="btn btn-p" onclick="panggil('${nm}','${k.no_antrian}')">🔊 PANGGIL (EDGE)</button></div>`
+}).join('')||'<p>Tidak ada antrian</p>'}catch(e){document.getElementById('info').innerText='Error: '+e}}load()
 </script></body></html>
