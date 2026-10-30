@@ -1,42 +1,40 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Login - Praktek dr Galih</title>
 <style>
 body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0f172a,#1e3a8a);font-family:system-ui}
-.card{background:#fff;width:90%;max-width:380px;border-radius:22px;padding:32px 28px;box-shadow:0 20px 40px #0004;text-align:center}
-h1{font-size:22px;margin:0 0 6px}.sub{color:#64748b;font-size:14px;margin-bottom:22px}
-input{width:100%;box-sizing:border-box;padding:14px 16px;border-radius:12px;border:1px solid #e2e8f0;margin:8px 0;font-size:15px;outline:none}
+.card{background:#fff;width:90%;max-width:400px;border-radius:22px;padding:28px 28px 16px;box-shadow:0 20px 40px #0004;text-align:center;overflow:hidden}
+h1{font-size:22px;margin:0 0 4px}.sub{color:#64748b;font-size:14px;margin-bottom:10px}
+.marquee{width:100%;background:#f0f9ff;border-radius:8px;overflow:hidden;white-space:nowrap;margin:0 0 14px;padding:8px 0;border:1px solid #e0f2fe}
+.marquee span{display:inline-block;padding-left:100%;animation:marquee 18s linear infinite;color:#0369a1;font-size:12.5px;font-weight:600}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+input{width:100%;box-sizing:border-box;padding:14px 16px;border-radius:12px;border:1px solid #e2e8f0;margin:7px 0;font-size:15px;outline:none}
 input:focus{border-color:#0ea5e9;box-shadow:0 0 0 3px #0ea5e933}
-.btn{width:100%;padding:14px;background:#0ea5e9;color:#fff;border:none;border-radius:12px;font-weight:700;font-size:15px;margin-top:16px;cursor:pointer}
-.btn:hover{background:#0284c7}
+.btn{width:100%;padding:14px;background:#0ea5e9;color:#fff;border:none;border-radius:12px;font-weight:700;font-size:15px;margin-top:14px;cursor:pointer}
+.copy{margin-top:16px;font-size:11.5px;color:#64748b;border-top:1px solid #e2e8f0;padding-top:12px;letter-spacing:0.2px}
 </style>
 </head><body>
 <div class="card">
 <h1>🔒 Praktek dr. Galih</h1>
 <div class="sub">Pilih Role Login</div>
-<input id="u" placeholder="Username" autocomplete="username">
-<input id="p" type="password" placeholder="Password" autocomplete="current-password">
+<div class="marquee"><span>🏥 Praktek Mandiri dr.Galih | 📍 Jl.Raya Sengkol Aikdarek | 😊 Melayani dengan senyum | 🕕 Buka setiap hari kerja jam 06.00-11.00 dan 17.00-21.00 WITA | </span></div>
+<input id="u" placeholder="Username">
+<input id="p" type="password" placeholder="Password">
 <button class="btn" onclick="login()">MASUK</button>
-<div id="msg" style="margin-top:12px;font-size:13px;color:#ef4444"></div>
+<div id="msg" style="margin-top:10px;font-size:13px;color:#ef4444"></div>
+<div class="copy">Copyright - Vercel.Postgres + AI @2026</div>
 </div>
 <script>
 async function login(){
-  let username=document.getElementById('u').value.trim();
-  let password=document.getElementById('p').value.trim();
-  if(!username||!password){document.getElementById('msg').innerText='Isi username & password!';return;}
+  let u=document.getElementById('u').value.trim();
+  let p=document.getElementById('p').value.trim();
+  if(!u||!p){document.getElementById('msg').innerText='Isi username & password!';return;}
   try{
-    const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
+    const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
     const d=await r.json();
-    if(r.ok && d.token || d.success || d.user){
-      localStorage.setItem('token', d.token||'ok');
-      localStorage.setItem('user', JSON.stringify(d.user||{username}));
-      localStorage.setItem('login_user', username);
-      let redirect=localStorage.getItem('redirect_after_login')||'/dashboard.html';
-      localStorage.removeItem('redirect_after_login');
-      location.href=redirect;
-    }else{
-      document.getElementById('msg').innerText=d.message||d.error||'Login gagal!';
-    }
+    if(r.ok && (d.token||d.success||d.user)){
+      localStorage.setItem('token',d.token||'ok');localStorage.setItem('user',JSON.stringify(d.user||{username:u}));localStorage.setItem('login_user',u);
+      location.href=localStorage.getItem('redirect_after_login')||'/dashboard.html';
+    }else{document.getElementById('msg').innerText=d.message||'Login gagal!'}
   }catch(e){document.getElementById('msg').innerText='Error: '+e}
 }
-document.addEventListener('keydown',e=>{if(e.key==='Enter') login()});
 </script>
 </body></html>
