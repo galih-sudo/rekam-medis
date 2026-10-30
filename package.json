@@ -1,12 +1,8 @@
 {
-  "name": "rekam-medis",
+  "name": "rekam-medis-v5",
+  "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "@prisma/client": "^5.22.0",
-    "prisma": "^5.22.0"
-  },
-  "scripts": {
-    "postinstall": "prisma generate",
-    "build": "prisma generate"
+    "@vercel/postgres": "^0.10.0"
   }
 }
